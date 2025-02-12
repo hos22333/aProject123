@@ -9,6 +9,6 @@ whitenoise==6.5.0
 pymysql
 python-docx
 openpyxl
-#mysqlclient
-#PyMySQL
 requests
+psycopg2-binary
+
