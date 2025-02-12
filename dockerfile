@@ -20,7 +20,7 @@ COPY . /app/
 #RUN pip install PyMySQL
 
 # Collect Static Files (if needed)
-RUN python manage.py collectstatic --noinput
+#RUN python manage.py collectstatic --noinput
 
 # Expose Port (default for Django)
 EXPOSE 8000
