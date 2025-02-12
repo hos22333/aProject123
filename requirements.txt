@@ -11,4 +11,4 @@ python-docx
 openpyxl
 requests
 psycopg2-binary
-
+ezdxf
