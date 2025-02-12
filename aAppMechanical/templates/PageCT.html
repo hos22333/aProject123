@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="page-inner">
+        <h2> Circular Tanks </h2>
+        <form method="POST" action="{% url 'ct_submit' %}" class="form-group">
+            {% csrf_token %}
+            <div class="row"> <!-- Row to hold both cards side by side -->
+                
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Input</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Output</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field04.label }}</label>
+                                    {{ form1.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field05.label }}</label>
+                                    {{ form1.oSec02Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field06.label }}</label>
+                                    {{ form1.oSec02Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field07.label }}</label>
+                                    {{ form1.oSec02Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field08.label }}</label>
+                                    {{ form1.oSec02Field08 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- Close row div -->
+
+            <div class="text-center">
+                <button type="submit" name="form1_submit" class="btn btn-primary btn-lg mt-3">Calculate</button>                                
+                <button type="submit" name="generate_report" formaction="{% url 'generate_ct_report' %}" class="btn btn-success btn-lg mt-3">Report</button>
+                <button type="submit" name="modify_dxf" formaction="{% url 'modify_ct_dxf' %}" class="btn btn-warning btn-lg mt-3">General Drawing</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

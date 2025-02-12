@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card" style="width: 100%; max-width: 600px;">
+        <div class="card-header text-center">
+            <h1>User Data</h1>
+        </div>
+        <div class="card-body">
+            
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+
+            
+            <h2>Actions</h2>
+
+            <button type="button" class="btn btn-primary" style="width: 200px; height: 50px; text-align: left;" onclick="window.location.href='{% url 'change_username' %}'">
+                Change Username
+            </button>
+            <br>
+            <br>
+
+            <button type="button" class="btn btn-primary" style="width: 200px; height: 50px; text-align: left;" onclick="window.location.href='{% url 'change_email' %}'">
+                Change Email
+            </button>
+            <br>
+            <br>            
+
+            <button type="button" class="btn btn-primary" style="width: 200px; height: 50px; text-align: left;" onclick="window.location.href='{% url 'password_change' %}'">
+                Change Password
+            </button>
+            <br>
+            <br>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,373 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Mechanical Design</title>
+    <meta
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+      name="viewport"
+    />
+    <link
+      rel="icon"
+      href="{% static 'aApp1/img/kaiadmin/favicon.ico' %}"
+      type="image/x-icon"
+    />
+
+    <!-- Fonts and icons -->
+    <script src="{% static 'aApp1/js/plugin/webfont/webfont.min.js' %}"></script>
+    <script>
+      WebFont.load({
+        google: { families: ["Public Sans:300,400,500,600,700"] },
+        custom: {
+          families: [
+            "Font Awesome 5 Solid",
+            "Font Awesome 5 Regular",
+            "Font Awesome 5 Brands",
+            "simple-line-icons",
+          ],
+          urls: ["{% static 'aApp1/css/fonts.min.css' %}"],
+        },
+        active: function () {
+          sessionStorage.fonts = true;
+        },
+      });
+    </script>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="{% static 'aApp1/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'aApp1/css/plugins.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'aApp1/css/kaiadmin.min.css' %}" />
+
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="{% static 'aApp1/css/demo.css' %}" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <!-- Sidebar -->
+      <div class="sidebar" data-background-color="dark">
+        <div class="sidebar-logo">
+          <!-- Logo Header -->
+          <div class="logo-header" data-background-color="dark">
+            <a href="/"> Design Calc </a>
+            <div class="nav-toggle">
+              <button class="btn btn-toggle toggle-sidebar">
+                <i class="gg-menu-right"></i>
+              </button>
+              <button class="btn btn-toggle sidenav-toggler">
+                <i class="gg-menu-left"></i>
+              </button>
+            </div>
+            <button class="topbar-toggler more">
+              <i class="gg-more-vertical-alt"></i>
+            </button>
+          </div>
+          <!-- End Logo Header -->
+
+          </div><div class="sidebar-wrapper scrollbar scrollbar-inner">
+            <div class="sidebar-content">
+              <ul class="nav nav-secondary">
+          
+                {% if user.is_authenticated %}
+                  <!-- Group1 -->
+                  {% if permissions.AthRol %}                  
+                  <li class="nav-section"><span class="sidebar-mini-icon"><i class="fa fa-ellipsis-h"></i></span><h4 class="text-section">Admin Pages</h4></li>
+
+                  <li class="nav-item"><a href="{% url 'user_roles_autho' %}">  <i class="fas fa-arrows-alt"></i><p>User, Roles, Autho</p></a></li>
+                  <li class="nav-item"><a href="{% url 'assign_user_role' %}">  <i class="fas fa-arrows-alt"></i><p>Assign User to Role</p></a></li>
+                  <li class="nav-item"><a href="{% url 'assign_role_autho' %}"> <i class="fas fa-arrows-alt"></i><p>Assign Role to Autho</p></a></li>
+                  <li class="nav-item"><a href="{% url 'create_role' %}">       <i class="fas fa-arrows-alt"></i><p>Create Role</p></a></li>                  
+                  <li class="nav-item"><a href="{% url 'create_autho' %}">      <i class="fas fa-arrows-alt"></i><p>Create Autho</p></a></li>                                    
+                  {% endif %}
+
+                  {% if permissions.Hist %} 
+                  <li class="nav-item"><a href="{% url 'modelcalc_list' %}">      <i class="fas fa-arrows-alt"></i><p>History</p></a></li>
+                  {% endif %}
+                                    
+                        
+                  <!-- Screens -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu1">
+                      <i class="fas fa-bars"></i>
+                      <p>Screens</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu1">
+                      <ul class="nav nav-collapse">
+                        <li class="sub-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Manual Screens  </p></a></li>
+                        <li class="sub-item"><a href="{% url 'BS' %}"> <i class="fas fa-window-close"></i> <p>Basket screens </p></a></li>
+                        <li class="sub-item"><a href="{% url 'MS' %}"> <i class="fas fa-desktop"></i> <p>Mechanical Screens</p></a></li>
+                        <li class="sub-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Band Screens  </p></a></li>
+                        <li class="sub-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Drum Screens  </p></a></li>
+                      </ul>
+                    </div>
+                  </li>
+
+                        
+                  <!-- Conveyors -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu2">
+                      <i class="fas fa-bars"></i>
+                      <p>Conveyors</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu2">
+                      <ul class="nav nav-collapse">
+                        <li class="nav-item"><a href="{% url 'BC' %}"> <i class="fas fa-desktop"></i> <p>Belt Conveyor   </p></a></li>
+                        <li class="nav-item"><a href="{% url 'SC' %}"> <i class="fas fa-desktop"></i> <p>Screw Conveyor  </p></a></li>
+                      </ul>
+                    </div>
+                  </li>
+
+                       
+                  <!-- Gritremoval -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu3">
+                      <i class="fas fa-bars"></i>
+                      <p>Gritremoval</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu3">
+                      <ul class="nav nav-collapse">
+                        <li class="nav-item"><a href="{% url 'GR' %}"> <i class="fas fa-desktop"></i> <p>Gritremoval (Scrapers)</p></a></li>
+                        <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Gritremoval (Air Lift Pump)</p></a></li>
+                      </ul>
+                    </div>
+                  </li>
+
+                       
+                  <!-- PST -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu4">
+                      <i class="fas fa-bars"></i>
+                      <p>PSTs</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu4">
+                      <ul class="nav nav-collapse">
+                        <li class="nav-item"><a href="{% url 'PS' %}"> <i class="fas fa-desktop"></i> <p>PST Half bridge </p></a></li>
+                        <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>PST Full bridge      </p></a></li>
+                      </ul>
+                    </div>
+                  </li>
+
+                       
+                  <!-- TH -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu5">
+                      <i class="fas fa-bars"></i>
+                      <p>Thickeners</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu5">
+                      <ul class="nav nav-collapse">
+                        <li class="nav-item"><a href="{% url 'TH' %}"> <i class="fas fa-desktop"></i> <p>Thickener 3 arm       </p></a></li>
+                        <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Thickener 2 arm      </p></a></li>
+                      </ul>
+                    </div>
+                  </li>
+
+                       
+                  <!-- MX -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu6">
+                      <i class="fas fa-bars"></i>
+                      <p>Mixers</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu6">
+                      <ul class="nav nav-collapse">
+                        <li class="nav-item"><a href="{% url 'MX' %}"> <i class="fas fa-desktop"></i> <p>Rectangular Mixers          </p></a></li>
+                        <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Circular Mixers      </p></a></li>
+                      </ul>
+                    </div>
+                  </li>
+
+                       
+                  <!-- TANKS -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu7">
+                      <i class="fas fa-bars"></i>
+                      <p>Tanks</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu7">
+                      <ul class="nav nav-collapse">
+                        <li class="nav-item"><a href="{% url 'RT' %}"> <i class="fas fa-desktop"></i> <p>Rectangular  Tanks      </p></a></li>
+                        <li class="nav-item"><a href="{% url 'CT' %}"> <i class="fas fa-desktop"></i> <p>Circular Tanks      </p></a></li>
+                      </ul>
+                    </div>
+                  </li>
+
+                       
+                  <!-- Penstocks -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu8">
+                      <i class="fas fa-bars"></i>
+                      <p>Penstocks</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu8">
+                      <ul class="nav nav-collapse">
+                        <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Channel Penstocks</p></a></li>
+                        <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Wall Penstocks  </p></a></li>
+                        <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Wier Penstocks  </p></a></li>
+                      </ul>
+                    </div>
+                  </li>
+                  
+          
+                {% else %}
+                  <!-- Group4 -->
+                  <li class="nav-item"><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i><p>Login</p></a></li>
+                  <li class="nav-item"><a href="{% url 'register' %}"><i class="fas fa-user-plus"></i><p>Register</p></a></li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+          
+
+
+
+      </div>
+        
+      <!-- End Sidebar -->
+
+      <div class="main-panel">
+        <div class="main-header">
+          <div class="main-header-logo">
+            <!-- Logo Header -->
+            <div class="logo-header" data-background-color="dark">
+              <a href="index.html" class="logo">
+                <img
+                  src="assets/img/kaiadmin/logo_light.svg"
+                  alt="navbar brand"
+                  class="navbar-brand"
+                  height="20"
+                />
+              </a>
+              <div class="nav-toggle">
+                <button class="btn btn-toggle toggle-sidebar">
+                  <i class="gg-menu-right"></i>
+                </button>
+                <button class="btn btn-toggle sidenav-toggler">
+                  <i class="gg-menu-left"></i>
+                </button>
+              </div>
+              <button class="topbar-toggler more">
+                <i class="gg-more-vertical-alt"></i>
+              </button>
+            </div>
+            <!-- End Logo Header -->
+          </div>
+          <!-- Navbar Header -->
+          <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+            <div class="container-fluid">              
+
+              <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">                               
+                                
+                  {% if user.is_authenticated %}                                        
+                    <form method="post" action="{% url 'logout' %}">
+                      {% csrf_token %}                      
+                      <button type="button" class="btn btn-primary btn-border" style="width: 100; height: 50px; text-align: left;">
+                          Hi, {{ user.username }}
+                      </button>                              
+                      <button type="submit" class="btn btn-primary" style="width: 100; height: 50px; text-align: left;">
+                          Logout
+                      </button>                  
+                      <button type="button" class="btn btn-primary" style="width: 100; height: 50px; text-align: left;" onclick="window.location.href='{% url 'profile' %}'">
+                          User Data
+                      </button>
+                    
+                    </form>                   
+                  {% else %}
+                  
+                  {% endif %}
+
+              </ul>
+
+            </div>
+          </nav>
+          <!-- End Navbar -->
+        </div>
+
+
+
+{% block content %}
+<!-- Your content goes here -->
+
+
+{% endblock %}
+
+
+
+      </div>
+
+      
+    </div>
+    <!--   Core JS Files   -->
+    <script src="{% static 'aApp1/js/core/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'aApp1/js/core/popper.min.js' %}"></script>
+    <script src="{% static 'aApp1/js/core/bootstrap.min.js' %}"></script>
+
+    <!-- jQuery Scrollbar -->
+    <script src="{% static 'aApp1/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js' %}"></script>
+
+    <!-- Chart JS -->
+    <script src="{% static 'aApp1/js/plugin/chart.js/chart.min.js' %}"></script>
+
+    <!-- jQuery Sparkline -->
+    <script src="{% static 'aApp1/js/plugin/jquery.sparkline/jquery.sparkline.min.js' %}"></script>
+
+    <!-- Chart Circle -->
+    <script src="{% static 'aApp1/js/plugin/chart-circle/circles.min.js' %}"></script>
+
+    <!-- Datatables -->
+    <script src="{% static 'aApp1/js/plugin/datatables/datatables.min.js' %}"></script>
+
+    <!-- Bootstrap Notify -->
+    <script src="{% static 'aApp1/js/plugin/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
+
+    <!-- jQuery Vector Maps -->
+    <script src="{% static 'aApp1/js/plugin/jsvectormap/jsvectormap.min.js' %}"></script>
+    <script src="{% static 'aApp1/js/plugin/jsvectormap/world.js' %}"></script>
+
+    <!-- Sweet Alert -->
+    <script src="{% static 'aApp1/js/plugin/sweetalert/sweetalert.min.js' %}"></script>
+
+    <!-- Kaiadmin JS -->
+    <script src="{% static 'aApp1/js/kaiadmin.min.js' %}"></script>
+
+ 
+    <script>
+      $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
+        type: "line",
+        height: "70",
+        width: "100%",
+        lineWidth: "2",
+        lineColor: "#177dff",
+        fillColor: "rgba(23, 125, 255, 0.14)",
+      });
+
+      $("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
+        type: "line",
+        height: "70",
+        width: "100%",
+        lineWidth: "2",
+        lineColor: "#f3545d",
+        fillColor: "rgba(243, 84, 93, .14)",
+      });
+
+      $("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
+        type: "line",
+        height: "70",
+        width: "100%",
+        lineWidth: "2",
+        lineColor: "#ffa534",
+        fillColor: "rgba(255, 165, 52, .14)",
+      });
+    </script>
+
+  </body>
+</html>
+

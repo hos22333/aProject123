@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card" style="width: 100%; max-width: 400px;">
+        <div class="card-header text-center">
+            <h4>Register</h4>
+        </div>
+        <div class="card-body">
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Display non-field errors -->
+        {% if form.non_field_errors %}
+            <div class="errorlist">{{ form.non_field_errors }}</div>
+        {% endif %}
+        
+        <!-- Display form fields -->
+        {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="color: #666;">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                    <div class="errorlist">{{ field.errors|striptags }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary w-100">Register</button>
+    </form>
+
+    <div class="footer">
+        <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+    </div>
+</div>
+</div>
+{% endblock %}

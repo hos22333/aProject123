@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <style>
+        /* Basic styling for navigation */
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav li {
+            display: inline;
+            margin-right: 15px;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+        .auth-section {
+            margin-top: 20px;
+        }
+        .auth-section form {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Home Page</h1>
+        
+        <!-- Navigation Menu -->
+        <nav>
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                    <li><a href="{% url 'password_change' %}">Change Password</a></li>
+                    <li><a href="aAppMech/">aAppMech</a></li>
+                {% else %}
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'password_reset' %}">Forgot Password</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+        <!-- User Greeting -->
+        <div class="auth-section">
+            {% if user.is_authenticated %}
+                <p>Hello, {{ user.username }}! You are logged in.</p>
+                <!-- Logout Form -->
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% else %}
+                <p>Hello, Guest! Please <a href="{% url 'login' %}">Login</a> or <a href="{% url 'register' %}">Register</a>.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

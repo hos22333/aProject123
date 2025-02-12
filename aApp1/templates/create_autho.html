@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card" style="width: 100%; max-width: 800px; max-height: 500px; overflow-y: auto;">    
+        <div class="card-header text-center">
+            <h4>Create Authos</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Save Autho</button>
+            </form>
+
+            <h2 class="mt-4">Current Authos</h2>
+            <table class="table table-striped mt-3">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for autho in authos %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ autho.name }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'delete_autho' autho.id %}" class="delete-form" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="button" class="btn btn-danger btn-sm delete-button">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">No authos available.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add event listener to all delete buttons
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        deleteButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                if (confirm('Are you sure you want to delete this autho?')) {
+                    // Submit the parent form if confirmed
+                    this.closest('form').submit();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

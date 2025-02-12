@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card" style="width: 100%; max-width: 800px; max-height: 500px; overflow-y: auto;">    
+        <div class="card-header text-center">
+            <h4>User Roles and Authorizations</h4>
+        </div>
+        <div class="card-body">
+
+    <!-- Filter Form -->
+    <form method="get">
+        <label for="user">Filter by User:</label>
+        <select name="user" id="user">
+            <option value="">All Users</option>
+            {% for user in users %}
+            <option value="{{ user.id }}" {% if user.id == selected_user %}selected{% endif %}>{{ user.username }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="role">Filter by Role:</label>
+        <select name="role" id="role">
+            <option value="">All Roles</option>
+            {% for role in roles %}
+            <option value="{{ role.id }}" {% if role.id == selected_role %}selected{% endif %}>{{ role.name }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Apply Filters</button>
+    </form>
+
+    <!-- User Roles Table -->
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Authorizations</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if user_data %}
+                {% for data in user_data %}
+                <tr>
+                    <td>{{ data.user.username }}</td>
+                    <td>{{ data.role.name }}</td>
+                    <td>
+                        <ul>
+                            {% for autho in data.authos %}
+                            <li>{{ autho.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="3">No data available.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+{% endblock %}

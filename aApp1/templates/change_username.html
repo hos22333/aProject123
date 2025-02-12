@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card" style="width: 100%; max-width: 400px;">
+        <div class="card-header text-center">
+            <h4>Change Username</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <label for="username">New Username:</label>
+                <input type="text" id="username" name="username" value="{{ current_username }}" required>
+                <button type="submit">Update Username</button>
+            </form>
+
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+    
+        </div>
+    </div>
+</div>
+{% endblock %}
