@@ -61,6 +61,12 @@ urlpatterns = [
     path('bs/submit/', views.handle_bs_form, name='bs_submit'), 
     path('generate_bs_report/', views.generate_bs_report, name='generate_bs_report'),
     path('modify_bs_dxf/', views.modify_bs_dxf, name='modify_bs_dxf'),
+     
+    
+    path('NS/',                 views.load_ns_page, name='NS'),
+    path('ns/submit/',          views.handle_ns_form, name='ns_submit'), 
+    path('generate_ns_report/', views.generate_ns_report, name='generate_ns_report'),
+    path('modify_ns_dxf/',      views.modify_ns_dxf, name='modify_ns_dxf'),
     
     
 ]

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import formCalcMS, formCalcBC, formCalcGR, formCalcPS, formCalcTH, formCalcMX, formCalcRT, formCalcCT, formCalcSC, formCalcBS
+from .forms import formCalcMS, formCalcBC, formCalcGR, formCalcPS, formCalcTH, formCalcMX, formCalcRT, formCalcCT, formCalcSC, formCalcBS, formCalcNS
 from datetime import datetime
 from django.contrib.auth.models import User
 from aApp1.models import UserRole, RoleAutho, Autho
@@ -1759,6 +1759,187 @@ def modify_bs_dxf(request):
     if request.method == "POST":
         form1 = formCalcBS(request.POST)
     return render(request, 'PageBS.html', {'form1': form1})
+
+    # if request.method == "POST":
+    #     # Define the path to the DXF file in the static directory
+    #     static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "MS_General_Drawing.dxf")
+    #     modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "modified_fileNew.dxf")
+
+    #     # Load the DXF file
+    #     doc = ezdxf.readfile(static_path)
+
+    #     # Iterate over the modelspace to find all DIMENSION entities
+    #     for entity in doc.modelspace().query("DIMENSION"):
+    #         if entity.dxf.text == "MS_chHeight":
+    #             entity.dxf.text = request.POST.get("oSec01Field01", "000")
+    #         elif entity.dxf.text == "MS_chWidth":
+    #             entity.dxf.text = request.POST.get("oSec01Field02", "000")
+    #         elif entity.dxf.text == "BeltHeight":
+    #             entity.dxf.text = request.POST.get("oSec01Field03", "000")
+    #         elif entity.dxf.text == "MS_angle":
+    #             entity.dxf.text = request.POST.get("oSec01Field08", "000")
+    #         elif entity.dxf.text == "MS_barSpace":
+    #             entity.dxf.text = request.POST.get("oSec01Field05", "000")
+    #         elif entity.dxf.text == "MS_barTh":
+    #             entity.dxf.text = request.POST.get("oSec01Field06", "000")
+
+    #         # Render the dimension to apply changes
+    #         entity.render()
+
+    #     # Save the modified DXF file
+    #     doc.saveas(modified_path)
+
+    #     # Serve the modified file for download
+    #     with open(modified_path, "rb") as dxf_file:
+    #         response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+    #         response["Content-Disposition"] = 'attachment; filename="modified_fileNew.dxf"'
+    #         return response
+
+    # return HttpResponse("Invalid request", status=400)
+
+###############################
+
+
+
+
+# Function to load the MS page
+def load_ns_page(request):
+    if not request.user.is_authenticated:
+        return redirect('login')  # Redirect to login page if user is not authenticated
+
+    result = check_user_autho(request.user.username, 'BS')
+    print('#####')
+    print(result)
+    print('######')
+
+    # Fetch initial values from DB
+    form_name = 'formCalcNS'
+    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
+    initial_values = {config.field_name: config.initial_value for config in field_configs}
+
+    form1 = formCalcNS(initial=initial_values)  # Pass DB values
+
+    
+    print(form_name)
+
+    return render(request, 'PageNS.html', {'form1': form1})
+
+# Function to handle form submission
+def handle_ns_form(request):
+    if not request.user.is_authenticated:
+        return redirect('login')  # Redirect to the login page if the user is not authenticated
+
+    
+    print("aaa")
+
+
+    if request.method == 'POST' and 'form1_submit' in request.POST:
+        
+        print("aaa")
+        
+        form1 = formCalcNS(request.POST)
+        if form1.is_valid():
+            # Access the cleaned_data dictionary to get individual field values
+            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
+            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
+            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
+            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
+            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
+            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
+            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
+            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
+
+            # Calculate new values for fields            
+            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
+            req_type = "NS"  
+            input_data = {
+                "NS_Ch_Height":         oSec01Field01_value,
+                "NS_Ch_Width":          oSec01Field02_value,
+                "NS_WaterLv":           oSec01Field03_value,
+                "NS_WaterLv_Margin":    oSec01Field04_value,
+                "NS_Bar_Spacing":       oSec01Field05_value,
+                "NS_Bar_Th":            oSec01Field06_value,
+                "NS_Bar_Width":         oSec01Field07_value,
+                "NS_Angle":             oSec01Field08_value,
+            }
+
+            # Call the function to interact with the API
+            response = interact_with_api(api_url, req_type, input_data)
+            
+            oSec02Field01_result = response["O_Weight"]
+
+            # Save the form with updated values
+            instance = form1.save(commit=False)  # Do not save to the database yet
+            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1            
+            instance.oSec00Field01 = request.user.username  # Insert username
+            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
+            instance.oSec00Field03 = "NS"  # Insert fixed type
+            instance.save()  # Save to the database
+
+            # Refresh the form with initial values to display results
+            form1 = formCalcNS(initial={
+                'oSec01Field01': oSec01Field01_value,
+                'oSec01Field02': oSec01Field02_value,
+                'oSec01Field03': oSec01Field03_value,
+                'oSec01Field04': oSec01Field04_value,
+                'oSec01Field05': oSec01Field05_value,
+                'oSec01Field06': oSec01Field06_value,
+                'oSec01Field07': oSec01Field07_value,
+                'oSec01Field08': oSec01Field08_value,
+
+                'oSec02Field01': oSec02Field01_result,
+            })
+
+            return render(request, 'PageNS.html', {'form1': form1})
+
+    return redirect('ms_load')  # Redirect to the page if the request is invalid
+
+
+def generate_ns_report(request):
+    
+    if request.method == "POST":
+        form1 = formCalcNS(request.POST)
+        # Create a new Word document
+        doc = Document()
+        doc.add_heading('Manual Screen Report', level=1)
+
+        # Extract form data
+        form_data = {
+            "Input": [
+                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
+                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
+                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
+                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
+                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
+                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
+                (form1.fields["oSec01Field07"].label, request.POST.get("oSec01Field07", "N/A")),
+                (form1.fields["oSec01Field08"].label, request.POST.get("oSec01Field08", "N/A")),
+            ],
+            "Output": [
+                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
+            ]
+        }
+
+        # Add form data to the Word document
+        for section, fields in form_data.items():
+            doc.add_heading(section, level=2)
+            for field, value in fields:
+                doc.add_paragraph(f"{field}: {value}")
+
+        # Prepare the response to download the document
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = 'attachment; filename="Manual_Screen_Report.docx"'
+        doc.save(response)
+        return response
+
+    return HttpResponse("Invalid request", status=400)
+
+
+def modify_ns_dxf(request):
+    
+    if request.method == "POST":
+        form1 = formCalcBS(request.POST)
+    return render(request, 'PageNS.html', {'form1': form1})
 
     # if request.method == "POST":
     #     # Define the path to the DXF file in the static directory
