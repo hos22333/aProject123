@@ -1709,7 +1709,7 @@ def handle_bs_form(request):
                 'oSec02Field03': oSec02Field03_result,
             })
 
-            return render(request, 'MS.html', {'form1': form1})
+            return render(request, 'PageBS.html', {'form1': form1})
 
     return redirect('ms_load')  # Redirect to the page if the request is invalid
 
@@ -1717,10 +1717,10 @@ def handle_bs_form(request):
 def generate_bs_report(request):
     
     if request.method == "POST":
-        form1 = formCalcMS(request.POST)
+        form1 = formCalcBS(request.POST)
         # Create a new Word document
         doc = Document()
-        doc.add_heading('Mechanical Screen Report', level=1)
+        doc.add_heading('Basket Screen Report', level=1)
 
         # Extract form data
         form_data = {
@@ -1731,11 +1731,6 @@ def generate_bs_report(request):
                 (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
                 (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
                 (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
-                (form1.fields["oSec01Field07"].label, request.POST.get("oSec01Field07", "N/A")),
-                (form1.fields["oSec01Field08"].label, request.POST.get("oSec01Field08", "N/A")),
-                (form1.fields["oSec01Field09"].label, request.POST.get("oSec01Field09", "N/A")),
-                (form1.fields["oSec01Field10"].label, request.POST.get("oSec01Field10", "N/A")),
-                (form1.fields["oSec01Field11"].label, request.POST.get("oSec01Field11", "N/A")),
             ],
             "Output": [
                 (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
@@ -1752,7 +1747,7 @@ def generate_bs_report(request):
 
         # Prepare the response to download the document
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Mechanical_Screen_Report.docx"'
+        response['Content-Disposition'] = 'attachment; filename="Basket_Screen_Report.docx"'
         doc.save(response)
         return response
 
@@ -1760,40 +1755,45 @@ def generate_bs_report(request):
 
 
 def modify_bs_dxf(request):
+    
     if request.method == "POST":
-        # Define the path to the DXF file in the static directory
-        static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "MS_General_Drawing.dxf")
-        modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "modified_fileNew.dxf")
+        form1 = formCalcBS(request.POST)
+    return render(request, 'PageBS.html', {'form1': form1})
 
-        # Load the DXF file
-        doc = ezdxf.readfile(static_path)
+    # if request.method == "POST":
+    #     # Define the path to the DXF file in the static directory
+    #     static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "MS_General_Drawing.dxf")
+    #     modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "modified_fileNew.dxf")
 
-        # Iterate over the modelspace to find all DIMENSION entities
-        for entity in doc.modelspace().query("DIMENSION"):
-            if entity.dxf.text == "MS_chHeight":
-                entity.dxf.text = request.POST.get("oSec01Field01", "000")
-            elif entity.dxf.text == "MS_chWidth":
-                entity.dxf.text = request.POST.get("oSec01Field02", "000")
-            elif entity.dxf.text == "BeltHeight":
-                entity.dxf.text = request.POST.get("oSec01Field03", "000")
-            elif entity.dxf.text == "MS_angle":
-                entity.dxf.text = request.POST.get("oSec01Field08", "000")
-            elif entity.dxf.text == "MS_barSpace":
-                entity.dxf.text = request.POST.get("oSec01Field05", "000")
-            elif entity.dxf.text == "MS_barTh":
-                entity.dxf.text = request.POST.get("oSec01Field06", "000")
+    #     # Load the DXF file
+    #     doc = ezdxf.readfile(static_path)
 
-            # Render the dimension to apply changes
-            entity.render()
+    #     # Iterate over the modelspace to find all DIMENSION entities
+    #     for entity in doc.modelspace().query("DIMENSION"):
+    #         if entity.dxf.text == "MS_chHeight":
+    #             entity.dxf.text = request.POST.get("oSec01Field01", "000")
+    #         elif entity.dxf.text == "MS_chWidth":
+    #             entity.dxf.text = request.POST.get("oSec01Field02", "000")
+    #         elif entity.dxf.text == "BeltHeight":
+    #             entity.dxf.text = request.POST.get("oSec01Field03", "000")
+    #         elif entity.dxf.text == "MS_angle":
+    #             entity.dxf.text = request.POST.get("oSec01Field08", "000")
+    #         elif entity.dxf.text == "MS_barSpace":
+    #             entity.dxf.text = request.POST.get("oSec01Field05", "000")
+    #         elif entity.dxf.text == "MS_barTh":
+    #             entity.dxf.text = request.POST.get("oSec01Field06", "000")
 
-        # Save the modified DXF file
-        doc.saveas(modified_path)
+    #         # Render the dimension to apply changes
+    #         entity.render()
 
-        # Serve the modified file for download
-        with open(modified_path, "rb") as dxf_file:
-            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
-            response["Content-Disposition"] = 'attachment; filename="modified_fileNew.dxf"'
-            return response
+    #     # Save the modified DXF file
+    #     doc.saveas(modified_path)
 
-    return HttpResponse("Invalid request", status=400)
+    #     # Serve the modified file for download
+    #     with open(modified_path, "rb") as dxf_file:
+    #         response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+    #         response["Content-Disposition"] = 'attachment; filename="modified_fileNew.dxf"'
+    #         return response
+
+    # return HttpResponse("Invalid request", status=400)
 
