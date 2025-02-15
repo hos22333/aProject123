@@ -102,4 +102,12 @@
     </div>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll("input[style*='display: none;']").forEach(function(input) {
+            input.closest('.col-md-6').style.display = "none";
+        });
+    });
+</script>
+
 {% endblock %}

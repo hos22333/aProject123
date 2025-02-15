@@ -73,6 +73,16 @@ urlpatterns = [
     path('PNch/submit/',          views.handle_pnch_form, name='PNch_submit'), 
     path('generate_pnch_report/', views.generate_pnch_report, name='generate_pnch_report'),
     path('modify_pnch_dxf/',      views.modify_pnch_dxf, name='modify_pnch_dxf'),
+     
+    
+    path('PNwa/',                 views.load_pnwa_page, name='PNwa'),
+    path('PNwa/submit/',          views.handle_pnwa_form, name='PNwa_submit'), 
+    path('generate_pnwa_report/', views.generate_pnwa_report, name='generate_pnwa_report'),
+    path('modify_pnwa_dxf/',      views.modify_pnwa_dxf, name='modify_pnwa_dxf'),
     
     
+    path('formdata/', views.list_configs, name='list_configs'),
+    path('add/', views.add_config, name='add_config'),
+    path('edit/<int:config_id>/', views.edit_config, name='edit_config'),
+    path('delete/<int:config_id>/', views.delete_config, name='delete_config'),
 ]

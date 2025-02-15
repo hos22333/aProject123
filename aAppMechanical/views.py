@@ -1,16 +1,87 @@
 from django.shortcuts import render, redirect
-from .forms import formCalcMS, formCalcBC, formCalcGR, formCalcPS, formCalcTH, formCalcMX, formCalcRT, formCalcCT, formCalcSC, formCalcBS, formCalcNS, formCalcPNch
+from .forms import formCalcMS, formCalcBC, formCalcGR, formCalcPS, formCalcTH
+from .forms import formCalcMX, formCalcRT, formCalcCT, formCalcSC, formCalcBS
+from .forms import formCalcNS, formCalcPNch, formCalcPNwa
 from datetime import datetime
 from django.contrib.auth.models import User
 from aApp1.models import UserRole, RoleAutho, Autho
 import requests
 
-from .models import FormFieldConfig
 from django.http import HttpResponse
 from docx import Document
 import os
 import ezdxf
 from django.conf import settings
+
+###################################
+###################################
+###################################
+###################################
+###################################
+###################################
+
+from django.shortcuts import get_object_or_404
+from .models import FormFieldConfig
+from .forms import FormFieldConfigForm
+
+
+
+def list_configs(request):
+    sort_by = request.GET.get('sort', 'id')  # Default sorting by ID
+    order = request.GET.get('order', 'asc')  # Default order is ascending
+
+    valid_fields = ['id', 'form_name', 'field_name', 'label', 'initial_value', 'visibility']
+    if sort_by not in valid_fields:
+        sort_by = 'id'
+
+    # Apply sorting order
+    if order == 'desc':
+        sort_by = f'-{sort_by}'
+
+    configs = FormFieldConfig.objects.all().order_by(sort_by)
+    
+    return render(request, 'form_config.html', {
+        'configs': configs,
+        'sort_by': sort_by.strip(''),  # Remove '-' to keep track of column sorting
+        'order': order
+    })
+
+
+
+def add_config(request):
+    if request.method == "POST":
+        form = FormFieldConfigForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('list_configs')
+    else:
+        form = FormFieldConfigForm()
+    return render(request, 'form_config_form.html', {'form': form})
+
+def edit_config(request, config_id):
+    config = get_object_or_404(FormFieldConfig, id=config_id)
+    if request.method == "POST":
+        form = FormFieldConfigForm(request.POST, instance=config)
+        if form.is_valid():
+            form.save()
+            return redirect('list_configs')
+    else:
+        form = FormFieldConfigForm(instance=config)
+    return render(request, 'form_config_form.html', {'form': form})
+
+def delete_config(request, config_id):
+    config = get_object_or_404(FormFieldConfig, id=config_id)
+    config.delete()
+    return redirect('list_configs')
+
+
+
+###################################
+###################################
+###################################
+###################################
+###################################
+###################################
 
 
 # Function to load the MS page
@@ -23,12 +94,8 @@ def load_ms_page(request):
     print(result)
     print('######')
 
-    # Fetch initial values from DB
-    form_name = 'formCalcMS'
-    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
-    initial_values = {config.field_name: config.initial_value for config in field_configs}
 
-    form1 = formCalcMS(initial=initial_values)  # Pass DB values
+    form1 = formCalcMS()  # Pass DB values
 
     return render(request, 'MS.html', {'form1': form1})
 
@@ -206,13 +273,8 @@ def load_bc_page(request):
     print('#####')
     print(result)
     print('######')
-    
-    # Fetch initial values from DB
-    form_name = 'formCalcBC'
-    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
-    initial_values = {config.field_name: config.initial_value for config in field_configs}
 
-    form1 = formCalcBC(initial=initial_values)  # Pass DB values
+    form1 = formCalcBC()  # Pass DB values
 
     return render(request, 'BC.html', {'form1': form1})
 
@@ -369,12 +431,7 @@ def load_gr_page(request):
     print(result)
     print('######')
 
-    # Fetch initial values from DB
-    form_name = 'formCalcGR'
-    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
-    initial_values = {config.field_name: config.initial_value for config in field_configs}
-
-    form1 = formCalcGR(initial=initial_values)  # Pass DB values
+    form1 = formCalcGR()  # Pass DB values
 
     return render(request, 'GR.html', {'form1': form1})
 
@@ -554,12 +611,7 @@ def load_ps_page(request):
     print(result)
     print('######')
 
-    # Fetch initial values from DB
-    form_name = 'formCalcPS'
-    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
-    initial_values = {config.field_name: config.initial_value for config in field_configs}
-
-    form1 = formCalcPS(initial=initial_values)  # Pass DB values
+    form1 = formCalcPS() 
     return render(request, 'PS.html', {'form1': form1})
 
 # Function to handle form submission
@@ -700,10 +752,6 @@ def modify_ps_dxf(request):
 
 
 
-
-
-
-# Function to load the MS page
 def load_th_page(request):
     if not request.user.is_authenticated:
         return redirect('login')  # Redirect to the login page if the user is not authenticated
@@ -713,12 +761,7 @@ def load_th_page(request):
     print(result)
     print('######')
 
-    # Fetch initial values from DB
-    form_name = 'formCalcTH'
-    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
-    initial_values = {config.field_name: config.initial_value for config in field_configs}
-
-    form1 = formCalcTH(initial=initial_values)  # Pass DB values
+    form1 = formCalcTH() 
     
     return render(request, 'TH.html', {'form1': form1})
 
@@ -874,12 +917,7 @@ def load_mx_page(request):
     print(result)
     print('######')
 
-    # Fetch initial values from DB
-    form_name = 'formCalcMX'
-    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
-    initial_values = {config.field_name: config.initial_value for config in field_configs}
-
-    form1 = formCalcMX(initial=initial_values)  # Pass DB values
+    form1 = formCalcMX()
     
     return render(request, 'MX.html', {'form1': form1})
 
@@ -1051,9 +1089,6 @@ def modify_mx_dxf(request):
 
 
 
-
-
-# Function to load the MS page
 def load_rt_page(request):
     if not request.user.is_authenticated:
         return redirect('login')  # Redirect to the login page if the user is not authenticated
@@ -1062,13 +1097,8 @@ def load_rt_page(request):
     print('#####')
     print(result)
     print('######')
-    
-    # Fetch initial values from DB
-    form_name = 'formCalcRT'
-    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
-    initial_values = {config.field_name: config.initial_value for config in field_configs}
 
-    form1 = formCalcRT(initial=initial_values)  # Pass DB values
+    form1 = formCalcRT()  
     
     return render(request, 'RT.html', {'form1': form1})
 
@@ -1223,13 +1253,8 @@ def load_ct_page(request):
     print('#####')
     print(result)
     print('######')
-    
-    # Fetch initial values from DB
-    form_name = 'formCalcCT'
-    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
-    initial_values = {config.field_name: config.initial_value for config in field_configs}
 
-    form1 = formCalcCT(initial=initial_values)  # Pass DB values
+    form1 = formCalcCT()  
     
     return render(request, 'PageCT.html', {'form1': form1})
 
@@ -1398,13 +1423,8 @@ def load_sc_page(request):
     print('#####')
     print(result)
     print('######')
-    
-    # Fetch initial values from DB
-    form_name = 'formCalcSC'
-    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
-    initial_values = {config.field_name: config.initial_value for config in field_configs}
 
-    form1 = formCalcSC(initial=initial_values)  # Pass DB values
+    form1 = formCalcSC()  # Pass DB values
     
     return render(request, 'PageSC.html', {'form1': form1})
 
@@ -1637,15 +1657,7 @@ def load_bs_page(request):
     print(result)
     print('######')
 
-    # Fetch initial values from DB
-    form_name = 'formCalcBS'
-    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
-    initial_values = {config.field_name: config.initial_value for config in field_configs}
-
-    form1 = formCalcBS(initial=initial_values)  # Pass DB values
-
-    
-    print(form_name)
+    form1 = formCalcBS()  # Pass DB values
 
     return render(request, 'PageBS.html', {'form1': form1})
 
@@ -1812,15 +1824,7 @@ def load_ns_page(request):
     print(result)
     print('######')
 
-    # Fetch initial values from DB
-    form_name = 'formCalcNS'
-    field_configs = FormFieldConfig.objects.filter(form_name=form_name)
-    initial_values = {config.field_name: config.initial_value for config in field_configs}
-
-    form1 = formCalcNS(initial=initial_values)  # Pass DB values
-
-    
-    print(form_name)
+    form1 = formCalcNS()  # Pass DB values
 
     return render(request, 'PageNS.html', {'form1': form1})
 
@@ -1984,7 +1988,6 @@ def modify_ns_dxf(request):
 
 
 
-# Function to load the MS page
 def load_pnch_page(request):
     if not request.user.is_authenticated:
         return redirect('login')  # Redirect to login page if user is not authenticated
@@ -2000,7 +2003,8 @@ def load_pnch_page(request):
 
     return render(request, 'PagePNch.html', {'form1': form1})
 
-# Function to handle form submission
+
+
 def handle_pnch_form(request):
     if not request.user.is_authenticated:
         return redirect('login')  # Redirect to the login page if the user is not authenticated
@@ -2107,10 +2111,215 @@ def handle_pnch_form(request):
 def generate_pnch_report(request):
     
     if request.method == "POST":
-        form1 = formCalcNS(request.POST)
+        form1 = formCalcPNch(request.POST)
         # Create a new Word document
         doc = Document()
-        doc.add_heading('Manual Screen Report', level=1)
+        doc.add_heading('Channel Penstock Report', level=1)
+
+        # Extract form data
+        form_data = {
+            "Input": [
+                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
+                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
+                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
+                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
+                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
+                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
+            ],
+            "Output": [
+                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
+                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
+                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
+                (form1.fields["oSec02Field04"].label, request.POST.get("oSec02Field04", "N/A")),
+                (form1.fields["oSec02Field05"].label, request.POST.get("oSec02Field05", "N/A")),
+                (form1.fields["oSec02Field06"].label, request.POST.get("oSec02Field06", "N/A")),
+                (form1.fields["oSec02Field07"].label, request.POST.get("oSec02Field07", "N/A")),
+            ]
+        }
+
+        # Add form data to the Word document
+        for section, fields in form_data.items():
+            doc.add_heading(section, level=2)
+            for field, value in fields:
+                doc.add_paragraph(f"{field}: {value}")
+
+        # Prepare the response to download the document
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = 'attachment; filename="Channel_Penstock_Report.docx"'
+        doc.save(response)
+        return response
+
+    return HttpResponse("Invalid request", status=400)
+
+
+def modify_pnch_dxf(request):
+    
+    if request.method == "POST":
+        form1 = formCalcBS(request.POST)
+    return render(request, 'PageNS.html', {'form1': form1})
+
+    # if request.method == "POST":
+    #     # Define the path to the DXF file in the static directory
+    #     static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "MS_General_Drawing.dxf")
+    #     modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "modified_fileNew.dxf")
+
+    #     # Load the DXF file
+    #     doc = ezdxf.readfile(static_path)
+
+    #     # Iterate over the modelspace to find all DIMENSION entities
+    #     for entity in doc.modelspace().query("DIMENSION"):
+    #         if entity.dxf.text == "MS_chHeight":
+    #             entity.dxf.text = request.POST.get("oSec01Field01", "000")
+    #         elif entity.dxf.text == "MS_chWidth":
+    #             entity.dxf.text = request.POST.get("oSec01Field02", "000")
+    #         elif entity.dxf.text == "BeltHeight":
+    #             entity.dxf.text = request.POST.get("oSec01Field03", "000")
+    #         elif entity.dxf.text == "MS_angle":
+    #             entity.dxf.text = request.POST.get("oSec01Field08", "000")
+    #         elif entity.dxf.text == "MS_barSpace":
+    #             entity.dxf.text = request.POST.get("oSec01Field05", "000")
+    #         elif entity.dxf.text == "MS_barTh":
+    #             entity.dxf.text = request.POST.get("oSec01Field06", "000")
+
+    #         # Render the dimension to apply changes
+    #         entity.render()
+
+    #     # Save the modified DXF file
+    #     doc.saveas(modified_path)
+
+    #     # Serve the modified file for download
+    #     with open(modified_path, "rb") as dxf_file:
+    #         response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+    #         response["Content-Disposition"] = 'attachment; filename="modified_fileNew.dxf"'
+    #         return response
+
+    # return HttpResponse("Invalid request", status=400)
+
+
+
+###############################
+
+
+
+
+def load_pnwa_page(request):
+    if not request.user.is_authenticated:
+        return redirect('login')  # Redirect to login page if user is not authenticated
+
+    result = check_user_autho(request.user.username, 'PNch')
+    print('#####')
+    print(result)
+    print('######')
+
+
+    form1 = formCalcPNwa()  
+
+    return render(request, 'PagePNwa.html', {'form1': form1})
+
+
+
+def handle_pnwa_form(request):
+    if not request.user.is_authenticated:
+        return redirect('login')  # Redirect to the login page if the user is not authenticated
+
+    print("aaa")
+    if request.method == 'POST' and 'form1_submit' in request.POST:
+                
+        print("aaa")
+        
+        form1 = formCalcPNwa(request.POST)
+        if form1.is_valid():
+            
+            print("form is valid")
+            # Access the cleaned_data dictionary to get individual field values
+            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
+            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
+            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
+            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
+            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
+            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
+            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
+            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
+            oSec01Field09_value = form1.cleaned_data.get('oSec01Field09')
+            oSec01Field10_value = form1.cleaned_data.get('oSec01Field10')
+            
+
+            # Calculate new values for fields            
+            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
+            req_type = "PNwa"  
+            input_data = {
+                "aInput01":   oSec01Field01_value,
+                "aInput02":   oSec01Field02_value,
+                "aInput03":   oSec01Field03_value,
+                "aInput04":   oSec01Field04_value,
+                "aInput05":   oSec01Field05_value,
+                "aInput06":   oSec01Field06_value,
+                "aInput07":   oSec01Field07_value,
+                "aInput08":   oSec01Field08_value,
+                "aInput09":   oSec01Field09_value,
+                "aInput10":   oSec01Field10_value,
+            }
+
+            # Call the function to interact with the API
+            response = interact_with_api(api_url, req_type, input_data)
+            
+            oSec02Field01_result = response["O_PNwa_Out01"]
+            oSec02Field02_result = response["O_PNwa_Out02"]
+            oSec02Field03_result = response["O_PNwa_Out03"]
+            oSec02Field04_result = response["O_PNwa_Out04"]
+            oSec02Field05_result = response["O_PNwa_Out05"]
+            oSec02Field06_result = response["O_PNwa_Out06"]
+            oSec02Field07_result = response["O_PNwa_Out07"]
+
+            # Save the form with updated values
+            instance = form1.save(commit=False)  # Do not save to the database yet
+            instance.oSec02Field01 = oSec02Field01_result      
+            instance.oSec02Field02 = oSec02Field02_result        
+            instance.oSec02Field03 = oSec02Field03_result      
+            instance.oSec02Field04 = oSec02Field04_result        
+            instance.oSec02Field05 = oSec02Field05_result       
+            instance.oSec02Field06 = oSec02Field06_result         
+            instance.oSec02Field07 = oSec02Field07_result  
+                      
+            instance.oSec00Field01 = request.user.username  # Insert username
+            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
+            instance.oSec00Field03 = "PNwa"  # Insert fixed type
+            instance.save()  # Save to the database
+
+            # Refresh the form with initial values to display results
+            form1 = formCalcPNwa(initial={
+                'oSec01Field01': oSec01Field01_value,
+                'oSec01Field02': oSec01Field02_value,
+                'oSec01Field03': oSec01Field03_value,
+                'oSec01Field04': oSec01Field04_value,
+                'oSec01Field05': oSec01Field05_value,
+                'oSec01Field06': oSec01Field06_value,
+                'oSec01Field07': oSec01Field07_value,
+                'oSec01Field08': oSec01Field08_value,
+                'oSec01Field09': oSec01Field09_value,
+                'oSec01Field10': oSec01Field10_value,
+
+                'oSec02Field01': oSec02Field01_result,
+                'oSec02Field02': oSec02Field02_result,
+                'oSec02Field03': oSec02Field03_result,
+                'oSec02Field04': oSec02Field04_result,
+                'oSec02Field05': oSec02Field05_result,
+                'oSec02Field06': oSec02Field06_result,
+                'oSec02Field07': oSec02Field07_result,
+            })
+                        
+            return render(request, 'PagePNwa.html', {'form1': form1})
+
+    return redirect('ms_load')  # Redirect to the page if the request is invalid
+
+
+def generate_pnwa_report(request):
+    
+    if request.method == "POST":
+        form1 = formCalcPNwa(request.POST)
+        # Create a new Word document
+        doc = Document()
+        doc.add_heading('Wall Penstock Report', level=1)
 
         # Extract form data
         form_data = {
@@ -2123,9 +2332,17 @@ def generate_pnch_report(request):
                 (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
                 (form1.fields["oSec01Field07"].label, request.POST.get("oSec01Field07", "N/A")),
                 (form1.fields["oSec01Field08"].label, request.POST.get("oSec01Field08", "N/A")),
+                (form1.fields["oSec01Field09"].label, request.POST.get("oSec01Field09", "N/A")),
+                (form1.fields["oSec01Field10"].label, request.POST.get("oSec01Field10", "N/A")),
             ],
             "Output": [
                 (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
+                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
+                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
+                (form1.fields["oSec02Field04"].label, request.POST.get("oSec02Field04", "N/A")),
+                (form1.fields["oSec02Field05"].label, request.POST.get("oSec02Field05", "N/A")),
+                (form1.fields["oSec02Field06"].label, request.POST.get("oSec02Field06", "N/A")),
+                (form1.fields["oSec02Field07"].label, request.POST.get("oSec02Field07", "N/A")),
             ]
         }
 
@@ -2137,14 +2354,14 @@ def generate_pnch_report(request):
 
         # Prepare the response to download the document
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Manual_Screen_Report.docx"'
+        response['Content-Disposition'] = 'attachment; filename="Wall_Penstock_Report.docx"'
         doc.save(response)
         return response
 
     return HttpResponse("Invalid request", status=400)
 
 
-def modify_pnch_dxf(request):
+def modify_pnwa_dxf(request):
     
     if request.method == "POST":
         form1 = formCalcBS(request.POST)
