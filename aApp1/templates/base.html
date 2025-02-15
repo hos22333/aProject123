@@ -70,18 +70,32 @@
           
                 {% if user.is_authenticated %}
                   <!-- Group1 -->
-                  {% if permissions.AthRol %}                  
-                  <li class="nav-section"><span class="sidebar-mini-icon"><i class="fa fa-ellipsis-h"></i></span><h4 class="text-section">Admin Pages</h4></li>
+                  {% if permissions.AthRol %}
+                                    
+                        
+                  <!-- Screens -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu0">
+                      <i class="fas fa-arrows-alt"></i>
+                      <p>Admins</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu0">
+                      <ul class="nav nav-collapse">
+                        <li class="sub-item"><a href="{% url 'user_roles_autho' %}"> <i class="fas fa-arrows-alt"></i> <p>User, Roles, Autho</p></a></li>
+                        <li class="sub-item"><a href="{% url 'assign_user_role' %}"> <i class="fas fa-arrows-alt"></i> <p>Assign User to Role </p></a></li>
+                        <li class="sub-item"><a href="{% url 'assign_role_autho' %}"> <i class="fas fa-arrows-alt"></i> <p>Assign Role to Autho</p></a></li>
+                        <li class="sub-item"><a href="{% url 'create_role' %}"> <i class="fas fa-arrows-alt"></i> <p>Create Role</p></a></li>
+                        <li class="sub-item"><a href="{% url 'create_autho' %}"> <i class="fas fa-arrows-alt"></i> <p>Create Autho  </p></a></li>
+                  
+                        {% if permissions.Hist %} 
+                        <li class="nav-item"><a href="{% url 'modelcalc_list' %}">      <i class="fas fa-arrows-alt"></i><p>History</p></a></li>
+                        {% endif %}
 
-                  <li class="nav-item"><a href="{% url 'user_roles_autho' %}">  <i class="fas fa-arrows-alt"></i><p>User, Roles, Autho</p></a></li>
-                  <li class="nav-item"><a href="{% url 'assign_user_role' %}">  <i class="fas fa-arrows-alt"></i><p>Assign User to Role</p></a></li>
-                  <li class="nav-item"><a href="{% url 'assign_role_autho' %}"> <i class="fas fa-arrows-alt"></i><p>Assign Role to Autho</p></a></li>
-                  <li class="nav-item"><a href="{% url 'create_role' %}">       <i class="fas fa-arrows-alt"></i><p>Create Role</p></a></li>                  
-                  <li class="nav-item"><a href="{% url 'create_autho' %}">      <i class="fas fa-arrows-alt"></i><p>Create Autho</p></a></li>                                    
-                  {% endif %}
-
-                  {% if permissions.Hist %} 
-                  <li class="nav-item"><a href="{% url 'modelcalc_list' %}">      <i class="fas fa-arrows-alt"></i><p>History</p></a></li>
+                      </ul>
+                    </div>
+                  </li>
+                  
                   {% endif %}
                                     
                         
@@ -209,7 +223,7 @@
                     </a>
                     <div class="collapse" id="submenu8">
                       <ul class="nav nav-collapse">
-                        <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Channel Penstocks</p></a></li>
+                        <li class="nav-item"><a href="{% url 'PNch' %}"> <i class="fas fa-desktop"></i> <p>Channel Penstocks</p></a></li>
                         <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Wall Penstocks  </p></a></li>
                         <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Wier Penstocks  </p></a></li>
                       </ul>

@@ -67,6 +67,12 @@ urlpatterns = [
     path('ns/submit/',          views.handle_ns_form, name='ns_submit'), 
     path('generate_ns_report/', views.generate_ns_report, name='generate_ns_report'),
     path('modify_ns_dxf/',      views.modify_ns_dxf, name='modify_ns_dxf'),
+     
+    
+    path('PNch/',                 views.load_pnch_page, name='PNch'),
+    path('PNch/submit/',          views.handle_pnch_form, name='PNch_submit'), 
+    path('generate_pnch_report/', views.generate_pnch_report, name='generate_pnch_report'),
+    path('modify_pnch_dxf/',      views.modify_pnch_dxf, name='modify_pnch_dxf'),
     
     
 ]
