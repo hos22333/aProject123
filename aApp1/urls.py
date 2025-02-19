@@ -47,6 +47,8 @@ urlpatterns = [
     path('user_roles_autho/', views.user_roles_with_authos, name='user_roles_autho'),
 
     path('modelcalc/', views.modelcalc_list, name='modelcalc_list'),
+    
+    path('users/', views.users_list, name='users_list'),
 
 
 

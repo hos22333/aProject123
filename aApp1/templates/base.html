@@ -90,6 +90,14 @@
                   
                         {% if permissions.Hist %} 
                         <li class="nav-item"><a href="{% url 'modelcalc_list' %}">      <i class="fas fa-arrows-alt"></i><p>History</p></a></li>
+                        {% endif %}                        
+                  
+                        {% if permissions.Settings %} 
+                        <li class="nav-item"><a href="{% url 'list_configs' %}">      <i class="fas fa-arrows-alt"></i><p>Settings</p></a></li>
+                        {% endif %}                       
+                  
+                        {% if permissions.Users %} 
+                        <li class="nav-item"><a href="{% url 'users_list' %}">      <i class="fas fa-arrows-alt"></i><p>Users</p></a></li>
                         {% endif %}
 
                       </ul>
@@ -224,7 +232,7 @@
                     <div class="collapse" id="submenu8">
                       <ul class="nav nav-collapse">
                         <li class="nav-item"><a href="{% url 'PNch' %}"> <i class="fas fa-desktop"></i> <p>Channel Penstocks</p></a></li>
-                        <li class="nav-item"><a href="{% url 'PNwa' %}"> <i class="fas fa-desktop"></i> <p>Wall Penstocks  </p></a></li>
+                        <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Wall Penstocks  </p></a></li>
                         <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Wier Penstocks  </p></a></li>
                       </ul>
                     </div>

@@ -15,6 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 
+
 def home(request):
     return render(request, 'home.html')
 
@@ -249,3 +250,10 @@ def change_email(request):
 @login_required
 def profile(request):
     return render(request, 'profile.html')
+
+
+
+
+def users_list(request):
+    users = User.objects.all()  # Fetch all users
+    return render(request, 'users_list.html', {'users': users})
