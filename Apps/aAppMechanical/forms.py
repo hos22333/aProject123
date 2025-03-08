@@ -806,3 +806,28 @@ class formDataSheetNS(forms.ModelForm):
                     field.widget.attrs.update({'style': 'display: none;'})
 
 
+
+class formDataSheetBS(forms.ModelForm):
+    class Meta:
+        model = Machine
+        fields = [
+            'project',
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04', 
+            'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08', 
+            'oSec01Field09', 'oSec01Field10'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        form_name = 'formDataSheetBS'
+        field_configs = FormFieldConfig.objects.filter(form_name=form_name)
+        config_dict = {config.field_name: config for config in field_configs}
+
+        for field_name, field in self.fields.items():
+            if field_name in config_dict:
+                field.label = config_dict[field_name].label  # Set label from DB
+                if not field.initial:
+                    field.initial = config_dict[field_name].initial_value
+                if config_dict[field_name].visibility == "Hide":
+                    field.widget.attrs.update({'style': 'display: none;'})
+

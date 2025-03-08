@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import formCalcMS, formCalcBC, formCalcGR, formCalcPS, formCalcTH
 from .forms import formCalcMX, formCalcRT, formCalcCT, formCalcSC, formCalcBS
 from .forms import formCalcNS, formCalcPNch, formCalcPNwa
-from .forms import formDataSheetNS
+from .forms import formDataSheetNS, formDataSheetBS
 
 from datetime import datetime
 from django.contrib.auth.models import User
@@ -21,6 +21,7 @@ from .models import Project
 from .models import Machine
 from .forms import ProjectForm
 from django.http import JsonResponse
+
 
 ###################################
 ###################################
@@ -2416,6 +2417,25 @@ def modify_pnwa_dxf(request):
 
 
 ############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
+############################
 
 
 
@@ -2474,135 +2494,6 @@ def delete_project(request, project_id):
 
 
 
-###
-###
-###
-###
-
-def load_DataSheetNS(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-
-    form_DataSheetNS = formDataSheetNS()
-    machines = Machine.objects.all()  # Fetch saved records
-
-    return render(request, 'PageNS_DataSheet.html', {
-        'form_DataSheetNS': form_DataSheetNS,
-        'machines': machines
-    })
-
-
-
-def Save_DataSheetNS(request):
-    print(">>> Save_DataSheetNS view called")  # Debugging
-
-    if request.method == 'POST' and 'form_DataSheetNS_submit' in request.POST:
-        print(">>> Received POST request")  # Debugging
-
-        form_DataSheetNS = formDataSheetNS(request.POST)
-
-        if form_DataSheetNS.is_valid():
-            print(">>> Form is valid")  # Debugging
-
-            instance = form_DataSheetNS.save(commit=False)  # Do not save yet
-
-            # Assign required fields
-            instance.oSec00Field01 = request.user.username  # Username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Timestamp
-            instance.oSec00Field03 = "DataSheetNS"  # Fixed type
-
-            # Ensure a project is assigned before saving
-            project_id = request.POST.get('project')  # Get project_id from form
-            if project_id:
-                try:
-                    instance.project = Project.objects.get(id=project_id)  # Assign project
-                except Project.DoesNotExist:
-                    print(">>> Error: Project ID not found")  # Debugging
-                    return render(request, 'PageNS_DataSheet.html', {
-                        'form_DataSheetNS': form_DataSheetNS,
-                        'error': 'Invalid Project ID'
-                    })
-
-            else:
-                print(">>> Error: No Project ID provided")  # Debugging
-                return render(request, 'PageNS_DataSheet.html', {
-                    'form_DataSheetNS': form_DataSheetNS,
-                    'error': 'Project is required'
-                })
-
-            # Save the instance
-            instance.save()
-            print(">>> Data Saved Successfully")  # Debugging
-
-            # Refresh the form with initial values
-            form_DataSheetNS = formDataSheetNS(initial=form_DataSheetNS.cleaned_data)
-            
-            machines = Machine.objects.all()
-
-            return render(request, 'PageNS_DataSheet.html', {
-                'form_DataSheetNS': form_DataSheetNS,
-                'success': 'Data saved successfully!',
-                "machines": machines
-            })
-
-        else:
-            print(">>> Form is NOT valid:", form_DataSheetNS.errors)  # Debugging
-            return render(request, 'PageNS_DataSheet.html', {
-                'form_DataSheetNS': form_DataSheetNS,
-                'error': 'Form contains errors',
-                "machines": machines
-            })
-
-    print(">>> Invalid request, redirecting to ms_load")  # Debugging
-    return redirect('ms_load')
-
-
-def Delete_DataSheetNS(request, machine_id):
-    machine = get_object_or_404(Machine, id=machine_id)
-    machine.delete()
-    return JsonResponse({"success": True})  # Return JSON response for AJAX requests
-
-
-
-def edit_datasheet(request, id):
-    machine = get_object_or_404(Machine, id=id)  # Fetch the machine instance
-    if request.method == "POST":
-        form = formDataSheetNS(request.POST, instance=machine)  # Bind the existing instance
-        if form.is_valid():
-            form.save()  # Save updates
-            return redirect('load_DataSheetNS')  # Redirect to list page
-    else:
-        form = formDataSheetNS(instance=machine)  # Load form with existing data
-    
-    return render(request, 'PageNS_DataSheet_edit.html', {'form': form, 'machine': machine})
-
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-
-def get_datasheet_data(request, machine_id):
-    machine = get_object_or_404(Machine, id=machine_id)
-    
-    data = {
-        "project": machine.project.name if machine.project else "No Project",
-        "oSec01Field01": machine.oSec01Field01,
-        "oSec01Field02": machine.oSec01Field02,
-        "oSec01Field03": machine.oSec01Field03,
-        "oSec01Field04": machine.oSec01Field04,
-        "oSec01Field05": machine.oSec01Field05,
-        "oSec01Field06": machine.oSec01Field06,
-        "oSec01Field07": machine.oSec01Field07,
-        "oSec01Field08": machine.oSec01Field08,
-        "oSec01Field09": machine.oSec01Field09,
-        "oSec01Field10": machine.oSec01Field10,
-        # Add other fields if necessary
-    }
-
-    return JsonResponse(data)
-
-
-
-
 def get_machines(request, project_id):
     try:
         project = Project.objects.get(id=project_id)
@@ -2616,10 +2507,6 @@ def get_machines(request, project_id):
     except Project.DoesNotExist:
         return JsonResponse({"error": "Project not found"}, status=404)
 
-
-from django.http import HttpResponse
-from docx import Document
-from .models import Project, Machine
 
 def generate_report(request, project_id):
     try:
@@ -2686,3 +2573,250 @@ def generate_report(request, project_id):
 
     except Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
+
+###
+###
+###
+###
+
+def DataSheetNS_load(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    form_DataSheetNS = formDataSheetNS()
+    machines = Machine.objects.all()  # Fetch saved records
+
+    return render(request, 'PageNS_DataSheet.html', {
+        'form_DataSheetNS': form_DataSheetNS,
+        'machines': machines
+    })
+
+
+
+def DataSheetNS_Save(request):
+    print(">>> Save_DataSheetNS view called")  # Debugging
+
+    if request.method == 'POST' and 'form_DataSheetNS_submit' in request.POST:
+        print(">>> Received POST request")  # Debugging
+
+        form_DataSheetNS = formDataSheetNS(request.POST)
+
+        if form_DataSheetNS.is_valid():
+            print(">>> Form is valid")  # Debugging
+
+            instance = form_DataSheetNS.save(commit=False)  # Do not save yet
+
+            # Assign required fields
+            instance.oSec00Field01 = request.user.username  # Username
+            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Timestamp
+            instance.oSec00Field03 = "DataSheetNS"  # Fixed type
+
+            # Ensure a project is assigned before saving
+            project_id = request.POST.get('project')  # Get project_id from form
+            if project_id:
+                try:
+                    instance.project = Project.objects.get(id=project_id)  # Assign project
+                except Project.DoesNotExist:
+                    print(">>> Error: Project ID not found")  # Debugging
+                    return render(request, 'PageNS_DataSheet.html', {
+                        'form_DataSheetNS': form_DataSheetNS,
+                        'error': 'Invalid Project ID'
+                    })
+
+            else:
+                print(">>> Error: No Project ID provided")  # Debugging
+                return render(request, 'PageNS_DataSheet.html', {
+                    'form_DataSheetNS': form_DataSheetNS,
+                    'error': 'Project is required'
+                })
+
+            # Save the instance
+            instance.save()
+            print(">>> Data Saved Successfully")  # Debugging
+
+            # Refresh the form with initial values
+            form_DataSheetNS = formDataSheetNS(initial=form_DataSheetNS.cleaned_data)
+            
+            machines = Machine.objects.all()
+
+            return render(request, 'PageNS_DataSheet.html', {
+                'form_DataSheetNS': form_DataSheetNS,
+                'success': 'Data saved successfully!',
+                "machines": machines
+            })
+
+        else:
+            print(">>> Form is NOT valid:", form_DataSheetNS.errors)  # Debugging
+            return render(request, 'PageNS_DataSheet.html', {
+                'form_DataSheetNS': form_DataSheetNS,
+                'error': 'Form contains errors',
+                "machines": machines
+            })
+
+    print(">>> Invalid request, redirecting to ms_load")  # Debugging
+    return redirect('ms_load')
+
+
+def DataSheetNS_Delete(request, machine_id):
+    machine = get_object_or_404(Machine, id=machine_id)
+    machine.delete()
+    return JsonResponse({"success": True})  # Return JSON response for AJAX requests
+
+
+def DataSheetNS_edit(request, id):
+    machine = get_object_or_404(Machine, id=id)  # Fetch the machine instance
+    if request.method == "POST":
+        form = formDataSheetNS(request.POST, instance=machine)  # Bind the existing instance
+        if form.is_valid():
+            form.save()  # Save updates
+            return redirect('load_DataSheetNS')  # Redirect to list page
+    else:
+        form = formDataSheetNS(instance=machine)  # Load form with existing data
+    
+    return render(request, 'PageNS_DataSheet_edit.html', {'form': form, 'machine': machine})
+
+
+def DataSheetNS_get_datasheet_data(request, machine_id):
+    machine = get_object_or_404(Machine, id=machine_id)
+    
+    data = {
+        "project": machine.project.name if machine.project else "No Project",
+        "oSec01Field01": machine.oSec01Field01,
+        "oSec01Field02": machine.oSec01Field02,
+        "oSec01Field03": machine.oSec01Field03,
+        "oSec01Field04": machine.oSec01Field04,
+        "oSec01Field05": machine.oSec01Field05,
+        "oSec01Field06": machine.oSec01Field06,
+        "oSec01Field07": machine.oSec01Field07,
+        "oSec01Field08": machine.oSec01Field08,
+        "oSec01Field09": machine.oSec01Field09,
+        "oSec01Field10": machine.oSec01Field10,
+        # Add other fields if necessary
+    }
+
+    return JsonResponse(data)
+
+
+
+###
+###
+###
+###
+
+def DataSheetBS_load(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    form_DataSheetBS = formDataSheetBS()
+    machines = Machine.objects.all()  # Fetch saved records
+
+    return render(request, 'PageBS_DataSheet.html', {
+        'form_DataSheetBS': form_DataSheetBS,
+        'machines': machines
+    })
+
+
+
+def DataSheetBS_Save(request):
+    print(">>> Save_DataSheetBS view called")  # Debugging
+
+    if request.method == 'POST' and 'form_DataSheetBS_submit' in request.POST:
+        print(">>> Received POST request")  # Debugging
+
+        form_DataSheetBS = formDataSheetBS(request.POST)
+
+        if form_DataSheetBS.is_valid():
+            print(">>> Form is valid")  # Debugging
+
+            instance = form_DataSheetBS.save(commit=False)  # Do not save yet
+
+            # Assign required fields
+            instance.oSec00Field01 = request.user.username  # Username
+            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Timestamp
+            instance.oSec00Field03 = "DataSheetBS"  # Fixed type
+
+            # Ensure a project is assigned before saving
+            project_id = request.POST.get('project')  # Get project_id from form
+            if project_id:
+                try:
+                    instance.project = Project.objects.get(id=project_id)  # Assign project
+                except Project.DoesNotExist:
+                    print(">>> Error: Project ID not found")  # Debugging
+                    return render(request, 'PageBS_DataSheet.html', {
+                        'form_DataSheetBS': form_DataSheetBS,
+                        'error': 'Invalid Project ID'
+                    })
+
+            else:
+                print(">>> Error: No Project ID provided")  # Debugging
+                return render(request, 'PageBS_DataSheet.html', {
+                    'form_DataSheetBS': form_DataSheetBS,
+                    'error': 'Project is required'
+                })
+
+            # Save the instance
+            instance.save()
+            print(">>> Data Saved Successfully")  # Debugging
+
+            # Refresh the form with initial values
+            form_DataSheetBS = formDataSheetBS(initial=form_DataSheetBS.cleaned_data)
+            
+            machines = Machine.objects.all()
+
+            return render(request, 'PageBS_DataSheet.html', {
+                'form_DataSheetBS': form_DataSheetBS,
+                'success': 'Data saved successfully!',
+                "machines": machines
+            })
+
+        else:
+            print(">>> Form is NOT valid:", form_DataSheetBS.errors)  # Debugging
+            return render(request, 'PageBS_DataSheet.html', {
+                'form_DataSheetBS': form_DataSheetBS,
+                'error': 'Form contains errors',
+                "machines": machines
+            })
+
+    print(">>> Invalid request, redirecting to ms_load")  # Debugging
+    return redirect('ms_load')
+
+
+def DataSheetBS_Delete(request, machine_id):
+    machine = get_object_or_404(Machine, id=machine_id)
+    machine.delete()
+    return JsonResponse({"success": True})  # Return JSON response for AJAX requests
+
+
+def DataSheetBS_edit(request, id):
+    machine = get_object_or_404(Machine, id=id)  # Fetch the machine instance
+    if request.method == "POST":
+        form = formDataSheetBS(request.POST, instance=machine)  # Bind the existing instance
+        if form.is_valid():
+            form.save()  # Save updates
+            return redirect('load_DataSheetNS')  # Redirect to list page
+    else:
+        form = formDataSheetBS(instance=machine)  # Load form with existing data
+    
+    return render(request, 'PageNS_DataSheet_edit.html', {'form': form, 'machine': machine})
+
+
+def DataSheetBS_get_datasheet_data(request, machine_id):
+    machine = get_object_or_404(Machine, id=machine_id)
+    
+    data = {
+        "project": machine.project.name if machine.project else "No Project",
+        "oSec01Field01": machine.oSec01Field01,
+        "oSec01Field02": machine.oSec01Field02,
+        "oSec01Field03": machine.oSec01Field03,
+        "oSec01Field04": machine.oSec01Field04,
+        "oSec01Field05": machine.oSec01Field05,
+        "oSec01Field06": machine.oSec01Field06,
+        "oSec01Field07": machine.oSec01Field07,
+        "oSec01Field08": machine.oSec01Field08,
+        "oSec01Field09": machine.oSec01Field09,
+        "oSec01Field10": machine.oSec01Field10,
+        # Add other fields if necessary
+    }
+
+    return JsonResponse(data)
+

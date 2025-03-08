@@ -90,19 +90,23 @@ urlpatterns = [
     
     path('projects/', views.project_list, name='project_list'),
     path('editprojects/<int:project_id>/', views.edit_project, name='edit_project'),
-    path('deleteprojects/<int:project_id>/', views.delete_project, name='delete_project'),
-    
-    
-    path('DataSheetNS/',       views.load_DataSheetNS, name='load_DataSheetNS'),
-    path('DataSheetNS/Save/',  views.Save_DataSheetNS, name='Save_DataSheetNS'), 
-    
-    path('DataSheetNSdelete/<int:machine_id>/', views.Delete_DataSheetNS, name='Delete_DataSheetNS'),
-    path('editDS/<int:id>/', views.edit_datasheet, name='Edit_DataSheetNS'),
-    path('DataSheetNSget_data/<int:machine_id>/', views.get_datasheet_data, name='get_datasheet_data'),
-
-    path('get_machines/<int:project_id>/', views.get_machines, name='get_machines'),
-    
+    path('deleteprojects/<int:project_id>/', views.delete_project, name='delete_project'),    
+    path('get_machines/<int:project_id>/', views.get_machines, name='get_machines'),    
     path('generate_report/<int:project_id>/', views.generate_report, name='generate_report'),
     
+    
+    path('DataSheetNS/',                            views.DataSheetNS_load,     name='load_DataSheetNS'),
+    path('DataSheetNS/Save/',                       views.DataSheetNS_Save,     name='Save_DataSheetNS'),
+    path('DataSheetNSdelete/<int:machine_id>/',     views.DataSheetNS_Delete,   name='Delete_DataSheetNS'),
+    path('editDS/<int:id>/',                        views.DataSheetNS_edit,     name='Edit_DataSheetNS'),
+    path('DataSheetNSget_data/<int:machine_id>/',   views.DataSheetNS_get_datasheet_data, name='get_datasheet_data'),
+
+    
+    path('DataSheetBS/',                            views.DataSheetBS_load,     name='load_DataSheetBS'),
+    path('DataSheetBS/Save/',                       views.DataSheetBS_Save,     name='Save_DataSheetBS'),
+    path('DataSheetBSdelete/<int:machine_id>/',     views.DataSheetBS_Delete,   name='Delete_DataSheetBS'),
+    path('editBS/<int:id>/',                        views.DataSheetBS_edit,     name='Edit_DataSheetBS'),
+    path('DataSheetBSget_data/<int:machine_id>/',   views.DataSheetBS_get_datasheet_data, name='get_datasheet_data'),
+
 
 ]
