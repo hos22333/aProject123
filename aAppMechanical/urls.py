@@ -85,4 +85,21 @@ urlpatterns = [
     path('add/', views.add_config, name='add_config'),
     path('edit/<int:config_id>/', views.edit_config, name='edit_config'),
     path('delete/<int:config_id>/', views.delete_config, name='delete_config'),
+    
+    
+    
+    path('projects/', views.project_list, name='project_list'),
+    path('editprojects/<int:project_id>/', views.edit_project, name='edit_project'),
+    path('deleteprojects/<int:project_id>/', views.delete_project, name='delete_project'),
+    
+    
+    path('DataSheetNS/',       views.load_DataSheetNS, name='load_DataSheetNS'),
+    path('DataSheetNS/Save/',  views.Save_DataSheetNS, name='Save_DataSheetNS'), 
+    
+    path('DataSheetNSdelete/<int:machine_id>/', views.Delete_DataSheetNS, name='Delete_DataSheetNS'),
+    path('editDS/<int:id>/', views.edit_datasheet, name='Edit_DataSheetNS'),
+    path('DataSheetNSget_data/<int:machine_id>/', views.get_datasheet_data, name='get_datasheet_data'),
+
+
+
 ]

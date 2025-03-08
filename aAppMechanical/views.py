@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from .forms import formCalcMS, formCalcBC, formCalcGR, formCalcPS, formCalcTH
 from .forms import formCalcMX, formCalcRT, formCalcCT, formCalcSC, formCalcBS
 from .forms import formCalcNS, formCalcPNch, formCalcPNwa
+from .forms import formDataSheetNS
+
 from datetime import datetime
 from django.contrib.auth.models import User
 from aApp1.models import UserRole, RoleAutho, Autho
@@ -12,6 +14,13 @@ from docx import Document
 import os
 import ezdxf
 from django.conf import settings
+
+
+from django.shortcuts import get_object_or_404
+from .models import Project
+from .models import Machine
+from .forms import ProjectForm
+from django.http import JsonResponse
 
 ###################################
 ###################################
@@ -2403,3 +2412,190 @@ def modify_pnwa_dxf(request):
     #         return response
 
     # return HttpResponse("Invalid request", status=400)
+
+
+
+############################
+
+
+
+def project_list(request):
+    if request.method == "POST":
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('project_list')
+    else:
+        form = ProjectForm()
+    
+    projects = Project.objects.all()
+    return render(request, 'project_list.html', {'form': form, 'projects': projects})
+
+
+
+def edit_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    
+    if request.method == "POST":
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            
+            # Check if request is AJAX
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            
+            # Redirect to project list page for normal form submission
+            return redirect('project_list')
+
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'errors': form.errors})
+
+    # If it's a normal GET request, render the edit page
+    form = ProjectForm(instance=project)
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'success': True, 'form': form.as_p()})
+    
+    return render(request, 'edit_project.html', {'form': form})
+
+
+
+def delete_project(request, project_id):
+    if request.method == "POST":
+        project = get_object_or_404(Project, id=project_id)
+        project.delete()
+
+        # Otherwise, redirect to the project list page
+        return redirect('project_list')
+
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+
+
+###
+###
+###
+###
+
+def load_DataSheetNS(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    form_DataSheetNS = formDataSheetNS()
+    machines = Machine.objects.all()  # Fetch saved records
+
+    return render(request, 'PageNS_DataSheet.html', {
+        'form_DataSheetNS': form_DataSheetNS,
+        'machines': machines
+    })
+
+
+
+def Save_DataSheetNS(request):
+    print(">>> Save_DataSheetNS view called")  # Debugging
+
+    if request.method == 'POST' and 'form_DataSheetNS_submit' in request.POST:
+        print(">>> Received POST request")  # Debugging
+
+        form_DataSheetNS = formDataSheetNS(request.POST)
+
+        if form_DataSheetNS.is_valid():
+            print(">>> Form is valid")  # Debugging
+
+            instance = form_DataSheetNS.save(commit=False)  # Do not save yet
+
+            # Assign required fields
+            instance.oSec00Field01 = request.user.username  # Username
+            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Timestamp
+            instance.oSec00Field03 = "DataSheetNS"  # Fixed type
+
+            # Ensure a project is assigned before saving
+            project_id = request.POST.get('project')  # Get project_id from form
+            if project_id:
+                try:
+                    instance.project = Project.objects.get(id=project_id)  # Assign project
+                except Project.DoesNotExist:
+                    print(">>> Error: Project ID not found")  # Debugging
+                    return render(request, 'PageNS_DataSheet.html', {
+                        'form_DataSheetNS': form_DataSheetNS,
+                        'error': 'Invalid Project ID'
+                    })
+
+            else:
+                print(">>> Error: No Project ID provided")  # Debugging
+                return render(request, 'PageNS_DataSheet.html', {
+                    'form_DataSheetNS': form_DataSheetNS,
+                    'error': 'Project is required'
+                })
+
+            # Save the instance
+            instance.save()
+            print(">>> Data Saved Successfully")  # Debugging
+
+            # Refresh the form with initial values
+            form_DataSheetNS = formDataSheetNS(initial=form_DataSheetNS.cleaned_data)
+            
+            machines = Machine.objects.all()
+
+            return render(request, 'PageNS_DataSheet.html', {
+                'form_DataSheetNS': form_DataSheetNS,
+                'success': 'Data saved successfully!',
+                "machines": machines
+            })
+
+        else:
+            print(">>> Form is NOT valid:", form_DataSheetNS.errors)  # Debugging
+            return render(request, 'PageNS_DataSheet.html', {
+                'form_DataSheetNS': form_DataSheetNS,
+                'error': 'Form contains errors',
+                "machines": machines
+            })
+
+    print(">>> Invalid request, redirecting to ms_load")  # Debugging
+    return redirect('ms_load')
+
+
+def Delete_DataSheetNS(request, machine_id):
+    machine = get_object_or_404(Machine, id=machine_id)
+    machine.delete()
+    return JsonResponse({"success": True})  # Return JSON response for AJAX requests
+
+
+
+def edit_datasheet(request, id):
+    machine = get_object_or_404(Machine, id=id)  # Fetch the machine instance
+    if request.method == "POST":
+        form = formDataSheetNS(request.POST, instance=machine)  # Bind the existing instance
+        if form.is_valid():
+            form.save()  # Save updates
+            return redirect('load_DataSheetNS')  # Redirect to list page
+    else:
+        form = formDataSheetNS(instance=machine)  # Load form with existing data
+    
+    return render(request, 'PageNS_DataSheet_edit.html', {'form': form, 'machine': machine})
+
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+
+def get_datasheet_data(request, machine_id):
+    machine = get_object_or_404(Machine, id=machine_id)
+    
+    data = {
+        "project": machine.project.name if machine.project else "No Project",
+        "oSec01Field01": machine.oSec01Field01,
+        "oSec01Field02": machine.oSec01Field02,
+        "oSec01Field03": machine.oSec01Field03,
+        "oSec01Field04": machine.oSec01Field04,
+        "oSec01Field05": machine.oSec01Field05,
+        "oSec01Field06": machine.oSec01Field06,
+        "oSec01Field07": machine.oSec01Field07,
+        "oSec01Field08": machine.oSec01Field08,
+        "oSec01Field09": machine.oSec01Field09,
+        "oSec01Field10": machine.oSec01Field10,
+        # Add other fields if necessary
+    }
+
+    return JsonResponse(data)
