@@ -8,7 +8,7 @@ from .models import UserRole
 from .models import RoleAutho
 
 from django.contrib.auth.models import User
-from aAppMechanical.models import modelcalc
+from Apps.aAppMechanical.models import modelcalc
 from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.decorators import login_required

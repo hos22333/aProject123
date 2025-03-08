@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'aApp1',
-    'aAppMechanical',
+    'Apps.aApp1',
+    'Apps.aAppMechanical',
 ]
 
 MIDDLEWARE = [
@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'aProject.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -64,14 +64,14 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'aProject.context_processors.user_permissions',
+                'config.context_processors.user_permissions',
 
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'aProject.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database

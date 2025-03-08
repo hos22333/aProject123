@@ -1,4 +1,4 @@
-from aApp1.models import RoleAutho
+from Apps.aApp1.models import RoleAutho
 
 def user_permissions(request):
     permissions = {}
