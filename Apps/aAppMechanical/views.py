@@ -2599,3 +2599,90 @@ def get_datasheet_data(request, machine_id):
     }
 
     return JsonResponse(data)
+
+
+
+
+def get_machines(request, project_id):
+    try:
+        project = Project.objects.get(id=project_id)
+        machines = Machine.objects.filter(project=project)
+        
+        data = {
+            "project_name": project.name,
+            "machines": list(machines.values("oSec00Field01", "oSec00Field02", "oSec00Field03", "oSec01Field01", "oSec01Field02"))
+        }
+        return JsonResponse(data)
+    except Project.DoesNotExist:
+        return JsonResponse({"error": "Project not found"}, status=404)
+
+
+from django.http import HttpResponse
+from docx import Document
+from .models import Project, Machine
+
+def generate_report(request, project_id):
+    try:
+        project = Project.objects.get(id=project_id)
+        machines = Machine.objects.filter(project=project)
+
+        # Create a Word document
+        doc = Document()
+        doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        # Add project details in a two-column table
+        doc.add_heading("Project Details", level=2)
+        project_table = doc.add_table(rows=0, cols=2)
+
+        project_data = {
+            "Name": project.name,
+            "Client Name": project.client_name,
+            "Capacity": project.capacity,
+        }
+
+        for key, value in project_data.items():
+            row_cells = project_table.add_row().cells
+            row_cells[0].text = key
+            row_cells[1].text = str(value)
+
+        doc.add_paragraph("\n" + "=" * 50 + "\n")
+
+        # Add machine details
+        doc.add_heading("Machines", level=2)
+
+        for machine in machines:
+            doc.add_paragraph(f"Machine ID: {machine.id}", style="Heading3")
+
+            machine_table = doc.add_table(rows=0, cols=2)
+
+            machine_data = {
+                "Username": machine.oSec00Field01,
+                "Created At": machine.oSec00Field02,
+                "Type": machine.oSec00Field03,
+                "Sec01Field01": machine.oSec01Field01,
+                "Sec01Field02": machine.oSec01Field02,
+                "Sec01Field03": machine.oSec01Field03,
+                "Sec01Field04": machine.oSec01Field04,
+                "Sec01Field05": machine.oSec01Field05,
+                "Sec01Field06": machine.oSec01Field06,
+                "Sec01Field07": machine.oSec01Field07,
+                "Sec01Field08": machine.oSec01Field08,
+                "Sec01Field09": machine.oSec01Field09,
+                "Sec01Field10": machine.oSec01Field10,
+            }
+
+            for key, value in machine_data.items():
+                row_cells = machine_table.add_row().cells
+                row_cells[0].text = key
+                row_cells[1].text = str(value)
+
+            doc.add_paragraph("\n")
+
+        # Save the document to a response
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+        doc.save(response)
+        return response
+
+    except Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)

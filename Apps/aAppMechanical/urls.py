@@ -100,6 +100,9 @@ urlpatterns = [
     path('editDS/<int:id>/', views.edit_datasheet, name='Edit_DataSheetNS'),
     path('DataSheetNSget_data/<int:machine_id>/', views.get_datasheet_data, name='get_datasheet_data'),
 
-
+    path('get_machines/<int:project_id>/', views.get_machines, name='get_machines'),
+    
+    path('generate_report/<int:project_id>/', views.generate_report, name='generate_report'),
+    
 
 ]
