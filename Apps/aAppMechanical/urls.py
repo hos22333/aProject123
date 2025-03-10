@@ -95,18 +95,16 @@ urlpatterns = [
     path('generate_report/<int:project_id>/', views.generate_report, name='generate_report'),
     
     
-    path('DataSheetNS/',                            views.DataSheetNS_load,     name='load_DataSheetNS'),
+    # path('DataSheetNS/',                            views.DataSheetNS_load,     name='load_DataSheetNS'),
     path('DataSheetNS/Save/',                       views.DataSheetNS_Save,     name='Save_DataSheetNS'),
     path('DataSheetNSdelete/<int:machine_id>/',     views.DataSheetNS_Delete,   name='Delete_DataSheetNS'),
     path('editDS/<int:id>/',                        views.DataSheetNS_edit,     name='Edit_DataSheetNS'),
     path('DataSheetNSget_data/<int:machine_id>/',   views.DataSheetNS_get_datasheet_data, name='get_datasheet_data'),
 
     
-    path('DataSheetBS/',                            views.DataSheetBS_load,     name='load_DataSheetBS'),
-    path('DataSheetBS/Save/',                       views.DataSheetBS_Save,     name='Save_DataSheetBS'),
-    path('DataSheetBSdelete/<int:machine_id>/',     views.DataSheetBS_Delete,   name='Delete_DataSheetBS'),
-    path('editBS/<int:id>/',                        views.DataSheetBS_edit,     name='Edit_DataSheetBS'),
-    path('DataSheetBSget_data/<int:machine_id>/',   views.DataSheetBS_get_datasheet_data, name='get_datasheet_data'),
-
+    path("assign-user/", views.assign_user_to_company, name="assign_user"),
+    
+    path("data-sheet/<str:sheet_key>/", views.load_data_sheet, name="load_data_sheet"),
+    path("data-sheet-save/<str:data_type>/", views.save_data_sheet, name="save_data_sheet"),
 
 ]

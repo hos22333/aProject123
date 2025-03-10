@@ -2,12 +2,12 @@
 {% block content %}
 
 <div class="container">
-    <h2>Edit Manual Screen Data</h2>
+    <h2>Edit Basket Screen Data</h2>
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-success">Update</button>
-        <a href="{% url 'load_DataSheetNS' %}" class="btn btn-secondary">Cancel</a>
+        <a href="{% url 'load_DataSheetBS' %}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 

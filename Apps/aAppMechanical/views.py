@@ -2,7 +2,21 @@ from django.shortcuts import render, redirect
 from .forms import formCalcMS, formCalcBC, formCalcGR, formCalcPS, formCalcTH
 from .forms import formCalcMX, formCalcRT, formCalcCT, formCalcSC, formCalcBS
 from .forms import formCalcNS, formCalcPNch, formCalcPNwa
-from .forms import formDataSheetNS, formDataSheetBS
+from .forms import FDS_NS
+from .forms import FDS_BS
+from .forms import FDS_MSc
+from .forms import FDS_MSf
+from .forms import FDS_BC
+from .forms import FDS_SC 
+from .forms import FDS_CO
+from .forms import FDS_GR  
+from .forms import FDS_SS  
+from .forms import FDS_PS  
+from .forms import FDS_QV  
+from .forms import FDS_TV  
+from .forms import FDS_TH  
+from .forms import FDS_MX 
+from .forms import FDS_TA  
 
 from datetime import datetime
 from django.contrib.auth.models import User
@@ -22,6 +36,8 @@ from .models import Machine
 from .forms import ProjectForm
 from django.http import JsonResponse
 
+from .forms import UserCompanyForm
+
 
 ###################################
 ###################################
@@ -40,7 +56,7 @@ def list_configs(request):
     sort_by = request.GET.get('sort', 'id')  # Default sorting by ID
     order = request.GET.get('order', 'asc')  # Default order is ascending
 
-    valid_fields = ['id', 'form_name', 'field_name', 'label', 'initial_value', 'visibility']
+    valid_fields = ['id', 'form_name', 'field_name', 'label', 'initial_value', 'visibility', 'company']
     if sort_by not in valid_fields:
         sort_by = 'id'
 
@@ -2546,16 +2562,11 @@ def generate_report(request, project_id):
                 "Username": machine.oSec00Field01,
                 "Created At": machine.oSec00Field02,
                 "Type": machine.oSec00Field03,
-                "Sec01Field01": machine.oSec01Field01,
-                "Sec01Field02": machine.oSec01Field02,
-                "Sec01Field03": machine.oSec01Field03,
-                "Sec01Field04": machine.oSec01Field04,
-                "Sec01Field05": machine.oSec01Field05,
-                "Sec01Field06": machine.oSec01Field06,
-                "Sec01Field07": machine.oSec01Field07,
-                "Sec01Field08": machine.oSec01Field08,
-                "Sec01Field09": machine.oSec01Field09,
-                "Sec01Field10": machine.oSec01Field10,
+                machine.oSec01Field01 : machine.oSec01Field02,
+                machine.oSec01Field03 : machine.oSec01Field04,
+                machine.oSec01Field05 : machine.oSec01Field06,
+                machine.oSec01Field07 : machine.oSec01Field08,
+                machine.oSec01Field09 : machine.oSec01Field10,
             }
 
             for key, value in machine_data.items():
@@ -2576,20 +2587,28 @@ def generate_report(request, project_id):
 
 ###
 ###
+
+
+
+def assign_user_to_company(request):
+    if request.method == "POST":
+        form = UserCompanyForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("assign_user_to_company")  # Redirect to a success page
+    else:
+        form = UserCompanyForm()
+    
+    return render(request, "assign_user_to_company.html", {"form": form})
+
+
+
+
+
 ###
 ###
 
-def DataSheetNS_load(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
 
-    form_DataSheetNS = formDataSheetNS()
-    machines = Machine.objects.all()  # Fetch saved records
-
-    return render(request, 'PageNS_DataSheet.html', {
-        'form_DataSheetNS': form_DataSheetNS,
-        'machines': machines
-    })
 
 
 
@@ -2599,7 +2618,7 @@ def DataSheetNS_Save(request):
     if request.method == 'POST' and 'form_DataSheetNS_submit' in request.POST:
         print(">>> Received POST request")  # Debugging
 
-        form_DataSheetNS = formDataSheetNS(request.POST)
+        form_DataSheetNS = FDS_NS(request.POST)
 
         if form_DataSheetNS.is_valid():
             print(">>> Form is valid")  # Debugging
@@ -2618,14 +2637,14 @@ def DataSheetNS_Save(request):
                     instance.project = Project.objects.get(id=project_id)  # Assign project
                 except Project.DoesNotExist:
                     print(">>> Error: Project ID not found")  # Debugging
-                    return render(request, 'PageNS_DataSheet.html', {
+                    return render(request, 'PageDataSheet_ManualScreen.html', {
                         'form_DataSheetNS': form_DataSheetNS,
                         'error': 'Invalid Project ID'
                     })
 
             else:
                 print(">>> Error: No Project ID provided")  # Debugging
-                return render(request, 'PageNS_DataSheet.html', {
+                return render(request, 'PageDataSheet_ManualScreen.html', {
                     'form_DataSheetNS': form_DataSheetNS,
                     'error': 'Project is required'
                 })
@@ -2635,19 +2654,19 @@ def DataSheetNS_Save(request):
             print(">>> Data Saved Successfully")  # Debugging
 
             # Refresh the form with initial values
-            form_DataSheetNS = formDataSheetNS(initial=form_DataSheetNS.cleaned_data)
+            form_DataSheetNS = FDS_NS(initial=form_DataSheetNS.cleaned_data)
             
-            machines = Machine.objects.all()
+            machines = Machine.objects.filter(oSec00Field03="DataSheetNS")
 
-            return render(request, 'PageNS_DataSheet.html', {
-                'form_DataSheetNS': form_DataSheetNS,
+            return render(request, 'PageDataSheet_ManualScreen.html', {
+                'form': form_DataSheetNS,
                 'success': 'Data saved successfully!',
                 "machines": machines
             })
 
         else:
             print(">>> Form is NOT valid:", form_DataSheetNS.errors)  # Debugging
-            return render(request, 'PageNS_DataSheet.html', {
+            return render(request, 'PageDataSheet_ManualScreen.html', {
                 'form_DataSheetNS': form_DataSheetNS,
                 'error': 'Form contains errors',
                 "machines": machines
@@ -2703,120 +2722,137 @@ def DataSheetNS_get_datasheet_data(request, machine_id):
 ###
 ###
 
-def DataSheetBS_load(request):
+
+
+
+
+
+
+
+
+
+
+
+# Mapping of keys to form classes and templates
+DATA_SHEET_CONFIG = {
+    "A":    {"form_class": FDS_NS,  "template": "PageDataSheet_ManualScreen.html",              "needs_user": True, "DB_Name": "DataSheetNS"},
+    "B":    {"form_class": FDS_BS,  "template": "PageDataSheet_BasketScreen.html",              "needs_user": True, "DB_Name": "DataSheetBS"},
+    "C":    {"form_class": FDS_MSc, "template": "PageDataSheet_MechanicalCoarseScreen.html",    "needs_user": True, "DB_Name": "DataSheetMSc"},
+    "D":    {"form_class": FDS_MSf, "template": "PageDataSheet_MechanicalFineScreen.html",      "needs_user": True, "DB_Name": "DataSheetMSf"},
+    "E":    {"form_class": FDS_BC,  "template": "PageDataSheet_BeltConveyor.html",              "needs_user": True, "DB_Name": "DataSheetBC"},
+    "F":    {"form_class": FDS_SC,  "template": "PageDataSheet_ScrewConveyor.html",             "needs_user": True, "DB_Name": "DataSheetSC"},
+    "G":    {"form_class": FDS_CO,  "template": "PageDataSheet_Container.html",                 "needs_user": True, "DB_Name": "DataSheetCO"},
+    "H":    {"form_class": FDS_GR,  "template": "PageDataSheet_GritGreaseRemoval.html",         "needs_user": True, "DB_Name": "DataSheetGR"},
+    "I":    {"form_class": FDS_SS,  "template": "PageDataSheet_SandSilo.html",                  "needs_user": True, "DB_Name": "DataSheetSS"},
+    "J":    {"form_class": FDS_PS,  "template": "PageDataSheet_PrimarySedimentationTank.html",  "needs_user": True, "DB_Name": "DataSheetPS"},
+    "K":    {"form_class": FDS_QV,  "template": "PageDataSheet_QuickValve.html",                "needs_user": True, "DB_Name": "DataSheetQV"},
+    "L":    {"form_class": FDS_TV,  "template": "PageDataSheet_TelescopicValve.html",           "needs_user": True, "DB_Name": "DataSheetTV"},
+    "M":    {"form_class": FDS_TH,  "template": "PageDataSheet_SludgeThickener.html",           "needs_user": True, "DB_Name": "DataSheetTH"},
+    "N":    {"form_class": FDS_MX,  "template": "PageDataSheet_Mixers.html",                    "needs_user": True, "DB_Name": "DataSheetMX"},
+    "O":    {"form_class": FDS_TA,  "template": "PageDataSheet_Tanks.html",                     "needs_user": True, "DB_Name": "DataSheetTA"},
+}
+
+
+def load_data_sheet(request, sheet_key):
     if not request.user.is_authenticated:
-        return redirect('login')
+        return redirect("login")
 
-    form_DataSheetBS = formDataSheetBS()
-    machines = Machine.objects.all()  # Fetch saved records
+    config = DATA_SHEET_CONFIG.get(sheet_key)
+    if not config:
+        return redirect("some_error_page")  # Handle invalid keys
 
-    return render(request, 'PageBS_DataSheet.html', {
-        'form_DataSheetBS': form_DataSheetBS,
-        'machines': machines
-    })
+    form_class = config["form_class"]
+    template = config["template"]
+    needs_user = config["needs_user"]
+    DB_Name = config["DB_Name"]
+
+    projects = Project.objects.all()
+
+    # Instantiate form with user if needed
+    if needs_user:
+        form = form_class(user=request.user)
+    else:
+        form = form_class()
+
+    # Ensure "project" field exists in form before setting queryset
+    if "project" in form.fields:
+        form.fields["project"].queryset = projects
+    else:
+        print("Project field not found in form!")
+
+    machines = Machine.objects.filter(oSec00Field03=DB_Name)
+
+
+    return render(request, template, {"form": form, "machines": machines})
 
 
 
-def DataSheetBS_Save(request):
-    print(">>> Save_DataSheetBS view called")  # Debugging
 
-    if request.method == 'POST' and 'form_DataSheetBS_submit' in request.POST:
-        print(">>> Received POST request")  # Debugging
 
-        form_DataSheetBS = formDataSheetBS(request.POST)
 
-        if form_DataSheetBS.is_valid():
-            print(">>> Form is valid")  # Debugging
+# Mapping between data types and their respective forms and templates
+DATA_SHEET_CONFIG_BBB = {
+    "AA":    {"form_class": FDS_NS,  "template": "PageDataSheet_ManualScreen.html",              "needs_user": True, "DB_Name": "DataSheetNS"},
+    "BB":    {"form_class": FDS_BS,  "template": "PageDataSheet_BasketScreen.html",              "needs_user": True, "DB_Name": "DataSheetBS"},
+    "CC":    {"form_class": FDS_MSc, "template": "PageDataSheet_MechanicalCoarseScreen.html",    "needs_user": True, "DB_Name": "DataSheetMSc"},
+    "DD":    {"form_class": FDS_MSf, "template": "PageDataSheet_MechanicalFineScreen.html",      "needs_user": True, "DB_Name": "DataSheetMSf"},
+    "EE":    {"form_class": FDS_BC,  "template": "PageDataSheet_BeltConveyor.html",              "needs_user": True, "DB_Name": "DataSheetBC"},
+    "FF":    {"form_class": FDS_SC,  "template": "PageDataSheet_ScrewConveyor.html",             "needs_user": True, "DB_Name": "DataSheetSC"},
+    "GG":    {"form_class": FDS_CO,  "template": "PageDataSheet_Container.html",                 "needs_user": True, "DB_Name": "DataSheetCO"},
+    "HH":    {"form_class": FDS_GR,  "template": "PageDataSheet_GritGreaseRemoval.html",         "needs_user": True, "DB_Name": "DataSheetGR"},
+    "II":    {"form_class": FDS_SS,  "template": "PageDataSheet_SandSilo.html",                  "needs_user": True, "DB_Name": "DataSheetSS"},
+    "JJ":    {"form_class": FDS_PS,  "template": "PageDataSheet_PrimarySedimentationTank.html",  "needs_user": True, "DB_Name": "DataSheetPS"},
+    "KK":    {"form_class": FDS_QV,  "template": "PageDataSheet_QuickValve.html",                "needs_user": True, "DB_Name": "DataSheetQV"},
+    "LL":    {"form_class": FDS_TV,  "template": "PageDataSheet_TelescopicValve.html",           "needs_user": True, "DB_Name": "DataSheetTV"},
+    "MM":    {"form_class": FDS_TH,  "template": "PageDataSheet_SludgeThickener.html",           "needs_user": True, "DB_Name": "DataSheetTH"},
+    "NN":    {"form_class": FDS_MX,  "template": "PageDataSheet_Mixers.html",                    "needs_user": True, "DB_Name": "DataSheetMX"},
+    "OO":    {"form_class": FDS_TA,  "template": "PageDataSheet_Tanks.html",                     "needs_user": True, "DB_Name": "DataSheetTA"},
+}
 
-            instance = form_DataSheetBS.save(commit=False)  # Do not save yet
 
-            # Assign required fields
+
+def save_data_sheet(request, data_type):
+    """Generic function to handle all data sheet saves."""
+    if data_type not in DATA_SHEET_CONFIG_BBB:
+        return redirect("ms_load")  # Redirect if data type is invalid
+
+    config = DATA_SHEET_CONFIG_BBB[data_type]
+    form_class = config["form_class"]
+    template = config["template"]
+    DB_Name = config["DB_Name"]
+
+    if request.method == "POST":
+        form = form_class(request.POST)
+
+        if form.is_valid():
+            instance = form.save(commit=False)  # Don't save to DB yet
+
+            # Assign common fields
             instance.oSec00Field01 = request.user.username  # Username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Timestamp
-            instance.oSec00Field03 = "DataSheetBS"  # Fixed type
+            instance.oSec00Field02 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Timestamp
+            instance.oSec00Field03 = DB_Name  # Fixed type
 
-            # Ensure a project is assigned before saving
-            project_id = request.POST.get('project')  # Get project_id from form
+            # Handle project assignment
+            project_id = request.POST.get("project")
             if project_id:
                 try:
-                    instance.project = Project.objects.get(id=project_id)  # Assign project
+                    instance.project = Project.objects.get(id=project_id)
                 except Project.DoesNotExist:
-                    print(">>> Error: Project ID not found")  # Debugging
-                    return render(request, 'PageBS_DataSheet.html', {
-                        'form_DataSheetBS': form_DataSheetBS,
-                        'error': 'Invalid Project ID'
-                    })
+                    return render(request, template, {"form": form, "error": "Invalid Project ID"})
 
             else:
-                print(">>> Error: No Project ID provided")  # Debugging
-                return render(request, 'PageBS_DataSheet.html', {
-                    'form_DataSheetBS': form_DataSheetBS,
-                    'error': 'Project is required'
-                })
+                return render(request, template, {"form": form, "error": "Project is required"})
 
-            # Save the instance
             instance.save()
-            print(">>> Data Saved Successfully")  # Debugging
 
-            # Refresh the form with initial values
-            form_DataSheetBS = formDataSheetBS(initial=form_DataSheetBS.cleaned_data)
-            
-            machines = Machine.objects.all()
+            # Refresh form with initial values
+            form = form_class(initial=form.cleaned_data)
+            machines = Machine.objects.filter(oSec00Field03=DB_Name)
 
-            return render(request, 'PageBS_DataSheet.html', {
-                'form_DataSheetBS': form_DataSheetBS,
-                'success': 'Data saved successfully!',
-                "machines": machines
-            })
+            return render(request, template, {"form": form, "success": "Data saved successfully!", "machines": machines})
 
         else:
-            print(">>> Form is NOT valid:", form_DataSheetBS.errors)  # Debugging
-            return render(request, 'PageBS_DataSheet.html', {
-                'form_DataSheetBS': form_DataSheetBS,
-                'error': 'Form contains errors',
-                "machines": machines
-            })
+            machines = Machine.objects.filter(oSec00Field03=DB_Name)
+            return render(request, template, {"form": form, "error": "Form contains errors", "machines": machines})
 
-    print(">>> Invalid request, redirecting to ms_load")  # Debugging
-    return redirect('ms_load')
-
-
-def DataSheetBS_Delete(request, machine_id):
-    machine = get_object_or_404(Machine, id=machine_id)
-    machine.delete()
-    return JsonResponse({"success": True})  # Return JSON response for AJAX requests
-
-
-def DataSheetBS_edit(request, id):
-    machine = get_object_or_404(Machine, id=id)  # Fetch the machine instance
-    if request.method == "POST":
-        form = formDataSheetBS(request.POST, instance=machine)  # Bind the existing instance
-        if form.is_valid():
-            form.save()  # Save updates
-            return redirect('load_DataSheetNS')  # Redirect to list page
-    else:
-        form = formDataSheetBS(instance=machine)  # Load form with existing data
-    
-    return render(request, 'PageNS_DataSheet_edit.html', {'form': form, 'machine': machine})
-
-
-def DataSheetBS_get_datasheet_data(request, machine_id):
-    machine = get_object_or_404(Machine, id=machine_id)
-    
-    data = {
-        "project": machine.project.name if machine.project else "No Project",
-        "oSec01Field01": machine.oSec01Field01,
-        "oSec01Field02": machine.oSec01Field02,
-        "oSec01Field03": machine.oSec01Field03,
-        "oSec01Field04": machine.oSec01Field04,
-        "oSec01Field05": machine.oSec01Field05,
-        "oSec01Field06": machine.oSec01Field06,
-        "oSec01Field07": machine.oSec01Field07,
-        "oSec01Field08": machine.oSec01Field08,
-        "oSec01Field09": machine.oSec01Field09,
-        "oSec01Field10": machine.oSec01Field10,
-        # Add other fields if necessary
-    }
-
-    return JsonResponse(data)
-
+    return redirect("ms_load")  # Redirect for invalid requests

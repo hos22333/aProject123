@@ -3,20 +3,34 @@
 
 <div class="container">
     <div class="page-inner">
-        <h2>Manual Screen</h2>
-        <form method="POST" action="{% url 'Save_DataSheetNS' %}" class="form-group">
+        <h2>Sand Silo</h2>
+        <form method="POST" action="{% url 'save_data_sheet' data_type='II' %}" class="form-group">
             {% csrf_token %}
             <div class="row"> <!-- Row to hold both cards side by side -->
                 
-                <!-- Project Selection -->
-                <div class="col-md-12 mb-3">
-                    <label for="project">Select Project:</label>
-                    <select name="project" id="project" class="form-control shadow-sm rounded">
-                        <option value="">-- Select a Project --</option>
-                        {% for project in form_DataSheetNS.fields.project.queryset %}
-                            <option value="{{ project.id }}">{{ project.name }}</option>
-                        {% endfor %}
-                    </select>
+                <!-- Section 0 Card Project Selection -->
+                <div class="col-md-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 0</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                
+                                <div class="col-md-12 mb-3">
+                                    <label for="project">Select Project:</label>
+                                    <select name="project" id="project" class="form-control shadow-sm rounded">
+                                        <option value="">-- Select a Project --</option>
+                                        {% for project in form.fields.project.queryset %}
+                                            <option value="{{ project.id }}">{{ project.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Section 1 Card -->
@@ -28,44 +42,34 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form_DataSheetNS.oSec01Field01.label }}</label>
-                                    {{ form_DataSheetNS.oSec01Field01 }}
+                                    {{ form.oSec01Field01 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form_DataSheetNS.oSec01Field02.label }}</label>
-                                    {{ form_DataSheetNS.oSec01Field02 }}
+                                    {{ form.oSec01Field02 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form_DataSheetNS.oSec01Field03.label }}</label>
-                                    {{ form_DataSheetNS.oSec01Field03 }}
+                                    {{ form.oSec01Field03 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form_DataSheetNS.oSec01Field04.label }}</label>
-                                    {{ form_DataSheetNS.oSec01Field04 }}
+                                    {{ form.oSec01Field04 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form_DataSheetNS.oSec01Field05.label }}</label>
-                                    {{ form_DataSheetNS.oSec01Field05 }}
+                                    {{ form.oSec01Field05 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form_DataSheetNS.oSec01Field06.label }}</label>
-                                    {{ form_DataSheetNS.oSec01Field06 }}
+                                    {{ form.oSec01Field06 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form_DataSheetNS.oSec01Field07.label }}</label>
-                                    {{ form_DataSheetNS.oSec01Field07 }}
+                                    {{ form.oSec01Field07 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form_DataSheetNS.oSec01Field08.label }}</label>
-                                    {{ form_DataSheetNS.oSec01Field08 }}
+                                    {{ form.oSec01Field08 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form_DataSheetNS.oSec01Field09.label }}</label>
-                                    {{ form_DataSheetNS.oSec01Field09 }}
+                                    {{ form.oSec01Field09 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form_DataSheetNS.oSec01Field10.label }}</label>
-                                    {{ form_DataSheetNS.oSec01Field10 }}
+                                    {{ form.oSec01Field10 }}
                                 </div>
                             </div>
                         </div>
@@ -81,17 +85,88 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form_DataSheetNS.oSec02Field01.label }}</label>
-                                    {{ form_DataSheetNS.oSec02Field01 }}
+                                    {{ form.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field10 }}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Section 3 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 3</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field10 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
             </div> <!-- Close row div -->
 
             <div class="text-center">
-                <button type="submit" name="form_DataSheetNS_submit" class="btn btn-primary btn-lg mt-3">Save</button>                                
+                <button type="submit" name="form_DataSheetMechanicalCoarseScreen_submit" class="btn btn-primary btn-lg mt-3">Save</button>                                
                 
             </div>
         </form>

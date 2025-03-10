@@ -105,19 +105,40 @@
                   </li>
                   
                   {% endif %}
-                                    
+                  
+                  <li class="nav-item">
+                    <a href="{% url 'project_list' %}">
+                      <i class="fas fa-desktop"></i>
+                      <p>Projects</p>
+                    </a>
+                  </li>
+                        
+                  
                         
                   <!-- Screens -->
                   <li class="nav-item">
-                    <a data-bs-toggle="collapse" href="#submenu_Projects">
+                    <a data-bs-toggle="collapse" href="#submenu_DS">
                       <i class="fas fa-bars"></i>
                       <p>DataSheets</p>
                       <span class="caret"></span>
                     </a>
-                    <div class="collapse" id="submenu_Projects">
+                    <div class="collapse" id="submenu_DS">
                       <ul class="nav nav-collapse">
-                        <li class="sub-item"><a href="{% url 'project_list' %}"> <i class="fas fa-desktop"></i> <p>Projects  </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_DataSheetNS' %}"> <i class="fas fa-desktop"></i> <p>NS </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='A' %}"> <i class="fas fa-desktop"></i> <p>ManualScreen </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='B' %}"> <i class="fas fa-desktop"></i> <p>BasketScreen </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='C' %}"> <i class="fas fa-desktop"></i> <p>Mechanical Coarse Screen </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='D' %}"> <i class="fas fa-desktop"></i> <p>Mechanical Fine Screen </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='E' %}"> <i class="fas fa-desktop"></i> <p>BeltConveyor </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='F' %}"> <i class="fas fa-desktop"></i> <p>ScrewConveyor </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='G' %}"> <i class="fas fa-desktop"></i> <p>Container </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='H' %}"> <i class="fas fa-desktop"></i> <p>GritGreaseRemoval </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='I' %}"> <i class="fas fa-desktop"></i> <p>SandSilo </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='J' %}"> <i class="fas fa-desktop"></i> <p>PST </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='K' %}"> <i class="fas fa-desktop"></i> <p>QuickValve </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='L' %}"> <i class="fas fa-desktop"></i> <p>TelescopicValve </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='M' %}"> <i class="fas fa-desktop"></i> <p>SludgeThickener </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='N' %}"> <i class="fas fa-desktop"></i> <p>Mixers </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='O' %}"> <i class="fas fa-desktop"></i> <p>Tanks </p></a></li>
                       </ul>
                     </div>
                   </li>

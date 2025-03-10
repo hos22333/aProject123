@@ -1,6 +1,38 @@
 from django.db import models
+from django.db import models
+from django.contrib.auth.models import User
 
 
+
+class Companies(models.Model):
+    nameCompanies  = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.nameCompanies  # Use the correct field name
+    
+    
+ 
+class Project(models.Model):
+    name            = models.CharField(max_length=255)
+    client_name     = models.CharField(max_length=255)
+    capacity        = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+ 
+ 
+   
+    
+class UserCompany(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)  # Ensures one user belongs to one company
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)  # Allows multiple users to be assigned to the same company
+
+    def __str__(self):
+        return f"{self.user.username} - {self.company.nameCompanies}"
+    
+
+
+     
 class FormFieldConfig(models.Model):
     form_name = models.CharField(max_length=100)
     field_name = models.CharField(max_length=100)
@@ -11,9 +43,12 @@ class FormFieldConfig(models.Model):
         ('Hide', 'Hide'),
     ]
     visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default='Show')
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)  # Add company selection
+
 
     def __str__(self):
         return f"{self.form_name} - {self.field_name}"
+
 
 
 class modelcalc(models.Model):
@@ -68,15 +103,6 @@ class modelcalc(models.Model):
         return self.oSec01Field01
 
 
-
-
-class Project(models.Model):
-    name            = models.CharField(max_length=255)
-    client_name     = models.CharField(max_length=255)
-    capacity        = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
 
 class Machine(models.Model):
     project         = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='machines')
@@ -298,3 +324,8 @@ class Machine(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.get_machine_type_display()})"
+    
+    
+    
+    
+

@@ -1,46 +1,49 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-3">Add New Project</h2>
-    <form method="post">
-        {% csrf_token %}
-        <div class="row">
-            <div class="col-md-4">{{ form.name }}</div>
-            <div class="col-md-4">{{ form.client_name }}</div>
-            <div class="col-md-4">{{ form.capacity }}</div>
-        </div>
-        <button type="submit" class="btn btn-primary mt-2">Save</button>
-    </form>
-    
-    <h3 class="mt-4">Projects List</h3>
-    <table class="table table-bordered mt-2">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Client Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for project in projects %}
-            <tr>
-                <td>{{ project.name }}</td>
-                <td>{{ project.client_name }}</td>
-                <td>
-                    <a href="{% url 'edit_project' project.id %}" class="btn btn-warning btn-sm">Edit</a>
-                    <form action="{% url 'delete_project' project.id %}" method="POST" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>                    
-                    <button class="btn btn-info btn-sm" onclick="showDetails('{{ project.name }}', '{{ project.client_name }}', '{{ project.capacity }}')">Show All</button>
-                    <button class="btn btn-success btn-sm" onclick="reviewMachines('{{ project.id }}')">Review Machines</button>
-                    <a href="{% url 'generate_report' project.id %}" class="btn btn-secondary btn-sm">Generate Report</a>
+<div class="container">
+    <div class="page-inner">
 
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <h2 class="mb-3">Add New Project</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-4">{{ form.name }}</div>
+                <div class="col-md-4">{{ form.client_name }}</div>
+                <div class="col-md-4">{{ form.capacity }}</div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Save</button>
+        </form>
+        
+        <h3 class="mt-4">Projects List</h3>
+        <table class="table table-bordered mt-2">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Client Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
+                <tr>
+                    <td>{{ project.name }}</td>
+                    <td>{{ project.client_name }}</td>
+                    <td>
+                        <a href="{% url 'edit_project' project.id %}" class="btn btn-warning btn-sm">Edit</a>
+                        <form action="{% url 'delete_project' project.id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>                    
+                        <button class="btn btn-info btn-sm" onclick="showDetails('{{ project.name }}', '{{ project.client_name }}', '{{ project.capacity }}')">Show All</button>
+                        <button class="btn btn-success btn-sm" onclick="reviewMachines('{{ project.id }}')">Review Machines</button>
+                        <a href="{% url 'generate_report' project.id %}" class="btn btn-secondary btn-sm">Generate Report</a>
+
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Modal -->
