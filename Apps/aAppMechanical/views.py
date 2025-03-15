@@ -37,7 +37,10 @@ from .forms import ProjectForm
 from django.http import JsonResponse
 
 from .forms import UserCompanyForm
+from django.urls import reverse
 
+from .models import aLogEntry
+from django.utils.timezone import now
 
 ###################################
 ###################################
@@ -2459,12 +2462,40 @@ def project_list(request):
     if request.method == "POST":
         form = ProjectForm(request.POST)
         if form.is_valid():
+            
+            instance = form.save(commit=False)  # Don't save to DB yet
+
+            
+            # Get the company associated with the user
+            try:
+                user_company = UserCompany.objects.get(user=request.user).company
+                instance.company = user_company  # Assign company to the instance
+            except UserCompany.DoesNotExist:
+                return render(request, 'project_list', {"form": form, "error": "User is not associated with a company"})
+
+
             form.save()
             return redirect('project_list')
     else:
         form = ProjectForm()
+        
+        
+    # Get the company of the logged-in user
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    # Assign company filter only if the user has a company
+    if user_company:
+        #machines = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company)
+        projects = Project.objects.filter(company=user_company)
+    else:
+        projects = Project.objects.none()  # Return an empty queryset if no company
     
-    projects = Project.objects.all()
+    #projects = Project.objects.all()
     return render(request, 'project_list.html', {'form': form, 'projects': projects})
 
 
@@ -2517,64 +2548,312 @@ def get_machines(request, project_id):
         
         data = {
             "project_name": project.name,
-            "machines": list(machines.values("oSec00Field01", "oSec00Field02", "oSec00Field03", "oSec01Field01", "oSec01Field02"))
+            "machines": list(machines.values("oSec00Field01", "oSec00Field02", "oSec00Field03",
+                                             "oSec01Field01", "oSec01Field02", "oSec01Field03",
+                                             "oSec01Field04", "oSec01Field05"))
         }
         return JsonResponse(data)
     except Project.DoesNotExist:
         return JsonResponse({"error": "Project not found"}, status=404)
 
 
+# def generate_report(request, project_id):
+#     try:
+#         project = Project.objects.get(id=project_id)
+#         machines = Machine.objects.filter(project=project)
+
+#         # Create a Word document
+#         doc = Document()
+#         doc.add_heading(f'Project Report: {project.name}', level=1)
+
+#         # Add project details in a two-column table
+#         doc.add_heading("Project Details", level=2)
+#         project_table = doc.add_table(rows=0, cols=2)
+
+#         project_data = {
+#             "Name": project.name,
+#             "Client Name": project.client_name,
+#             "Capacity": project.capacity,
+#         }
+
+#         for key, value in project_data.items():
+#             row_cells = project_table.add_row().cells
+#             row_cells[0].text = key
+#             row_cells[1].text = str(value)
+
+#         doc.add_paragraph("\n" + "=" * 50 + "\n")
+
+#         # Add machine details
+#         doc.add_heading("Machines", level=2)
+
+#         for machine in machines:
+#             doc.add_paragraph(f"Machine ID: {machine.id}", style="Heading3")
+#             doc.add_paragraph("Sec01")
+
+#             machine_table = doc.add_table(rows=0, cols=2)
+
+#             machine_data = {
+#                 "Username": machine.oSec00Field01,
+#                 "Created At": machine.oSec00Field02,
+#                 "Type": machine.oSec00Field03,
+#                 machine.oSec01Field01 : machine.oSec01Field02,
+#                 machine.oSec01Field03 : machine.oSec01Field04,
+#                 machine.oSec01Field05 : machine.oSec01Field06,
+#                 machine.oSec01Field07 : machine.oSec01Field08,
+#                 machine.oSec01Field09 : machine.oSec01Field10,
+#             }
+
+#             for key, value in machine_data.items():
+#                 row_cells = machine_table.add_row().cells
+#                 row_cells[0].text = key
+#                 row_cells[1].text = str(value)
+
+#             doc.add_paragraph("\n")
+#             doc.add_paragraph("Sec02")
+
+#             machine_table = doc.add_table(rows=0, cols=2)
+
+#             machine_data = {
+#                 machine.oSec02Field01 : machine.oSec02Field02,
+#                 machine.oSec02Field03 : machine.oSec02Field04,
+#                 machine.oSec02Field05 : machine.oSec02Field06,
+#                 machine.oSec02Field07 : machine.oSec02Field08,
+#                 machine.oSec02Field09 : machine.oSec02Field10,
+#             }
+
+#             for key, value in machine_data.items():
+#                 row_cells = machine_table.add_row().cells
+#                 row_cells[0].text = key
+#                 row_cells[1].text = str(value)
+
+#             doc.add_paragraph("\n")
+#             doc.add_paragraph("Sec03")
+
+#             machine_table = doc.add_table(rows=0, cols=2)
+
+#             machine_data = {
+#                 machine.oSec03Field01 : machine.oSec03Field02,
+#                 machine.oSec03Field03 : machine.oSec03Field04,
+#                 machine.oSec03Field05 : machine.oSec03Field06,
+#                 machine.oSec03Field07 : machine.oSec03Field08,
+#                 machine.oSec03Field09 : machine.oSec03Field10,
+#             }
+
+#             for key, value in machine_data.items():
+#                 row_cells = machine_table.add_row().cells
+#                 row_cells[0].text = key
+#                 row_cells[1].text = str(value)
+
+#             doc.add_paragraph("\n")
+
+#         # Save the document to a response
+#         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+#         response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+#         doc.save(response)
+#         return response
+
+#     except Project.DoesNotExist:
+#         return HttpResponse("Project not found", status=404)
+
+
+
+
+
+
+
+
+from django.http import HttpResponse
+from docx import Document
+from docx.shared import Pt, RGBColor
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.oxml import OxmlElement, ns
+from .models import Project, Machine  # Assuming these models exist
+from docx.shared import Inches
+
+def add_header_footer(doc):
+    """Adds header and footer with page numbers in the format 'Page X of Y'."""
+    section = doc.sections[0]
+
+    # Header
+    header = section.header
+    header_para = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+    header_para.add_run("Company Name\n")
+    header_para.add_run("Project Name\n")
+    header_para.add_run("Date: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
+    header_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+    # Adding logo
+    run_logo = header_para.add_run()  # Corrected reference to header paragraph
+    run_logo.add_picture("Logo.PNG", width=Inches(1.0))  # Adjust width as needed
+
+    # Footer
+    footer = section.footer
+    footer_para = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+    footer_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+    # Add "Page X of Y" format
+    run = footer_para.add_run("Page ")
+
+    # PAGE field (Current Page Number)
+    fldChar1 = OxmlElement("w:fldChar")
+    fldChar1.set(ns.qn("w:fldCharType"), "begin")
+
+    instrText1 = OxmlElement("w:instrText")
+    instrText1.set(ns.qn("xml:space"), "preserve")
+    instrText1.text = "PAGE"
+
+    fldChar2 = OxmlElement("w:fldChar")
+    fldChar2.set(ns.qn("w:fldCharType"), "end")
+
+    run._r.append(fldChar1)
+    run._r.append(instrText1)
+    run._r.append(fldChar2)
+
+    run.add_text(" of ")
+
+    # NUMPAGES field (Total Number of Pages)
+    fldChar3 = OxmlElement("w:fldChar")
+    fldChar3.set(ns.qn("w:fldCharType"), "begin")
+
+    instrText2 = OxmlElement("w:instrText")
+    instrText2.set(ns.qn("xml:space"), "preserve")
+    instrText2.text = "NUMPAGES"
+
+    fldChar4 = OxmlElement("w:fldChar")
+    fldChar4.set(ns.qn("w:fldCharType"), "end")
+
+    run._r.append(fldChar3)
+    run._r.append(instrText2)
+    run._r.append(fldChar4)
+
+
+def add_colored_heading(doc, text, level, color):
+    """Adds a heading with color."""
+    heading = doc.add_paragraph()
+    run = heading.add_run(text)
+    run.bold = True
+    run.font.size = Pt(14) if level == 1 else Pt(12)
+    run.font.color.rgb = color
+    heading.style = f"Heading {level}"
+
+
+def add_table(doc, data, title=None):
+    """Creates a table and applies a background color to the header."""
+    if title:
+        doc.add_heading(title, level=3)
+
+    table = doc.add_table(rows=len(data), cols=2)
+    table.style = "Table Grid"
+
+    for i, row in enumerate(data):
+        for j, text in enumerate(row):
+            cell = table.cell(i, j)
+            cell.text = text
+
+            # Apply background color only to the header row (first row)
+            if i == 0:
+                shading_elm = OxmlElement("w:shd")
+                shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Light Gray color
+                cell._tc.get_or_add_tcPr().append(shading_elm)
+
+
+
+from docx.shared import Pt
+
+from docx.shared import Pt
+
 def generate_report(request, project_id):
+    """Generates a Word report for a given project."""
     try:
         project = Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
 
         # Create a Word document
         doc = Document()
+
+        # Add header and footer with page numbers
+        add_header_footer(doc)
+
+        # Add project title
         doc.add_heading(f'Project Report: {project.name}', level=1)
 
-        # Add project details in a two-column table
+        # Add project details
         doc.add_heading("Project Details", level=2)
-        project_table = doc.add_table(rows=0, cols=2)
 
-        project_data = {
-            "Name": project.name,
-            "Client Name": project.client_name,
-            "Capacity": project.capacity,
-        }
+        project_data = [
+            ("Field", "Value"),
+            ("Name", project.name),
+            ("Client Name", project.client_name),
+            ("Capacity", project.capacity),
+        ]
+        add_table(doc, project_data)     
 
-        for key, value in project_data.items():
-            row_cells = project_table.add_row().cells
-            row_cells[0].text = key
-            row_cells[1].text = str(value)
-
-        doc.add_paragraph("\n" + "=" * 50 + "\n")
+        doc.add_paragraph("\n")
+        doc.add_page_break()     
+        doc.add_paragraph("\n")
 
         # Add machine details
-        doc.add_heading("Machines", level=2)
+        for index, machine in enumerate(machines, start=1):  # Add numbering
+            machine_name = machine.oSec00Field03
+            section_titles = []
 
-        for machine in machines:
-            doc.add_paragraph(f"Machine ID: {machine.id}", style="Heading3")
+            if machine_name == "DataSheetNS":
+                machine_name = "Manual Screen" 
+                section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
 
-            machine_table = doc.add_table(rows=0, cols=2)
+            if machine_name == "DataSheetMSc":
+                machine_name = "Mechanical Screen" 
+                section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
 
-            machine_data = {
-                "Username": machine.oSec00Field01,
-                "Created At": machine.oSec00Field02,
-                "Type": machine.oSec00Field03,
-                machine.oSec01Field01 : machine.oSec01Field02,
-                machine.oSec01Field03 : machine.oSec01Field04,
-                machine.oSec01Field05 : machine.oSec01Field06,
-                machine.oSec01Field07 : machine.oSec01Field08,
-                machine.oSec01Field09 : machine.oSec01Field10,
-            }
+            if machine_name == "DataSheetBC":
+                machine_name = "Belt Conveyor"
+                section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
 
-            for key, value in machine_data.items():
-                row_cells = machine_table.add_row().cells
-                row_cells[0].text = key
-                row_cells[1].text = str(value)
+            if machine_name == "DataSheetCO":
+                machine_name = "Container"
+                section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
 
-            doc.add_paragraph("\n")
+            if machine_name == "DataSheetGR":
+                machine_name = "Gritremoval"
+                section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
+
+            if machine_name == "DataSheetSS":
+                machine_name = "Sand Silo"
+
+            if machine_name == "DataSheetPS":
+                machine_name = "Primary Sedimentation"
+
+            if machine_name == "DataSheetQV":
+                machine_name = "Quick Valve"
+
+            if machine_name == "DataSheetTV":
+                machine_name = "Telescopic Valve"
+                
+            if machine_name == "DataSheetTH":
+                machine_name = "Sludge Thickener"
+
+            # Add machine title with font size 14 and numbering
+            machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
+            machine_title.runs[0].font.size = Pt(14)
+
+            for i in range(1, 11):  # Loop from Sec01 to Sec10
+                section_name = f"Sec{i:02d}"
+                section_data = [("Field", "Value")]
+
+                for j in range(1, 21, 2):  # Step by 2 to avoid duplication
+                    key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
+                    value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
+
+                    if key and value and key.lower() != "oooo" and value.lower() != "oooo":
+                        section_data.append((key, value))
+
+                if len(section_data) > 1:  # If the section has valid data, create a table
+                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                    doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
+
+                    add_table(doc, section_data)  # Removed redundant title
+
+            doc.add_page_break()     
 
         # Save the document to a response
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
@@ -2584,6 +2863,11 @@ def generate_report(request, project_id):
 
     except Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
+
+
+
+
+
 
 ###
 ###
@@ -2657,6 +2941,8 @@ def DataSheetNS_Save(request):
             form_DataSheetNS = FDS_NS(initial=form_DataSheetNS.cleaned_data)
             
             machines = Machine.objects.filter(oSec00Field03="DataSheetNS")
+            
+
 
             return render(request, 'PageDataSheet_ManualScreen.html', {
                 'form': form_DataSheetNS,
@@ -2679,7 +2965,9 @@ def DataSheetNS_Save(request):
 def DataSheetNS_Delete(request, machine_id):
     machine = get_object_or_404(Machine, id=machine_id)
     machine.delete()
-    return JsonResponse({"success": True})  # Return JSON response for AJAX requests
+    
+    # Redirect to the 'load_data_sheet' view with sheet_key='A'
+    return redirect(reverse('load_data_sheet', kwargs={'sheet_key': 'A'}))
 
 
 def DataSheetNS_edit(request, id):
@@ -2753,11 +3041,24 @@ DATA_SHEET_CONFIG = {
 }
 
 
-def load_data_sheet(request, sheet_key):
-    if not request.user.is_authenticated:
-        return redirect("login")
+from django.shortcuts import render, get_object_or_404
+from .models import Machine, UserCompany  # Import your models
 
-    config = DATA_SHEET_CONFIG.get(sheet_key)
+def load_data_sheet(request, sheet_key):
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} accessed Load {sheet_key} "
+        )
+    print(f"at {now()} {User} accessed Load {sheet_key} ")
+    ###LOG
+
+    print(UserCompany.objects.get(user=request.user).company)
+
+    if not request.user.is_authenticated:
+        return redirect("login")  # Redirect unauthenticated users
+
+    config = config = DATA_SHEET_CONFIG.get(sheet_key)
     if not config:
         return redirect("some_error_page")  # Handle invalid keys
 
@@ -2766,24 +3067,33 @@ def load_data_sheet(request, sheet_key):
     needs_user = config["needs_user"]
     DB_Name = config["DB_Name"]
 
-    projects = Project.objects.all()
+    # Get the company of the logged-in user
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
 
-    # Instantiate form with user if needed
-    if needs_user:
-        form = form_class(user=request.user)
+    # Assign company filter only if the user has a company
+    if user_company:
+        machines = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company)
+        projects = Project.objects.filter(company=user_company)
     else:
-        form = form_class()
+        machines = Machine.objects.none()  # Return an empty queryset if no company
+        projects = Project.objects.none()  # Return an empty queryset if no company
 
-    # Ensure "project" field exists in form before setting queryset
-    if "project" in form.fields:
-        form.fields["project"].queryset = projects
-    else:
-        print("Project field not found in form!")
+    # If the form needs user association, provide it
+    form = form_class() if not needs_user else form_class(user=request.user)
+    
+    print(projects)
 
-    machines = Machine.objects.filter(oSec00Field03=DB_Name)
-
-
-    return render(request, template, {"form": form, "machines": machines})
+    return render(request, template, {
+    "form": form,
+    "machines": machines,
+    "projects": projects,  
+    "user_company": user_company,
+})
 
 
 
@@ -2811,8 +3121,22 @@ DATA_SHEET_CONFIG_BBB = {
 
 
 
+from django.shortcuts import render, redirect
+from datetime import datetime
+from .models import Machine, Project, UserCompany  # Import necessary models
+
 def save_data_sheet(request, data_type):
-    """Generic function to handle all data sheet saves."""
+    
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} accessed Save {data_type} "
+        )    
+    ###LOG
+
+    if not request.user.is_authenticated:
+        return redirect("ms_load")  # Redirect if user is not logged in
+
     if data_type not in DATA_SHEET_CONFIG_BBB:
         return redirect("ms_load")  # Redirect if data type is invalid
 
@@ -2839,20 +3163,521 @@ def save_data_sheet(request, data_type):
                     instance.project = Project.objects.get(id=project_id)
                 except Project.DoesNotExist:
                     return render(request, template, {"form": form, "error": "Invalid Project ID"})
-
             else:
                 return render(request, template, {"form": form, "error": "Project is required"})
 
+            # Get the company associated with the user
+            try:
+                user_company = UserCompany.objects.get(user=request.user).company
+                instance.company = user_company  # Assign company to the instance
+            except UserCompany.DoesNotExist:
+                return render(request, template, {"form": form, "error": "User is not associated with a company"})
+
+            # Save the instance to the database
             instance.save()
 
             # Refresh form with initial values
             form = form_class(initial=form.cleaned_data)
-            machines = Machine.objects.filter(oSec00Field03=DB_Name)
+
+            # Filter machines by the user’s company
+            machines = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company)
 
             return render(request, template, {"form": form, "success": "Data saved successfully!", "machines": machines})
 
         else:
+            # If the form has errors, return all machines for this DB_Name (no company filtering)
             machines = Machine.objects.filter(oSec00Field03=DB_Name)
             return render(request, template, {"form": form, "error": "Form contains errors", "machines": machines})
 
     return redirect("ms_load")  # Redirect for invalid requests
+
+
+
+
+def General_DXF_NS(request, aMachine_ID):
+    print(aMachine_ID)
+    if request.method == "POST":
+        # Define the path to the DXF file in the static directory
+        static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "NS.dxf")
+        modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "NS_new.dxf")
+               
+        # Load the DXF file
+        doc = ezdxf.readfile(static_path)
+
+        # Iterate over the modelspace to find all DIMENSION entities
+        for entity in doc.modelspace().query("DIMENSION"):
+            if entity.dxf.text == "ScreenLength":
+                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
+                entity.dxf.text = "1000"
+            elif entity.dxf.text == "BarLength":
+                entity.dxf.text = "500"
+            elif entity.dxf.text == "ScreenWidth":
+                entity.dxf.text = "600"
+            elif entity.dxf.text == "BarTh":
+                entity.dxf.text = "10"
+            elif entity.dxf.text == "BarSpacing":
+                entity.dxf.text = "25"
+                            
+            
+            # Update text height and arrow size via dimstyle
+            dimstyle_name = entity.dxf.dimstyle
+            dimstyle = doc.dimstyles.get(dimstyle_name)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Set text height
+                dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+            # Render the dimension to apply changes
+            entity.render()
+
+        # Save the modified DXF file
+        doc.saveas(modified_path)
+
+        # Serve the modified file for download
+        with open(modified_path, "rb") as dxf_file:
+            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+            response["Content-Disposition"] = 'attachment; filename="NS_new_new.dxf"'
+            return response
+
+    return HttpResponse("Invalid request", status=400)
+
+
+
+
+def General_DXF_MS(request, aMachine_ID):
+    print(aMachine_ID)
+    if request.method == "POST":
+        # Define the path to the DXF file in the static directory
+        static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "MS.dxf")
+        modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "MS_new.dxf")
+               
+        # Load the DXF file
+        doc = ezdxf.readfile(static_path)
+
+        # Iterate over the modelspace to find all DIMENSION entities
+        for entity in doc.modelspace().query("DIMENSION"):
+            if entity.dxf.text == "ScreenLength":
+                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
+                entity.dxf.text = "1000"
+            elif entity.dxf.text == "BarLength":
+                entity.dxf.text = "500"
+            elif entity.dxf.text == "ScreenWidth":
+                entity.dxf.text = "600"
+            elif entity.dxf.text == "BarTh":
+                entity.dxf.text = "10"
+            elif entity.dxf.text == "BarSpacing":
+                entity.dxf.text = "25"
+                            
+            
+            # Update text height and arrow size via dimstyle
+            dimstyle_name = entity.dxf.dimstyle
+            dimstyle = doc.dimstyles.get(dimstyle_name)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Set text height
+                dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+            # Render the dimension to apply changes
+            entity.render()
+
+        # Save the modified DXF file
+        doc.saveas(modified_path)
+
+        # Serve the modified file for download
+        with open(modified_path, "rb") as dxf_file:
+            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+            response["Content-Disposition"] = 'attachment; filename="MS_new_new.dxf"'
+            return response
+
+    return HttpResponse("Invalid request", status=400)
+
+
+
+
+def General_DXF_BC(request, aMachine_ID):
+    print(aMachine_ID)
+    if request.method == "POST":
+        # Define the path to the DXF file in the static directory
+        static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "BC.dxf")
+        modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "BC_new.dxf")
+               
+        # Load the DXF file
+        doc = ezdxf.readfile(static_path)
+
+        # Iterate over the modelspace to find all DIMENSION entities
+        for entity in doc.modelspace().query("DIMENSION"):
+            if entity.dxf.text == "ScreenLength":
+                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
+                entity.dxf.text = "1000"
+            elif entity.dxf.text == "BarLength":
+                entity.dxf.text = "500"
+            elif entity.dxf.text == "ScreenWidth":
+                entity.dxf.text = "600"
+            elif entity.dxf.text == "BarTh":
+                entity.dxf.text = "10"
+            elif entity.dxf.text == "BarSpacing":
+                entity.dxf.text = "25"
+                            
+            
+            # Update text height and arrow size via dimstyle
+            dimstyle_name = entity.dxf.dimstyle
+            dimstyle = doc.dimstyles.get(dimstyle_name)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Set text height
+                dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+            # Render the dimension to apply changes
+            entity.render()
+
+        # Save the modified DXF file
+        doc.saveas(modified_path)
+
+        # Serve the modified file for download
+        with open(modified_path, "rb") as dxf_file:
+            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+            response["Content-Disposition"] = 'attachment; filename="BC_new_new.dxf"'
+            return response
+
+    return HttpResponse("Invalid request", status=400)
+
+
+
+def General_DXF_CO(request, aMachine_ID):
+    print(aMachine_ID)
+    if request.method == "POST":
+        # Define the path to the DXF file in the static directory
+        static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "CO.dxf")
+        modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "CO_new.dxf")
+               
+        # Load the DXF file
+        doc = ezdxf.readfile(static_path)
+
+        # Iterate over the modelspace to find all DIMENSION entities
+        for entity in doc.modelspace().query("DIMENSION"):
+            if entity.dxf.text == "ScreenLength":
+                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
+                entity.dxf.text = "1000"
+            elif entity.dxf.text == "BarLength":
+                entity.dxf.text = "500"
+            elif entity.dxf.text == "ScreenWidth":
+                entity.dxf.text = "600"
+            elif entity.dxf.text == "BarTh":
+                entity.dxf.text = "10"
+            elif entity.dxf.text == "BarSpacing":
+                entity.dxf.text = "25"
+                            
+            
+            # Update text height and arrow size via dimstyle
+            dimstyle_name = entity.dxf.dimstyle
+            dimstyle = doc.dimstyles.get(dimstyle_name)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Set text height
+                dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+            # Render the dimension to apply changes
+            entity.render()
+
+        # Save the modified DXF file
+        doc.saveas(modified_path)
+
+        # Serve the modified file for download
+        with open(modified_path, "rb") as dxf_file:
+            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+            response["Content-Disposition"] = 'attachment; filename="CO_new_new.dxf"'
+            return response
+
+    return HttpResponse("Invalid request", status=400)
+
+
+
+
+def General_DXF_GR(request, aMachine_ID):
+    print(aMachine_ID)
+    if request.method == "POST":
+        # Define the path to the DXF file in the static directory
+        static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "GR.dxf")
+        modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "GR_new.dxf")
+               
+        # Load the DXF file
+        doc = ezdxf.readfile(static_path)
+
+        # Iterate over the modelspace to find all DIMENSION entities
+        for entity in doc.modelspace().query("DIMENSION"):
+            if entity.dxf.text == "ScreenLength":
+                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
+                entity.dxf.text = "1000"
+            elif entity.dxf.text == "BarLength":
+                entity.dxf.text = "500"
+            elif entity.dxf.text == "ScreenWidth":
+                entity.dxf.text = "600"
+            elif entity.dxf.text == "BarTh":
+                entity.dxf.text = "10"
+            elif entity.dxf.text == "BarSpacing":
+                entity.dxf.text = "25"
+                            
+            
+            # Update text height and arrow size via dimstyle
+            dimstyle_name = entity.dxf.dimstyle
+            dimstyle = doc.dimstyles.get(dimstyle_name)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Set text height
+                dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+            # Render the dimension to apply changes
+            entity.render()
+
+        # Save the modified DXF file
+        doc.saveas(modified_path)
+
+        # Serve the modified file for download
+        with open(modified_path, "rb") as dxf_file:
+            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+            response["Content-Disposition"] = 'attachment; filename="GR_new_new.dxf"'
+            return response
+
+    return HttpResponse("Invalid request", status=400)
+
+
+
+
+def General_DXF_SS(request, aMachine_ID):
+    print(aMachine_ID)
+    if request.method == "POST":
+        # Define the path to the DXF file in the static directory
+        static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "SS.dxf")
+        modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "SS_new.dxf")
+               
+        # Load the DXF file
+        doc = ezdxf.readfile(static_path)
+
+        # Iterate over the modelspace to find all DIMENSION entities
+        for entity in doc.modelspace().query("DIMENSION"):
+            if entity.dxf.text == "ScreenLength":
+                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
+                entity.dxf.text = "1000"
+            elif entity.dxf.text == "BarLength":
+                entity.dxf.text = "500"
+            elif entity.dxf.text == "ScreenWidth":
+                entity.dxf.text = "600"
+            elif entity.dxf.text == "BarTh":
+                entity.dxf.text = "10"
+            elif entity.dxf.text == "BarSpacing":
+                entity.dxf.text = "25"
+                            
+            
+            # Update text height and arrow size via dimstyle
+            dimstyle_name = entity.dxf.dimstyle
+            dimstyle = doc.dimstyles.get(dimstyle_name)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Set text height
+                dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+            # Render the dimension to apply changes
+            entity.render()
+
+        # Save the modified DXF file
+        doc.saveas(modified_path)
+
+        # Serve the modified file for download
+        with open(modified_path, "rb") as dxf_file:
+            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+            response["Content-Disposition"] = 'attachment; filename="SS_new_new.dxf"'
+            return response
+
+    return HttpResponse("Invalid request", status=400)
+
+
+
+
+def General_DXF_PST(request, aMachine_ID):
+    print(aMachine_ID)
+    if request.method == "POST":
+        # Define the path to the DXF file in the static directory
+        static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "PST.dxf")
+        modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "PST_new.dxf")
+               
+        # Load the DXF file
+        doc = ezdxf.readfile(static_path)
+
+        # Iterate over the modelspace to find all DIMENSION entities
+        for entity in doc.modelspace().query("DIMENSION"):
+            if entity.dxf.text == "ScreenLength":
+                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
+                entity.dxf.text = "1000"
+            elif entity.dxf.text == "BarLength":
+                entity.dxf.text = "500"
+            elif entity.dxf.text == "ScreenWidth":
+                entity.dxf.text = "600"
+            elif entity.dxf.text == "BarTh":
+                entity.dxf.text = "10"
+            elif entity.dxf.text == "BarSpacing":
+                entity.dxf.text = "25"
+                            
+            
+            # Update text height and arrow size via dimstyle
+            dimstyle_name = entity.dxf.dimstyle
+            dimstyle = doc.dimstyles.get(dimstyle_name)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Set text height
+                dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+            # Render the dimension to apply changes
+            entity.render()
+
+        # Save the modified DXF file
+        doc.saveas(modified_path)
+
+        # Serve the modified file for download
+        with open(modified_path, "rb") as dxf_file:
+            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+            response["Content-Disposition"] = 'attachment; filename="PST_new_new.dxf"'
+            return response
+
+    return HttpResponse("Invalid request", status=400)
+
+
+
+
+def General_DXF_QV(request, aMachine_ID):
+    print(aMachine_ID)
+    if request.method == "POST":
+        # Define the path to the DXF file in the static directory
+        static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "QV.dxf")
+        modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "QV_new.dxf")
+               
+        # Load the DXF file
+        doc = ezdxf.readfile(static_path)
+
+        # Iterate over the modelspace to find all DIMENSION entities
+        for entity in doc.modelspace().query("DIMENSION"):
+            if entity.dxf.text == "ScreenLength":
+                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
+                entity.dxf.text = "1000"
+            elif entity.dxf.text == "BarLength":
+                entity.dxf.text = "500"
+            elif entity.dxf.text == "ScreenWidth":
+                entity.dxf.text = "600"
+            elif entity.dxf.text == "BarTh":
+                entity.dxf.text = "10"
+            elif entity.dxf.text == "BarSpacing":
+                entity.dxf.text = "25"
+                            
+            
+            # Update text height and arrow size via dimstyle
+            dimstyle_name = entity.dxf.dimstyle
+            dimstyle = doc.dimstyles.get(dimstyle_name)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Set text height
+                dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+            # Render the dimension to apply changes
+            entity.render()
+
+        # Save the modified DXF file
+        doc.saveas(modified_path)
+
+        # Serve the modified file for download
+        with open(modified_path, "rb") as dxf_file:
+            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+            response["Content-Disposition"] = 'attachment; filename="QV_new_new.dxf"'
+            return response
+
+    return HttpResponse("Invalid request", status=400)
+
+
+
+
+def General_DXF_TV(request, aMachine_ID):
+    print(aMachine_ID)
+    if request.method == "POST":
+        # Define the path to the DXF file in the static directory
+        static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "TV.dxf")
+        modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "TV_new.dxf")
+               
+        # Load the DXF file
+        doc = ezdxf.readfile(static_path)
+
+        # Iterate over the modelspace to find all DIMENSION entities
+        for entity in doc.modelspace().query("DIMENSION"):
+            if entity.dxf.text == "ScreenLength":
+                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
+                entity.dxf.text = "1000"
+            elif entity.dxf.text == "BarLength":
+                entity.dxf.text = "500"
+            elif entity.dxf.text == "ScreenWidth":
+                entity.dxf.text = "600"
+            elif entity.dxf.text == "BarTh":
+                entity.dxf.text = "10"
+            elif entity.dxf.text == "BarSpacing":
+                entity.dxf.text = "25"
+                            
+            
+            # Update text height and arrow size via dimstyle
+            dimstyle_name = entity.dxf.dimstyle
+            dimstyle = doc.dimstyles.get(dimstyle_name)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Set text height
+                dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+            # Render the dimension to apply changes
+            entity.render()
+
+        # Save the modified DXF file
+        doc.saveas(modified_path)
+
+        # Serve the modified file for download
+        with open(modified_path, "rb") as dxf_file:
+            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+            response["Content-Disposition"] = 'attachment; filename="TV_new_new.dxf"'
+            return response
+
+    return HttpResponse("Invalid request", status=400)
+
+
+
+
+def General_DXF_TH(request, aMachine_ID):
+    print(aMachine_ID)
+    if request.method == "POST":
+        # Define the path to the DXF file in the static directory
+        static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "TH.dxf")
+        modified_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "TH_new.dxf")
+               
+        # Load the DXF file
+        doc = ezdxf.readfile(static_path)
+
+        # Iterate over the modelspace to find all DIMENSION entities
+        for entity in doc.modelspace().query("DIMENSION"):
+            if entity.dxf.text == "ScreenLength":
+                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
+                entity.dxf.text = "1000"
+            elif entity.dxf.text == "BarLength":
+                entity.dxf.text = "500"
+            elif entity.dxf.text == "ScreenWidth":
+                entity.dxf.text = "600"
+            elif entity.dxf.text == "BarTh":
+                entity.dxf.text = "10"
+            elif entity.dxf.text == "BarSpacing":
+                entity.dxf.text = "25"
+                            
+            
+            # Update text height and arrow size via dimstyle
+            dimstyle_name = entity.dxf.dimstyle
+            dimstyle = doc.dimstyles.get(dimstyle_name)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Set text height
+                dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+            # Render the dimension to apply changes
+            entity.render()
+
+        # Save the modified DXF file
+        doc.saveas(modified_path)
+
+        # Serve the modified file for download
+        with open(modified_path, "rb") as dxf_file:
+            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+            response["Content-Disposition"] = 'attachment; filename="TH_new_new.dxf"'
+            return response
+
+    return HttpResponse("Invalid request", status=400)
+
+

@@ -1802,7 +1802,7 @@ class FDS_MSc(forms.Form):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Get the logged-in user
         super().__init__(*args, **kwargs)
-        form_name = 'formDataSheetMechanicalCoarseScreen'
+        form_name = 'FDS_MechanicalScreen'
 
         # Determine the user's company
         user_company = None

@@ -108,7 +108,7 @@
                   
                   <li class="nav-item">
                     <a href="{% url 'project_list' %}">
-                      <i class="fas fa-desktop"></i>
+                      <i class="fas fa-book-open"></i>
                       <p>Projects</p>
                     </a>
                   </li>
@@ -118,27 +118,22 @@
                   <!-- Screens -->
                   <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#submenu_DS">
-                      <i class="fas fa-bars"></i>
+                      <i class="fas fa-book"></i>
                       <p>DataSheets</p>
                       <span class="caret"></span>
                     </a>
                     <div class="collapse" id="submenu_DS">
                       <ul class="nav nav-collapse">
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='A' %}"> <i class="fas fa-desktop"></i> <p>ManualScreen </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='B' %}"> <i class="fas fa-desktop"></i> <p>BasketScreen </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='C' %}"> <i class="fas fa-desktop"></i> <p>Mechanical Coarse Screen </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='D' %}"> <i class="fas fa-desktop"></i> <p>Mechanical Fine Screen </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='E' %}"> <i class="fas fa-desktop"></i> <p>BeltConveyor </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='F' %}"> <i class="fas fa-desktop"></i> <p>ScrewConveyor </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='G' %}"> <i class="fas fa-desktop"></i> <p>Container </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='H' %}"> <i class="fas fa-desktop"></i> <p>GritGreaseRemoval </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='I' %}"> <i class="fas fa-desktop"></i> <p>SandSilo </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='J' %}"> <i class="fas fa-desktop"></i> <p>PST </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='K' %}"> <i class="fas fa-desktop"></i> <p>QuickValve </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='L' %}"> <i class="fas fa-desktop"></i> <p>TelescopicValve </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='M' %}"> <i class="fas fa-desktop"></i> <p>SludgeThickener </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='N' %}"> <i class="fas fa-desktop"></i> <p>Mixers </p></a></li>
-                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='O' %}"> <i class="fas fa-desktop"></i> <p>Tanks </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='A' %}"> <i class="fas fa-circle"></i> <p>Manual Screen </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='C' %}"> <i class="fas fa-circle"></i> <p>Mechanical Screen </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='E' %}"> <i class="fas fa-circle"></i> <p>BeltConveyor </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='G' %}"> <i class="fas fa-circle"></i> <p>Container </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='H' %}"> <i class="fas fa-circle"></i> <p>GritGreaseRemoval </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='I' %}"> <i class="fas fa-circle"></i> <p>SandSilo </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='J' %}"> <i class="fas fa-circle"></i> <p>PST </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='K' %}"> <i class="fas fa-circle"></i> <p>QuickValve </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='L' %}"> <i class="fas fa-circle"></i> <p>TelescopicValve </p></a></li>
+                        <li class="sub-item"><a href="{% url 'load_data_sheet' sheet_key='M' %}"> <i class="fas fa-circle"></i> <p>SludgeThickener </p></a></li>
                       </ul>
                     </div>
                   </li>
@@ -153,9 +148,9 @@
                     </a>
                     <div class="collapse" id="submenu1">
                       <ul class="nav nav-collapse">
-                        <li class="sub-item"><a href="{% url 'NS' %}"> <i class="fas fa-desktop"></i> <p>Manual Screens  </p></a></li>
-                        <li class="sub-item"><a href="{% url 'BS' %}"> <i class="fas fa-desktop"></i> <p>Basket screens </p></a></li>
-                        <li class="sub-item"><a href="{% url 'MS' %}"> <i class="fas fa-desktop"></i> <p>Mechanical Screens</p></a></li>
+                        <li class="sub-item"><a href="{% url 'NS' %}"> <i class="fas fa-calculator"></i> <p>Manual Screens  </p></a></li>
+                        <li class="sub-item"><a href="{% url 'BS' %}"> <i class="fas fa-calculator"></i> <p>Basket screens </p></a></li>
+                        <li class="sub-item"><a href="{% url 'MS' %}"> <i class="fas fa-calculator"></i> <p>Mechanical Screens</p></a></li>
                         <li class="sub-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Band Screens  </p></a></li>
                         <li class="sub-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Drum Screens  </p></a></li>
                       </ul>
@@ -172,8 +167,8 @@
                     </a>
                     <div class="collapse" id="submenu2">
                       <ul class="nav nav-collapse">
-                        <li class="nav-item"><a href="{% url 'BC' %}"> <i class="fas fa-desktop"></i> <p>Belt Conveyor   </p></a></li>
-                        <li class="nav-item"><a href="{% url 'SC' %}"> <i class="fas fa-desktop"></i> <p>Screw Conveyor  </p></a></li>
+                        <li class="nav-item"><a href="{% url 'BC' %}"> <i class="fas fa-calculator"></i> <p>Belt Conveyor   </p></a></li>
+                        <li class="nav-item"><a href="{% url 'SC' %}"> <i class="fas fa-calculator"></i> <p>Screw Conveyor  </p></a></li>
                       </ul>
                     </div>
                   </li>
@@ -188,7 +183,7 @@
                     </a>
                     <div class="collapse" id="submenu3">
                       <ul class="nav nav-collapse">
-                        <li class="nav-item"><a href="{% url 'GR' %}"> <i class="fas fa-desktop"></i> <p>Gritremoval (Scrapers)</p></a></li>
+                        <li class="nav-item"><a href="{% url 'GR' %}"> <i class="fas fa-calculator"></i> <p>Gritremoval (Scrapers)</p></a></li>
                         <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Gritremoval (Air Lift Pump)</p></a></li>
                       </ul>
                     </div>
@@ -204,7 +199,7 @@
                     </a>
                     <div class="collapse" id="submenu4">
                       <ul class="nav nav-collapse">
-                        <li class="nav-item"><a href="{% url 'PS' %}"> <i class="fas fa-desktop"></i> <p>PST Half bridge </p></a></li>
+                        <li class="nav-item"><a href="{% url 'PS' %}"> <i class="fas fa-calculator"></i> <p>PST Half bridge </p></a></li>
                         <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>PST Full bridge      </p></a></li>
                       </ul>
                     </div>
@@ -220,7 +215,7 @@
                     </a>
                     <div class="collapse" id="submenu5">
                       <ul class="nav nav-collapse">
-                        <li class="nav-item"><a href="{% url 'TH' %}"> <i class="fas fa-desktop"></i> <p>Thickener 3 arm       </p></a></li>
+                        <li class="nav-item"><a href="{% url 'TH' %}"> <i class="fas fa-calculator"></i> <p>Thickener 3 arm       </p></a></li>
                         <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Thickener 2 arm      </p></a></li>
                       </ul>
                     </div>
@@ -236,7 +231,7 @@
                     </a>
                     <div class="collapse" id="submenu6">
                       <ul class="nav nav-collapse">
-                        <li class="nav-item"><a href="{% url 'MX' %}"> <i class="fas fa-desktop"></i> <p>Rectangular Mixers          </p></a></li>
+                        <li class="nav-item"><a href="{% url 'MX' %}"> <i class="fas fa-calculator"></i> <p>Rectangular Mixers          </p></a></li>
                         <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Circular Mixers      </p></a></li>
                       </ul>
                     </div>
@@ -252,8 +247,8 @@
                     </a>
                     <div class="collapse" id="submenu7">
                       <ul class="nav nav-collapse">
-                        <li class="nav-item"><a href="{% url 'RT' %}"> <i class="fas fa-desktop"></i> <p>Rectangular  Tanks      </p></a></li>
-                        <li class="nav-item"><a href="{% url 'CT' %}"> <i class="fas fa-desktop"></i> <p>Circular Tanks      </p></a></li>
+                        <li class="nav-item"><a href="{% url 'RT' %}"> <i class="fas fa-calculator"></i> <p>Rectangular  Tanks      </p></a></li>
+                        <li class="nav-item"><a href="{% url 'CT' %}"> <i class="fas fa-calculator"></i> <p>Circular Tanks      </p></a></li>
                       </ul>
                     </div>
                   </li>
@@ -268,7 +263,7 @@
                     </a>
                     <div class="collapse" id="submenu8">
                       <ul class="nav nav-collapse">
-                        <li class="nav-item"><a href="{% url 'PNch' %}"> <i class="fas fa-desktop"></i> <p>Channel Penstocks</p></a></li>
+                        <li class="nav-item"><a href="{% url 'PNch' %}"> <i class="fas fa-calculator"></i> <p>Channel Penstocks</p></a></li>
                         <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Wall Penstocks  </p></a></li>
                         <li class="nav-item"><a href="#"> <i class="fas fa-window-close"></i> <p>Wier Penstocks  </p></a></li>
                       </ul>
@@ -328,9 +323,16 @@
                   {% if user.is_authenticated %}                                        
                     <form method="post" action="{% url 'logout' %}">
                       {% csrf_token %}                      
-                      <button type="button" class="btn btn-primary btn-border" style="width: 100; height: 50px; text-align: left;">
-                          Hi, {{ user.username }}
-                      </button>                              
+                          <button type="button" class="btn btn-primary btn-border" style="width: 100; height: 50px; text-align: left;">
+                              Hi, {{ user.username }}
+                          </button>  
+
+                      {% if user_company %}
+                          <button type="button" class="btn btn-primary btn-border" style="width: 150px; height: 50px; text-align: left;">
+                              {{ user_company.company.nameCompanies }}
+                          </button>
+                      {% endif %}
+
                       <button type="submit" class="btn btn-primary" style="width: 100; height: 50px; text-align: left;">
                           Logout
                       </button>                  

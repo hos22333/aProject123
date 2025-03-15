@@ -104,7 +104,21 @@ urlpatterns = [
     
     path("assign-user/", views.assign_user_to_company, name="assign_user"),
     
+
+    
     path("data-sheet/<str:sheet_key>/", views.load_data_sheet, name="load_data_sheet"),
     path("data-sheet-save/<str:data_type>/", views.save_data_sheet, name="save_data_sheet"),
+    
+    path("DrawNS/<int:aMachine_ID>/", views.General_DXF_NS, name="General_DXF_NS"),
+    path("DrawMS/<int:aMachine_ID>/", views.General_DXF_MS, name="General_DXF_MS"),
+    path("DrawBC/<int:aMachine_ID>/", views.General_DXF_BC, name="General_DXF_BC"),
+    path("DrawCO/<int:aMachine_ID>/", views.General_DXF_CO, name="General_DXF_CO"),
+    path("DrawGR/<int:aMachine_ID>/", views.General_DXF_GR, name="General_DXF_GR"),
+    path("DrawSS/<int:aMachine_ID>/", views.General_DXF_SS, name="General_DXF_SS"),
+    path("DrawPST/<int:aMachine_ID>/", views.General_DXF_PST, name="General_DXF_PST"),
+    path("DrawQV/<int:aMachine_ID>/", views.General_DXF_QV, name="General_DXF_QV"),
+    path("DrawTV/<int:aMachine_ID>/", views.General_DXF_TV, name="General_DXF_TV"),
+    path("DrawTH/<int:aMachine_ID>/", views.General_DXF_TH, name="General_DXF_TH"),
+
 
 ]

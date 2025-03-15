@@ -21,7 +21,7 @@
                                     <label for="project">Select Project:</label>
                                     <select name="project" id="project" class="form-control shadow-sm rounded">
                                         <option value="">-- Select a Project --</option>
-                                        {% for project in form.fields.project.queryset %}
+                                        {% for project in projects %}
                                             <option value="{{ project.id }}">{{ project.name }}</option>
                                         {% endfor %}
                                     </select>
@@ -42,44 +42,64 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form.oSec01Field01.label }}</label>
                                     {{ form.oSec01Field01 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form.oSec01Field02.label }}</label>
                                     {{ form.oSec01Field02 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form.oSec01Field03.label }}</label>
                                     {{ form.oSec01Field03 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form.oSec01Field04.label }}</label>
                                     {{ form.oSec01Field04 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form.oSec01Field05.label }}</label>
                                     {{ form.oSec01Field05 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form.oSec01Field06.label }}</label>
                                     {{ form.oSec01Field06 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form.oSec01Field07.label }}</label>
                                     {{ form.oSec01Field07 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form.oSec01Field08.label }}</label>
                                     {{ form.oSec01Field08 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form.oSec01Field09.label }}</label>
                                     {{ form.oSec01Field09 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form.oSec01Field10.label }}</label>
                                     {{ form.oSec01Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field20 }}
                                 </div>
                             </div>
                         </div>
@@ -95,13 +115,364 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form.oSec02Field01.label }}</label>
                                     {{ form.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field20 }}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Section 3 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 3</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 4 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 4</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 5 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 5</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 6 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 6</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
             </div> <!-- Close row div -->
 
             <div class="text-center">
@@ -112,12 +483,12 @@
 
         <!-- Table to Display Saved Data -->
         <h3 class="mt-5">Saved Data</h3>
-        <table class="table table-striped">
-            <thead>
+        <table  id="sortable-table" class="table table-bordered table-hover text-center">
+            <thead class="thead-dark">
                 <tr>
                     <th>Project Name</th>
-                    <th>oSec01Field01</th>
-                    <th>oSec01Field02</th>
+                    <th>Width</th>
+                    <th>Length</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -125,14 +496,19 @@
                 {% for machine in machines %}
                 <tr>
                     <td>{{ machine.project.name }}</td>
-                    <td>{{ machine.oSec01Field01 }}</td>
-                    <td>{{ machine.oSec01Field02 }}</td>
+                    <td>{{ machine.oSec02Field08 }}</td>
+                    <td>{{ machine.oSec02Field10 }}</td>
                     <td>
                         <a href="{% url 'Edit_DataSheetNS' machine.id %}" class="btn btn-warning btn-sm">Edit</a>
                         <a href="{% url 'Delete_DataSheetNS' machine.id %}" class="btn btn-danger btn-sm">Delete</a>
                         <button class="btn btn-info btn-sm show-data-btn" data-id="{{ machine.id }}" data-toggle="modal" data-target="#dataModal">
                             Show All Data
                         </button>
+                        <form action="{% url 'General_DXF_MS' aMachine_ID=machine.id %}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary btn-sm">Generate General Drawing</button>
+                        </form>
+                        
                         
                     </td>
                 </tr>
@@ -166,6 +542,23 @@
     </div>
 </div>
 
+
+
+<!-- Add jQuery & DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+
+<!-- Initialize DataTables -->
+<script>
+    $(document).ready(function () {
+        $('#sortable-table').DataTable();
+    });
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Add this to <head> in base.html -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">

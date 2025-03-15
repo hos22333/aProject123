@@ -36,7 +36,8 @@
                         </form>                    
                         <button class="btn btn-info btn-sm" onclick="showDetails('{{ project.name }}', '{{ project.client_name }}', '{{ project.capacity }}')">Show All</button>
                         <button class="btn btn-success btn-sm" onclick="reviewMachines('{{ project.id }}')">Review Machines</button>
-                        <a href="{% url 'generate_report' project.id %}" class="btn btn-secondary btn-sm">Generate Report</a>
+                        <a href="{% url 'generate_report' project.id %}" class="btn btn-secondary btn-sm">Generate Submittal (Word file)</a>
+                        <a href="#" class="btn btn-secondary btn-sm disabled" aria-disabled="true">Generate Submittal (PDF)</a>
 
                     </td>
                 </tr>
@@ -95,6 +96,38 @@
     </div>
 </div>
 
+<style>
+    /* Change modal background color */
+    #machineDetailsModal .modal-content {
+        background-color:#d0ebff; /* Light gray */
+        color: #000; /* Black text */
+    }
+</style>
+
+<!-- Machine Details Modal -->
+<div class="modal fade" id="machineDetailsModal" tabindex="-1" aria-labelledby="machineDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="machineDetailsModalLabel">Machine Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Username:</strong> <span id="detailUsername"></span></p>
+                <p><strong>Created At:</strong> <span id="detailCreatedAt"></span></p>
+                <p><strong>Type:</strong> <span id="detailType"></span></p>
+                <hr>
+                <p><strong><span id="labelField1"></span>:</strong> <span id="detailField1"></span></p>
+                <p><strong><span id="labelField2"></span>:</strong> <span id="detailField2"></span></p>
+                <p><strong><span id="labelField3"></span>:</strong> <span id="detailField3"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
 function showDetails(name, client, capacity) {
     document.getElementById('modalName').textContent = name;
@@ -104,19 +137,18 @@ function showDetails(name, client, capacity) {
 }
 </script>
 
+
 <script>
     function reviewMachines(projectId) {
-        // Set the modal project name
         document.getElementById('modalProjectName').textContent = "Loading...";
-    
-        // Fetch machine data using AJAX
+        
         fetch(`/Mechanical/get_machines/${projectId}/`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('modalProjectName').textContent = data.project_name;
     
                 let machinesTableBody = document.getElementById('machinesTableBody');
-                machinesTableBody.innerHTML = "";  // Clear existing rows
+                machinesTableBody.innerHTML = "";  
     
                 if (data.machines.length > 0) {
                     data.machines.forEach(machine => {
@@ -126,18 +158,49 @@ function showDetails(name, client, capacity) {
                             <td>${machine.oSec00Field03}</td>
                             <td>${machine.oSec01Field01}</td>
                             <td>${machine.oSec01Field02}</td>
+                            <td>
+                                <button class="btn btn-info btn-sm" onclick="showMachineDetails(
+                                    '${machine.oSec00Field01}', 
+                                    '${machine.oSec00Field02}', 
+                                    '${machine.oSec00Field03}', 
+                                    '${machine.oSec01Field01}', 
+                                    '${machine.oSec01Field02}', 
+                                    '${machine.oSec01Field03}', 
+                                    '${machine.oSec01Field04}', 
+                                    '${machine.oSec01Field05}'
+                                )">View Details</button>
+                            </td>
                         </tr>`;
                         machinesTableBody.innerHTML += row;
                     });
                 } else {
-                    machinesTableBody.innerHTML = "<tr><td colspan='3' class='text-center'>No machines found.</td></tr>";
+                    machinesTableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No machines found.</td></tr>";
                 }
     
-                // Show modal
                 $('#reviewMachinesModal').modal('show');
             })
             .catch(error => console.error('Error:', error));
     }
-    </script>
+
+    function showMachineDetails(username, createdAt, type, field1, field2, field3, field4, field5) {
+        document.getElementById('detailUsername').textContent = username || "N/A";
+        document.getElementById('detailCreatedAt').textContent = createdAt || "N/A";
+        document.getElementById('detailType').textContent = type || "N/A";
+    
+        document.getElementById('labelField1').textContent = field1 || "N/A";
+        document.getElementById('detailField1').textContent = field2 || "N/A";
+    
+        document.getElementById('labelField2').textContent = field3 || "N/A";
+        document.getElementById('detailField2').textContent = field4 || "N/A";
+    
+        document.getElementById('labelField3').textContent = field5 || "N/A";
+        document.getElementById('detailField3').textContent = field5 || "N/A";
+    
+        $('#machineDetailsModal').modal('show');
+    }
+    
+
+    
+</script>
     
 {% endblock %}

@@ -21,7 +21,7 @@
                                     <label for="project">Select Project:</label>
                                     <select name="project" id="project" class="form-control shadow-sm rounded">
                                         <option value="">-- Select a Project --</option>
-                                        {% for project in form.fields.project.queryset %}
+                                        {% for project in projects %}
                                             <option value="{{ project.id }}">{{ project.name }}</option>
                                         {% endfor %}
                                     </select>
@@ -162,91 +162,6 @@
                     </div>
                 </div>
                 
-                <!-- Section 4 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Section 4</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec04Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec04Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec04Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec04Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec04Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec04Field06 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec04Field07 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec04Field08 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec04Field09 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec04Field10 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section 5 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Section 5</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec05Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec05Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec05Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec05Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec05Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec05Field06 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec05Field07 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec05Field08 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec05Field09 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ form.oSec05Field10 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div> <!-- Close row div -->
 
             <div class="text-center">
@@ -278,6 +193,10 @@
                         <button class="btn btn-info btn-sm show-data-btn" data-id="{{ machine.id }}" data-toggle="modal" data-target="#dataModal">
                             Show All Data
                         </button>
+                        <form action="{% url 'General_DXF_CO' aMachine_ID=machine.id %}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary btn-sm">Generate General Drawing</button>
+                        </form>
                         
                     </td>
                 </tr>
