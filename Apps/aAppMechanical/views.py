@@ -2688,8 +2688,8 @@ def add_header_footer(doc):
     header_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
     # Adding logo
-    run_logo = header_para.add_run()  # Corrected reference to header paragraph
-    run_logo.add_picture("Logo.PNG", width=Inches(1.0))  # Adjust width as needed
+    #run_logo = header_para.add_run()  # Corrected reference to header paragraph
+    #run_logo.add_picture("Logo.PNG", width=Inches(1.0))  # Adjust width as needed
 
     # Footer
     footer = section.footer
