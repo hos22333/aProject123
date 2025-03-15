@@ -3138,6 +3138,7 @@ def save_data_sheet(request, data_type):
             message=f"at {now()} {request.user} accessed Save {data_type} "
         )    
     ###LOG
+    
 
     if not request.user.is_authenticated:
         return redirect("ms_load")  # Redirect if user is not logged in
@@ -3200,6 +3201,23 @@ def save_data_sheet(request, data_type):
 
 
 def General_DXF_NS(request, aMachine_ID):
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} Download DXF NS {aMachine_ID} "
+        )
+    
+    ###LOG
+    ###### Get the company ######
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+            
+    ###### Get the company ######
+    
     print(aMachine_ID)
     if request.method == "POST":
         # Define the path to the DXF file in the static directory

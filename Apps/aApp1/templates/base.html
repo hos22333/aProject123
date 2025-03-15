@@ -106,6 +106,7 @@
                   
                   {% endif %}
                   
+                  {% if permissions.DataSheet %} 
                   <li class="nav-item">
                     <a href="{% url 'project_list' %}">
                       <i class="fas fa-book-open"></i>
@@ -137,7 +138,7 @@
                       </ul>
                     </div>
                   </li>
-                                    
+                  {% endif %}            
                         
                   <!-- Screens -->
                   <li class="nav-item">

@@ -8,10 +8,10 @@ class LoggingMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
 
-        # if request.user.is_authenticated:
-            # aLogEntry.objects.create(
-            #     user=request.user,
-            #     message=f"at {now()} Accessed {request.path} "
-            # )
+        if request.user.is_authenticated:
+            aLogEntry.objects.create(
+                user=request.user,
+                message=f"at {now()} Accessed {request.path} "
+            )
 
         return response

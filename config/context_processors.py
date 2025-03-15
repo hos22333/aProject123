@@ -4,7 +4,7 @@ from Apps.aAppMechanical.models import UserCompany  # Import your UserCompany mo
 def user_permissions(request):
     permissions = {}
     if request.user.is_authenticated:
-        for autho_name in ["MS", "BC", "GR", "PS", "TH", "MX", "RT", "AthRol", "Hist", "Settings", "Users"]:
+        for autho_name in ["MS", "BC", "GR", "PS", "TH", "MX", "RT", "AthRol", "Hist", "Settings", "Users", "DataSheet"]:
             permissions[autho_name] = RoleAutho.objects.filter(
                 role__userrole__user=request.user, autho__name=autho_name
             ).exists()
