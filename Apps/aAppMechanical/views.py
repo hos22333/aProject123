@@ -1863,15 +1863,20 @@ def handle_ns_form(request):
         return redirect('login')  # Redirect to the login page if the user is not authenticated
 
     
-    print("aaa")
+    print("Line 1866")
 
 
     if request.method == 'POST' and 'form1_submit' in request.POST:
         
-        print("aaa")
+        print("Line 1871")
         
         form1 = formCalcNS(request.POST)
+        
+        print("Line 1875")
+
         if form1.is_valid():
+            
+            print("Line 1879")
             # Access the cleaned_data dictionary to get individual field values
             oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
             oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
