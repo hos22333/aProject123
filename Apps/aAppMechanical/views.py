@@ -3219,6 +3219,11 @@ def General_DXF_NS(request, aMachine_ID):
     ###### Get the company ######
     
     print(aMachine_ID)
+    
+    machine = Machine.objects.get(id=aMachine_ID)
+    print(machine.oSec02Field04)
+    print(machine.oSec02Field06)    
+    
     if request.method == "POST":
         # Define the path to the DXF file in the static directory
         static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "NS.dxf")
@@ -3231,15 +3236,15 @@ def General_DXF_NS(request, aMachine_ID):
         for entity in doc.modelspace().query("DIMENSION"):
             if entity.dxf.text == "ScreenLength":
                 #entity.dxf.text = request.POST.get("oSec01Field01", "000")
-                entity.dxf.text = "1000"
+                entity.dxf.text = machine.oSec02Field06
             elif entity.dxf.text == "BarLength":
                 entity.dxf.text = "500"
             elif entity.dxf.text == "ScreenWidth":
-                entity.dxf.text = "600"
+                entity.dxf.text = machine.oSec02Field04
             elif entity.dxf.text == "BarTh":
                 entity.dxf.text = "10"
             elif entity.dxf.text == "BarSpacing":
-                entity.dxf.text = "25"
+                entity.dxf.text = machine.oSec02Field10
                             
             
             # Update text height and arrow size via dimstyle
