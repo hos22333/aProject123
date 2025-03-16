@@ -3272,7 +3272,26 @@ def General_DXF_NS(request, aMachine_ID):
 
 
 def General_DXF_MS(request, aMachine_ID):
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} Download DXF NS {aMachine_ID} "
+        )
+    
+    ###LOG
+    ###### Get the company ######
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+            
+    ###### Get the company ######
+    
     print(aMachine_ID)
+    machine = Machine.objects.get(id=aMachine_ID)
+    
     if request.method == "POST":
         # Define the path to the DXF file in the static directory
         static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "MS.dxf")
@@ -3283,17 +3302,16 @@ def General_DXF_MS(request, aMachine_ID):
 
         # Iterate over the modelspace to find all DIMENSION entities
         for entity in doc.modelspace().query("DIMENSION"):
-            if entity.dxf.text == "ScreenLength":
-                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
-                entity.dxf.text = "1000"
-            elif entity.dxf.text == "BarLength":
-                entity.dxf.text = "500"
-            elif entity.dxf.text == "ScreenWidth":
-                entity.dxf.text = "600"
-            elif entity.dxf.text == "BarTh":
-                entity.dxf.text = "10"
-            elif entity.dxf.text == "BarSpacing":
-                entity.dxf.text = "25"
+            if entity.dxf.text == "ChannelHeight":                
+                entity.dxf.text = "0000"
+            elif entity.dxf.text == "WaterLevel":
+                entity.dxf.text = "000"
+            elif entity.dxf.text == "Width":
+                entity.dxf.text = machine.oSec02Field08
+            elif entity.dxf.text == "Length":
+                entity.dxf.text = machine.oSec02Field10
+            elif entity.dxf.text == "Angle":
+                entity.dxf.text = machine.oSec02Field20
                             
             
             # Update text height and arrow size via dimstyle
@@ -3321,7 +3339,26 @@ def General_DXF_MS(request, aMachine_ID):
 
 
 def General_DXF_BC(request, aMachine_ID):
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} Download DXF NS {aMachine_ID} "
+        )
+    
+    ###LOG
+    ###### Get the company ######
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+            
+    ###### Get the company ######
+    
     print(aMachine_ID)
+    machine = Machine.objects.get(id=aMachine_ID)
+    
     if request.method == "POST":
         # Define the path to the DXF file in the static directory
         static_path = os.path.join(settings.BASE_DIR, "static", "aDxfs", "BC.dxf")
@@ -3332,13 +3369,12 @@ def General_DXF_BC(request, aMachine_ID):
 
         # Iterate over the modelspace to find all DIMENSION entities
         for entity in doc.modelspace().query("DIMENSION"):
-            if entity.dxf.text == "ScreenLength":
-                #entity.dxf.text = request.POST.get("oSec01Field01", "000")
-                entity.dxf.text = "1000"
-            elif entity.dxf.text == "BarLength":
-                entity.dxf.text = "500"
-            elif entity.dxf.text == "ScreenWidth":
-                entity.dxf.text = "600"
+            if entity.dxf.text == "Length":
+                entity.dxf.text = machine.oSec02Field04
+            elif entity.dxf.text == "Width":
+                entity.dxf.text = machine.oSec02Field02
+            elif entity.dxf.text == "WidB":
+                entity.dxf.text = "000"
             elif entity.dxf.text == "BarTh":
                 entity.dxf.text = "10"
             elif entity.dxf.text == "BarSpacing":
