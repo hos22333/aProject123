@@ -122,6 +122,13 @@
                 <p><strong><span id="labelField1"></span>:</strong> <span id="detailField1"></span></p>
                 <p><strong><span id="labelField2"></span>:</strong> <span id="detailField2"></span></p>
                 <p><strong><span id="labelField3"></span>:</strong> <span id="detailField3"></span></p>
+                <p><strong><span id="labelField4"></span>:</strong> <span id="detailField4"></span></p>
+                <p><strong><span id="labelField5"></span>:</strong> <span id="detailField5"></span></p>
+                <p><strong><span id="labelField6"></span>:</strong> <span id="detailField6"></span></p>
+                <p><strong><span id="labelField7"></span>:</strong> <span id="detailField7"></span></p>
+                <p><strong><span id="labelField8"></span>:</strong> <span id="detailField8"></span></p>
+                <p><strong><span id="labelField9"></span>:</strong> <span id="detailField9"></span></p>
+                <p><strong><span id="labelField10"></span>:</strong> <span id="detailField10"></span></p>
             </div>
         </div>
     </div>
@@ -167,7 +174,22 @@ function showDetails(name, client, capacity) {
                                     '${machine.oSec01Field02}', 
                                     '${machine.oSec01Field03}', 
                                     '${machine.oSec01Field04}', 
-                                    '${machine.oSec01Field05}'
+                                    '${machine.oSec01Field05}', 
+                                    '${machine.oSec01Field06}', 
+                                    '${machine.oSec01Field07}', 
+                                    '${machine.oSec01Field08}', 
+                                    '${machine.oSec01Field09}', 
+                                    '${machine.oSec01Field10}', 
+                                    '${machine.oSec01Field11}', 
+                                    '${machine.oSec01Field12}', 
+                                    '${machine.oSec01Field13}', 
+                                    '${machine.oSec01Field14}', 
+                                    '${machine.oSec01Field15}', 
+                                    '${machine.oSec01Field16}', 
+                                    '${machine.oSec01Field17}', 
+                                    '${machine.oSec01Field18}', 
+                                    '${machine.oSec01Field19}', 
+                                    '${machine.oSec01Field20}'
                                 )">View Details</button>
                             </td>
                         </tr>`;
@@ -182,7 +204,11 @@ function showDetails(name, client, capacity) {
             .catch(error => console.error('Error:', error));
     }
 
-    function showMachineDetails(username, createdAt, type, field1, field2, field3, field4, field5) {
+    function showMachineDetails(username, createdAt, type, field1, field2,
+    field3, field4, field5, field6, field7,
+    field8, field9, field10, field11, field12,
+    field13, field14, field15, field16, field17,
+    field18, field19, field20) {
         document.getElementById('detailUsername').textContent = username || "N/A";
         document.getElementById('detailCreatedAt').textContent = createdAt || "N/A";
         document.getElementById('detailType').textContent = type || "N/A";
@@ -194,7 +220,28 @@ function showDetails(name, client, capacity) {
         document.getElementById('detailField2').textContent = field4 || "N/A";
     
         document.getElementById('labelField3').textContent = field5 || "N/A";
-        document.getElementById('detailField3').textContent = field5 || "N/A";
+        document.getElementById('detailField3').textContent = field6 || "N/A";
+    
+        document.getElementById('labelField4').textContent = field7 || "N/A";
+        document.getElementById('detailField4').textContent = field8 || "N/A";
+    
+        document.getElementById('labelField5').textContent = field9 || "N/A";
+        document.getElementById('detailField5').textContent = field10 || "N/A";
+    
+        document.getElementById('labelField6').textContent = field11 || "N/A";
+        document.getElementById('detailField6').textContent = field12 || "N/A";
+    
+        document.getElementById('labelField7').textContent = field13 || "N/A";
+        document.getElementById('detailField7').textContent = field14 || "N/A";
+    
+        document.getElementById('labelField8').textContent = field15 || "N/A";
+        document.getElementById('detailField8').textContent = field16 || "N/A";
+    
+        document.getElementById('labelField9').textContent = field17 || "N/A";
+        document.getElementById('detailField9').textContent = field18 || "N/A";
+    
+        document.getElementById('labelField10').textContent = field19 || "N/A";
+        document.getElementById('detailField10').textContent = field20 || "N/A";
     
         $('#machineDetailsModal').modal('show');
     }
