@@ -2044,12 +2044,8 @@ def get_machines(request, project_id):
 def generate_report(request, project_id):
     try:
         # Log the action
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"at {now()} {request.user} accessed Load"
-        )
-        print(f"at {now()} {request.user} accessed Download Report")
-
+        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
+        
         # Get the user’s company and project
         aCompany = UserCompany.objects.get(user=request.user)
 
@@ -2186,183 +2182,94 @@ def generate_report_AAA(request, project_id):
         
         print(aCompany.id)
         print(project.id)
+    
+        print("Company 1")
+    
+    
+        # Create a Word document
+        doc = Document()
+
+        # Add header and footer with page numbers
+        add_header_footer(doc)
+
+        # Add project title
+        doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        # Add project details
+        doc.add_heading("Project Details", level=2)     
+
+        doc.add_paragraph("\n")
+        doc.add_paragraph("Name: " + project.name)
+        doc.add_paragraph("Client Name: " + project.client_name)
+        doc.add_paragraph("Capacity: " + project.capacity)
+        doc.add_paragraph("\n")
         
-        if aCompany.id == 1:
-            print("Company 1")
+        doc.add_page_break()     
+        doc.add_paragraph("\n")
+
+        # Add machine details
+        for index, machine in enumerate(machines, start=1):  # Add numbering
+            machine_name = machine.oSec00Field03
+            section_titles = []
+
+            if machine_name == "DataSheetNS":
+                machine_name = "Manual Screen" 
+                section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetMSc":
+                machine_name = "Mechanical Screen" 
+                section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetBC":
+                machine_name = "Belt Conveyor"
+                section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetCO":
+                machine_name = "Container"
+                section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetGR":
+                machine_name = "Gritremoval"
+                section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
+
+            if machine_name == "DataSheetSS":
+                machine_name = "Sand Silo"
+
+            if machine_name == "DataSheetPS":
+                machine_name = "Primary Sedimentation"
+
+            if machine_name == "DataSheetQV":
+                machine_name = "Quick Valve"
+
+            if machine_name == "DataSheetTV":
+                machine_name = "Telescopic Valve"
+                
+            if machine_name == "DataSheetTH":
+                machine_name = "Sludge Thickener"
+
+            # Add machine title with font size 14 and numbering
+            machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
+            machine_title.runs[0].font.size = Pt(14)
+
+            for i in range(1, 11):  # Loop from Sec01 to Sec10
+                section_name = f"Sec{i:02d}"
+                section_data = [("Field", "Value")]
+
+                for j in range(1, 21, 2):  # Step by 2 to avoid duplication
+                    key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
+                    value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
+
+                    if key and value and key.lower() != "oooo" and value.lower() != "oooo":
+                        section_data.append((key, value))
+
+                if len(section_data) > 1:  # If the section has valid data, create a table
+                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                    doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
+
+                    add_table(doc, section_data)  # Removed redundant title
+
+            doc.add_page_break() 
         
-        
-            # Create a Word document
-            doc = Document()
-
-            # Add header and footer with page numbers
-            add_header_footer(doc)
-
-            # Add project title
-            doc.add_heading(f'Project Report: {project.name}', level=1)
-
-            # Add project details
-            doc.add_heading("Project Details", level=2)     
-
-            doc.add_paragraph("\n")
-            doc.add_paragraph("Name: " + project.name)
-            doc.add_paragraph("Client Name: " + project.client_name)
-            doc.add_paragraph("Capacity: " + project.capacity)
-            doc.add_paragraph("\n")
-            
-            doc.add_page_break()     
-            doc.add_paragraph("\n")
-
-            # Add machine details
-            for index, machine in enumerate(machines, start=1):  # Add numbering
-                machine_name = machine.oSec00Field03
-                section_titles = []
-
-                if machine_name == "DataSheetNS":
-                    machine_name = "Manual Screen" 
-                    section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetMSc":
-                    machine_name = "Mechanical Screen" 
-                    section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetBC":
-                    machine_name = "Belt Conveyor"
-                    section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetCO":
-                    machine_name = "Container"
-                    section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetGR":
-                    machine_name = "Gritremoval"
-                    section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
-
-                if machine_name == "DataSheetSS":
-                    machine_name = "Sand Silo"
-
-                if machine_name == "DataSheetPS":
-                    machine_name = "Primary Sedimentation"
-
-                if machine_name == "DataSheetQV":
-                    machine_name = "Quick Valve"
-
-                if machine_name == "DataSheetTV":
-                    machine_name = "Telescopic Valve"
-                    
-                if machine_name == "DataSheetTH":
-                    machine_name = "Sludge Thickener"
-
-                # Add machine title with font size 14 and numbering
-                machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
-                machine_title.runs[0].font.size = Pt(14)
-
-                for i in range(1, 11):  # Loop from Sec01 to Sec10
-                    section_name = f"Sec{i:02d}"
-                    section_data = [("Field", "Value")]
-
-                    for j in range(1, 21, 2):  # Step by 2 to avoid duplication
-                        key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
-                        value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
-
-                        if key and value and key.lower() != "oooo" and value.lower() != "oooo":
-                            section_data.append((key, value))
-
-                    if len(section_data) > 1:  # If the section has valid data, create a table
-                        section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
-                        doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
-
-                        add_table(doc, section_data)  # Removed redundant title
-
-                doc.add_page_break() 
-        
-        if aCompany.id == 2:
-            print("Company 2")
-        
-        
-            # Create a Word document
-            doc = Document()
-
-            # Add header and footer with page numbers
-            add_header_footer(doc)
-
-            # Add project title
-            doc.add_heading(f'Project Report: {project.name}', level=1)
-
-            # Add project details
-            doc.add_heading("Project Details", level=2)     
-
-            doc.add_paragraph("\n")
-            doc.add_paragraph("Name: " + project.name)
-            doc.add_paragraph("Client Name: " + project.client_name)
-            doc.add_paragraph("Capacity: " + project.capacity)
-            doc.add_paragraph("\n")
-            
-            doc.add_page_break()     
-            doc.add_paragraph("\n")
-
-            # Add machine details
-            for index, machine in enumerate(machines, start=1):  # Add numbering
-                machine_name = machine.oSec00Field03
-                section_titles = []
-
-                if machine_name == "DataSheetNS":
-                    machine_name = "Manual Screen" 
-                    section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetMSc":
-                    machine_name = "Mechanical Screen" 
-                    section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetBC":
-                    machine_name = "Belt Conveyor"
-                    section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetCO":
-                    machine_name = "Container"
-                    section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetGR":
-                    machine_name = "Gritremoval"
-                    section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
-
-                if machine_name == "DataSheetSS":
-                    machine_name = "Sand Silo"
-
-                if machine_name == "DataSheetPS":
-                    machine_name = "Primary Sedimentation"
-
-                if machine_name == "DataSheetQV":
-                    machine_name = "Quick Valve"
-
-                if machine_name == "DataSheetTV":
-                    machine_name = "Telescopic Valve"
-                    
-                if machine_name == "DataSheetTH":
-                    machine_name = "Sludge Thickener"
-
-                # Add machine title with font size 14 and numbering
-                machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
-                machine_title.runs[0].font.size = Pt(14)
-
-                for i in range(1, 11):  # Loop from Sec01 to Sec10
-                    section_name = f"Sec{i:02d}"
-                    section_data = [("Field", "Value")]
-
-                    for j in range(1, 21, 2):  # Step by 2 to avoid duplication
-                        key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
-                        value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
-
-                        if key and value and key.lower() != "oooo" and value.lower() != "oooo":
-                            section_data.append((key, value))
-
-                    if len(section_data) > 1:  # If the section has valid data, create a table
-                        section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
-                        doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
-
-                        add_table(doc, section_data)  # Removed redundant title
-
-                doc.add_page_break()     
-
         # Save the document to a response
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
         response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
@@ -2500,182 +2407,93 @@ def generate_report_BBB(request, project_id):
         
         print(aCompany.id)
         print(project.id)
+    
+        print("Company 2")
+    
+    
+        # Create a Word document
+        doc = Document()
+
+        # Add header and footer with page numbers
+        add_header_footer(doc)
+
+        # Add project title
+        doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        # Add project details
+        doc.add_heading("Project Details", level=2)     
+
+        doc.add_paragraph("\n")
+        doc.add_paragraph("Name: " + project.name)
+        doc.add_paragraph("Client Name: " + project.client_name)
+        doc.add_paragraph("Capacity: " + project.capacity)
+        doc.add_paragraph("\n")
         
-        if aCompany.id == 1:
-            print("Company 1")
-        
-        
-            # Create a Word document
-            doc = Document()
+        doc.add_page_break()     
+        doc.add_paragraph("\n")
 
-            # Add header and footer with page numbers
-            add_header_footer(doc)
+        # Add machine details
+        for index, machine in enumerate(machines, start=1):  # Add numbering
+            machine_name = machine.oSec00Field03
+            section_titles = []
 
-            # Add project title
-            doc.add_heading(f'Project Report: {project.name}', level=1)
+            if machine_name == "DataSheetNS":
+                machine_name = "Manual Screen" 
+                section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
 
-            # Add project details
-            doc.add_heading("Project Details", level=2)     
+            if machine_name == "DataSheetMSc":
+                machine_name = "Mechanical Screen" 
+                section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
 
-            doc.add_paragraph("\n")
-            doc.add_paragraph("Name: " + project.name)
-            doc.add_paragraph("Client Name: " + project.client_name)
-            doc.add_paragraph("Capacity: " + project.capacity)
-            doc.add_paragraph("\n")
-            
+            if machine_name == "DataSheetBC":
+                machine_name = "Belt Conveyor"
+                section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetCO":
+                machine_name = "Container"
+                section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetGR":
+                machine_name = "Gritremoval"
+                section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
+
+            if machine_name == "DataSheetSS":
+                machine_name = "Sand Silo"
+
+            if machine_name == "DataSheetPS":
+                machine_name = "Primary Sedimentation"
+
+            if machine_name == "DataSheetQV":
+                machine_name = "Quick Valve"
+
+            if machine_name == "DataSheetTV":
+                machine_name = "Telescopic Valve"
+                
+            if machine_name == "DataSheetTH":
+                machine_name = "Sludge Thickener"
+
+            # Add machine title with font size 14 and numbering
+            machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
+            machine_title.runs[0].font.size = Pt(14)
+
+            for i in range(1, 11):  # Loop from Sec01 to Sec10
+                section_name = f"Sec{i:02d}"
+                section_data = [("Field", "Value")]
+
+                for j in range(1, 21, 2):  # Step by 2 to avoid duplication
+                    key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
+                    value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
+
+                    if key and value and key.lower() != "oooo" and value.lower() != "oooo":
+                        section_data.append((key, value))
+
+                if len(section_data) > 1:  # If the section has valid data, create a table
+                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                    doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
+
+                    add_table(doc, section_data)  # Removed redundant title
+
             doc.add_page_break()     
-            doc.add_paragraph("\n")
-
-            # Add machine details
-            for index, machine in enumerate(machines, start=1):  # Add numbering
-                machine_name = machine.oSec00Field03
-                section_titles = []
-
-                if machine_name == "DataSheetNS":
-                    machine_name = "Manual Screen" 
-                    section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetMSc":
-                    machine_name = "Mechanical Screen" 
-                    section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetBC":
-                    machine_name = "Belt Conveyor"
-                    section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetCO":
-                    machine_name = "Container"
-                    section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetGR":
-                    machine_name = "Gritremoval"
-                    section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
-
-                if machine_name == "DataSheetSS":
-                    machine_name = "Sand Silo"
-
-                if machine_name == "DataSheetPS":
-                    machine_name = "Primary Sedimentation"
-
-                if machine_name == "DataSheetQV":
-                    machine_name = "Quick Valve"
-
-                if machine_name == "DataSheetTV":
-                    machine_name = "Telescopic Valve"
-                    
-                if machine_name == "DataSheetTH":
-                    machine_name = "Sludge Thickener"
-
-                # Add machine title with font size 14 and numbering
-                machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
-                machine_title.runs[0].font.size = Pt(14)
-
-                for i in range(1, 11):  # Loop from Sec01 to Sec10
-                    section_name = f"Sec{i:02d}"
-                    section_data = [("Field", "Value")]
-
-                    for j in range(1, 21, 2):  # Step by 2 to avoid duplication
-                        key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
-                        value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
-
-                        if key and value and key.lower() != "oooo" and value.lower() != "oooo":
-                            section_data.append((key, value))
-
-                    if len(section_data) > 1:  # If the section has valid data, create a table
-                        section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
-                        doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
-
-                        add_table(doc, section_data)  # Removed redundant title
-
-                doc.add_page_break() 
-        
-        if aCompany.id == 2:
-            print("Company 2")
-        
-        
-            # Create a Word document
-            doc = Document()
-
-            # Add header and footer with page numbers
-            add_header_footer(doc)
-
-            # Add project title
-            doc.add_heading(f'Project Report: {project.name}', level=1)
-
-            # Add project details
-            doc.add_heading("Project Details", level=2)     
-
-            doc.add_paragraph("\n")
-            doc.add_paragraph("Name: " + project.name)
-            doc.add_paragraph("Client Name: " + project.client_name)
-            doc.add_paragraph("Capacity: " + project.capacity)
-            doc.add_paragraph("\n")
-            
-            doc.add_page_break()     
-            doc.add_paragraph("\n")
-
-            # Add machine details
-            for index, machine in enumerate(machines, start=1):  # Add numbering
-                machine_name = machine.oSec00Field03
-                section_titles = []
-
-                if machine_name == "DataSheetNS":
-                    machine_name = "Manual Screen" 
-                    section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetMSc":
-                    machine_name = "Mechanical Screen" 
-                    section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetBC":
-                    machine_name = "Belt Conveyor"
-                    section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetCO":
-                    machine_name = "Container"
-                    section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
-
-                if machine_name == "DataSheetGR":
-                    machine_name = "Gritremoval"
-                    section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
-
-                if machine_name == "DataSheetSS":
-                    machine_name = "Sand Silo"
-
-                if machine_name == "DataSheetPS":
-                    machine_name = "Primary Sedimentation"
-
-                if machine_name == "DataSheetQV":
-                    machine_name = "Quick Valve"
-
-                if machine_name == "DataSheetTV":
-                    machine_name = "Telescopic Valve"
-                    
-                if machine_name == "DataSheetTH":
-                    machine_name = "Sludge Thickener"
-
-                # Add machine title with font size 14 and numbering
-                machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
-                machine_title.runs[0].font.size = Pt(14)
-
-                for i in range(1, 11):  # Loop from Sec01 to Sec10
-                    section_name = f"Sec{i:02d}"
-                    section_data = [("Field", "Value")]
-
-                    for j in range(1, 21, 2):  # Step by 2 to avoid duplication
-                        key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
-                        value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
-
-                        if key and value and key.lower() != "oooo" and value.lower() != "oooo":
-                            section_data.append((key, value))
-
-                    if len(section_data) > 1:  # If the section has valid data, create a table
-                        section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
-                        doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
-
-                        add_table(doc, section_data)  # Removed redundant title
-
-                doc.add_page_break()     
 
         # Save the document to a response
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
@@ -2685,8 +2503,6 @@ def generate_report_BBB(request, project_id):
 
     except Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
-
-
 
 
 
