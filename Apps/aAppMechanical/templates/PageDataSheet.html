@@ -1,0 +1,1681 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="page-inner">
+        <h2>DataSheet : {{ aMachineName }}</h2>
+        <form method="POST" action="{% url 'SavePageDataSheet' sheet_key=sheet_key %}" class="form-group">
+            {% csrf_token %}
+            <div class="row"> <!-- Row to hold both cards side by side -->
+                
+                <!-- Section 0 Card Project Selection -->
+                <div class="col-md-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 0</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                
+                                <div class="col-md-12 mb-3">
+                                    <label for="project">Select Project:</label>
+                                    <select name="project" id="project" class="form-control shadow-sm rounded">
+                                        <option value="">-- Select a Project --</option>
+                                        {% for project in projects %}
+                                            <option value="{{ project.id }}">{{ project.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 1</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec01Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 2</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec02Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 3 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 3</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec03Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 4 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 4</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec04Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 5 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 5</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec05Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 6 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 6</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec06Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 7 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 7</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec07Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 8 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 8</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec08Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 9 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 9</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.oSec09Field20 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div> <!-- Close row div -->
+
+            <div class="text-center">
+                <button type="submit" name="savebuttonname" class="btn btn-primary btn-lg mt-3">Save</button>                                
+                
+            </div>
+        </form>
+
+        <!-- Table to Display Saved Data -->
+        <h3 class="mt-5">Saved Data</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Project Name</th>
+                    <th>oSec01Field01</th>
+                    <th>oSec01Field02</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for machine in machines %}
+                <tr>
+                    <td>{{ machine.project.name }}</td>
+                    <td>{{ machine.oSec01Field01 }}</td>
+                    <td>{{ machine.oSec01Field02 }}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm edit-btn" data-id="{{ machine.id }}">Edit</button>
+                        <a href="{% url 'DeleteMachine' machine_id=machine.id aType=sheet_key %}" class="btn btn-danger btn-sm">Delete</a>
+                        <button class="btn btn-info btn-sm show-data-btn" data-id="{{ machine.id }}" data-toggle="modal" data-target="#dataModal">
+                            Show All Data
+                        </button>
+                        <form action="{% url 'General_DXF_ALL' aMachine_ID=machine.id aType=sheet_key%}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary btn-sm">Generate General Drawing</button>
+                        </form>
+                        
+                    </td>
+                </tr>
+
+                
+                {% endfor %}
+                
+
+
+            </tbody>
+        </table>
+
+        
+    </div>
+</div>
+
+<!-- Modal for Showing All Data -->
+<div class="modal fade" id="dataModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Full Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Data will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editForm" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="editMachineId" name="machine_id">
+                    
+                    <div class="mb-3">
+                        <label for="editProject">Project</label>
+                        <select name="project" id="editProject" class="form-control">
+                            <option value="">-- Select a Project --</option>
+                            {% for project in projects %}
+                                <option value="{{ project.id }}">{{ project.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field01" name="oSec01Field01">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field02" name="oSec01Field02">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field03" name="oSec01Field03">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field04" name="oSec01Field04">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field05" name="oSec01Field05">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field06" name="oSec01Field06">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field07" name="oSec01Field07">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field08" name="oSec01Field08">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field09" name="oSec01Field09">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field10" name="oSec01Field10">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field11" name="oSec01Field11">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field12" name="oSec01Field12">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field13" name="oSec01Field13">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field14" name="oSec01Field14">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field15" name="oSec01Field15">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field16" name="oSec01Field16">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field17" name="oSec01Field17">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field18" name="oSec01Field18">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field19" name="oSec01Field19">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec01Field20" name="oSec01Field20">
+                        </div>
+                    </div>
+
+                    <br/>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field01" name="oSec02Field01">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field02" name="oSec02Field02">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field03" name="oSec02Field03">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field04" name="oSec02Field04">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field05" name="oSec02Field05">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field06" name="oSec02Field06">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field07" name="oSec02Field07">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field08" name="oSec02Field08">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field09" name="oSec02Field09">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field10" name="oSec02Field10">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field11" name="oSec02Field11">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field12" name="oSec02Field12">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field13" name="oSec02Field13">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field14" name="oSec02Field14">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field15" name="oSec02Field15">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field16" name="oSec02Field16">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field17" name="oSec02Field17">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field18" name="oSec02Field18">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field19" name="oSec02Field19">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec02Field20" name="oSec02Field20">
+                        </div>
+                    </div>
+
+                    <br/><div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec03Field01" name="oSec03Field01">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec03Field02" name="oSec03Field02">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec03Field03" name="oSec03Field03">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec03Field04" name="oSec03Field04">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec03Field05" name="oSec03Field05">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec03Field06" name="oSec03Field06">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec03Field07" name="oSec03Field07">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec03Field08" name="oSec03Field08">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec03Field09" name="oSec03Field09">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec03Field10" name="oSec03Field10">
+                        </div>
+                    </div>
+
+                    <br/>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec04Field01" name="oSec04Field01">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec04Field02" name="oSec04Field02">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec04Field03" name="oSec04Field03">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec04Field04" name="oSec04Field04">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec04Field05" name="oSec04Field05">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec04Field06" name="oSec04Field06">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec04Field07" name="oSec04Field07">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec04Field08" name="oSec04Field08">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec04Field09" name="oSec04Field09">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec04Field10" name="oSec04Field10">
+                        </div>
+                    </div>
+
+                    <br/>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec05Field01" name="oSec05Field01">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec05Field02" name="oSec05Field02">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec05Field03" name="oSec05Field03">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec05Field04" name="oSec05Field04">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec05Field05" name="oSec05Field05">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec05Field06" name="oSec05Field06">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec05Field07" name="oSec05Field07">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec05Field08" name="oSec05Field08">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec05Field09" name="oSec05Field09">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec05Field10" name="oSec05Field10">
+                        </div>
+                    </div>
+
+                    <br/>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec06Field01" name="oSec06Field01">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec06Field02" name="oSec06Field02">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec06Field03" name="oSec06Field03">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec06Field04" name="oSec06Field04">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec06Field05" name="oSec06Field05">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec06Field06" name="oSec06Field06">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec06Field07" name="oSec06Field07">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec06Field08" name="oSec06Field08">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec06Field09" name="oSec06Field09">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec06Field10" name="oSec06Field10">
+                        </div>
+                    </div>
+
+                    <br/>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec07Field01" name="oSec07Field01">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec07Field02" name="oSec07Field02">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec07Field03" name="oSec07Field03">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec07Field04" name="oSec07Field04">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec07Field05" name="oSec07Field05">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec07Field06" name="oSec07Field06">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec07Field07" name="oSec07Field07">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec07Field08" name="oSec07Field08">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec07Field09" name="oSec07Field09">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec07Field10" name="oSec07Field10">
+                        </div>
+                    </div>
+
+                    <br/>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec08Field01" name="oSec08Field01">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec08Field02" name="oSec08Field02">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec08Field03" name="oSec08Field03">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec08Field04" name="oSec08Field04">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec08Field05" name="oSec08Field05">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec08Field06" name="oSec08Field06">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec08Field07" name="oSec08Field07">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec08Field08" name="oSec08Field08">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec08Field09" name="oSec08Field09">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec08Field10" name="oSec08Field10">
+                        </div>
+                    </div>
+
+                    <br/>
+
+                    
+                    <br/><div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec09Field01" name="oSec09Field01">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec09Field02" name="oSec09Field02">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec09Field03" name="oSec09Field03">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec09Field04" name="oSec09Field04">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec09Field05" name="oSec09Field05">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec09Field06" name="oSec09Field06">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec09Field07" name="oSec09Field07">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec09Field08" name="oSec09Field08">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec09Field09" name="oSec09Field09">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec09Field10" name="oSec09Field10">
+                        </div>
+                    </div>
+
+                    <br/>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec10Field01" name="oSec10Field01">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec10Field02" name="oSec10Field02">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec10Field03" name="oSec10Field03">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec10Field04" name="oSec10Field04">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec10Field05" name="oSec10Field05">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec10Field06" name="oSec10Field06">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec10Field07" name="oSec10Field07">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec10Field08" name="oSec10Field08">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec10Field09" name="oSec10Field09">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" id="edit_oSec10Field10" name="oSec10Field10">
+                        </div>
+                    </div>
+
+                    <br/>
+                    
+                    
+                    
+                    <!-- Add more fields as needed -->
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Add this to <head> in base.html -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".edit-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let machineId = this.dataset.id;
+                
+                fetch(`/Mechanical/DataSheetNSget_data/${machineId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("editMachineId").value = machineId;
+                        document.getElementById("editProject").value = data.project_id;
+
+                        document.getElementById("edit_oSec01Field01").value = data.oSec01Field01;
+                        document.getElementById("edit_oSec01Field02").value = data.oSec01Field02;
+                        document.getElementById("edit_oSec01Field03").value = data.oSec01Field03;
+                        document.getElementById("edit_oSec01Field04").value = data.oSec01Field04;
+                        document.getElementById("edit_oSec01Field05").value = data.oSec01Field05;
+                        document.getElementById("edit_oSec01Field06").value = data.oSec01Field06;
+                        document.getElementById("edit_oSec01Field07").value = data.oSec01Field07;
+                        document.getElementById("edit_oSec01Field08").value = data.oSec01Field08;
+                        document.getElementById("edit_oSec01Field09").value = data.oSec01Field09;
+                        document.getElementById("edit_oSec01Field10").value = data.oSec01Field10;
+                        document.getElementById("edit_oSec01Field11").value = data.oSec01Field11;
+                        document.getElementById("edit_oSec01Field12").value = data.oSec01Field12;
+                        document.getElementById("edit_oSec01Field13").value = data.oSec01Field13;
+                        document.getElementById("edit_oSec01Field14").value = data.oSec01Field14;
+                        document.getElementById("edit_oSec01Field15").value = data.oSec01Field15;
+                        document.getElementById("edit_oSec01Field16").value = data.oSec01Field16;
+                        document.getElementById("edit_oSec01Field17").value = data.oSec01Field17;
+                        document.getElementById("edit_oSec01Field18").value = data.oSec01Field18;
+                        document.getElementById("edit_oSec01Field19").value = data.oSec01Field19;
+                        document.getElementById("edit_oSec01Field20").value = data.oSec01Field20;
+                        
+                        document.getElementById("edit_oSec02Field01").value = data.oSec02Field01;
+                        document.getElementById("edit_oSec02Field02").value = data.oSec02Field02;
+                        document.getElementById("edit_oSec02Field03").value = data.oSec02Field03;
+                        document.getElementById("edit_oSec02Field04").value = data.oSec02Field04;
+                        document.getElementById("edit_oSec02Field05").value = data.oSec02Field05;
+                        document.getElementById("edit_oSec02Field06").value = data.oSec02Field06;
+                        document.getElementById("edit_oSec02Field07").value = data.oSec02Field07;
+                        document.getElementById("edit_oSec02Field08").value = data.oSec02Field08;
+                        document.getElementById("edit_oSec02Field09").value = data.oSec02Field09;
+                        document.getElementById("edit_oSec02Field10").value = data.oSec02Field10;
+                        document.getElementById("edit_oSec02Field11").value = data.oSec02Field11;
+                        document.getElementById("edit_oSec02Field12").value = data.oSec02Field12;
+                        document.getElementById("edit_oSec02Field13").value = data.oSec02Field13;
+                        document.getElementById("edit_oSec02Field14").value = data.oSec02Field14;
+                        document.getElementById("edit_oSec02Field15").value = data.oSec02Field15;
+                        document.getElementById("edit_oSec02Field16").value = data.oSec02Field16;
+                        document.getElementById("edit_oSec02Field17").value = data.oSec02Field17;
+                        document.getElementById("edit_oSec02Field18").value = data.oSec02Field18;
+                        document.getElementById("edit_oSec02Field19").value = data.oSec02Field19;
+                        document.getElementById("edit_oSec02Field20").value = data.oSec02Field10;
+                                                
+                        document.getElementById("edit_oSec03Field01").value = data.oSec03Field01;
+                        document.getElementById("edit_oSec03Field02").value = data.oSec03Field02;
+                        document.getElementById("edit_oSec03Field03").value = data.oSec03Field03;
+                        document.getElementById("edit_oSec03Field04").value = data.oSec03Field04;
+                        document.getElementById("edit_oSec03Field05").value = data.oSec03Field05;
+                        document.getElementById("edit_oSec03Field06").value = data.oSec03Field06;
+                        document.getElementById("edit_oSec03Field07").value = data.oSec03Field07;
+                        document.getElementById("edit_oSec03Field08").value = data.oSec03Field08;
+                        document.getElementById("edit_oSec03Field09").value = data.oSec03Field09;
+                        document.getElementById("edit_oSec03Field10").value = data.oSec03Field10;
+                        
+                        document.getElementById("edit_oSec04Field01").value = data.oSec04Field01;
+                        document.getElementById("edit_oSec04Field02").value = data.oSec04Field02;
+                        document.getElementById("edit_oSec04Field03").value = data.oSec04Field03;
+                        document.getElementById("edit_oSec04Field04").value = data.oSec04Field04;
+                        document.getElementById("edit_oSec04Field05").value = data.oSec04Field05;
+                        document.getElementById("edit_oSec04Field06").value = data.oSec04Field06;
+                        document.getElementById("edit_oSec04Field07").value = data.oSec04Field07;
+                        document.getElementById("edit_oSec04Field08").value = data.oSec04Field08;
+                        document.getElementById("edit_oSec04Field09").value = data.oSec04Field09;
+                        document.getElementById("edit_oSec04Field10").value = data.oSec04Field10;
+                        
+                        document.getElementById("edit_oSec05Field01").value = data.oSec05Field01;
+                        document.getElementById("edit_oSec05Field02").value = data.oSec05Field02;
+                        document.getElementById("edit_oSec05Field03").value = data.oSec05Field03;
+                        document.getElementById("edit_oSec05Field04").value = data.oSec05Field04;
+                        document.getElementById("edit_oSec05Field05").value = data.oSec05Field05;
+                        document.getElementById("edit_oSec05Field06").value = data.oSec05Field06;
+                        document.getElementById("edit_oSec05Field07").value = data.oSec05Field07;
+                        document.getElementById("edit_oSec05Field08").value = data.oSec05Field08;
+                        document.getElementById("edit_oSec05Field09").value = data.oSec05Field09;
+                        document.getElementById("edit_oSec05Field10").value = data.oSec05Field10;
+                        
+                        document.getElementById("edit_oSec06Field01").value = data.oSec06Field01;
+                        document.getElementById("edit_oSec06Field02").value = data.oSec06Field02;
+                        document.getElementById("edit_oSec06Field03").value = data.oSec06Field03;
+                        document.getElementById("edit_oSec06Field04").value = data.oSec06Field04;
+                        document.getElementById("edit_oSec06Field05").value = data.oSec06Field05;
+                        document.getElementById("edit_oSec06Field06").value = data.oSec06Field06;
+                        document.getElementById("edit_oSec06Field07").value = data.oSec06Field07;
+                        document.getElementById("edit_oSec06Field08").value = data.oSec06Field08;
+                        document.getElementById("edit_oSec06Field09").value = data.oSec06Field09;
+                        document.getElementById("edit_oSec06Field10").value = data.oSec06Field10;
+                                                
+                        document.getElementById("edit_oSec07Field01").value = data.oSec07Field01;
+                        document.getElementById("edit_oSec07Field02").value = data.oSec07Field02;
+                        document.getElementById("edit_oSec07Field03").value = data.oSec07Field03;
+                        document.getElementById("edit_oSec07Field04").value = data.oSec07Field04;
+                        document.getElementById("edit_oSec07Field05").value = data.oSec07Field05;
+                        document.getElementById("edit_oSec07Field06").value = data.oSec07Field06;
+                        document.getElementById("edit_oSec07Field07").value = data.oSec07Field07;
+                        document.getElementById("edit_oSec07Field08").value = data.oSec07Field08;
+                        document.getElementById("edit_oSec07Field09").value = data.oSec07Field09;
+                        document.getElementById("edit_oSec07Field10").value = data.oSec07Field10;
+                        
+                        document.getElementById("edit_oSec08Field01").value = data.oSec08Field01;
+                        document.getElementById("edit_oSec08Field02").value = data.oSec08Field02;
+                        document.getElementById("edit_oSec08Field03").value = data.oSec08Field03;
+                        document.getElementById("edit_oSec08Field04").value = data.oSec08Field04;
+                        document.getElementById("edit_oSec08Field05").value = data.oSec08Field05;
+                        document.getElementById("edit_oSec08Field06").value = data.oSec08Field06;
+                        document.getElementById("edit_oSec08Field07").value = data.oSec08Field07;
+                        document.getElementById("edit_oSec08Field08").value = data.oSec08Field08;
+                        document.getElementById("edit_oSec08Field09").value = data.oSec08Field09;
+                        document.getElementById("edit_oSec08Field10").value = data.oSec08Field10;
+                                                   
+                        document.getElementById("edit_oSec09Field01").value = data.oSec09Field01;
+                        document.getElementById("edit_oSec09Field02").value = data.oSec09Field02;
+                        document.getElementById("edit_oSec09Field03").value = data.oSec09Field03;
+                        document.getElementById("edit_oSec09Field04").value = data.oSec09Field04;
+                        document.getElementById("edit_oSec09Field05").value = data.oSec09Field05;
+                        document.getElementById("edit_oSec09Field06").value = data.oSec09Field06;
+                        document.getElementById("edit_oSec09Field07").value = data.oSec09Field07;
+                        document.getElementById("edit_oSec09Field08").value = data.oSec09Field08;
+                        document.getElementById("edit_oSec09Field09").value = data.oSec09Field09;
+                        document.getElementById("edit_oSec09Field10").value = data.oSec09Field10;
+                        
+                        document.getElementById("edit_oSec10Field01").value = data.oSec10Field01;
+                        document.getElementById("edit_oSec10Field02").value = data.oSec10Field02;
+                        document.getElementById("edit_oSec10Field03").value = data.oSec10Field03;
+                        document.getElementById("edit_oSec10Field04").value = data.oSec10Field04;
+                        document.getElementById("edit_oSec10Field05").value = data.oSec10Field05;
+                        document.getElementById("edit_oSec10Field06").value = data.oSec10Field06;
+                        document.getElementById("edit_oSec10Field07").value = data.oSec10Field07;
+                        document.getElementById("edit_oSec10Field08").value = data.oSec10Field08;
+                        document.getElementById("edit_oSec10Field09").value = data.oSec10Field09;
+                        document.getElementById("edit_oSec10Field10").value = data.oSec10Field10;
+                           
+
+
+                        // Show the modal
+                        let editModal = new bootstrap.Modal(document.getElementById("editModal"));
+                        editModal.show();
+                    })
+                    .catch(error => console.error("Error fetching data:", error));
+            });
+        });
+
+        // Handle form submission
+        document.getElementById("editForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            let formData = new FormData(this);
+            let machineId = document.getElementById("editMachineId").value;
+
+            fetch(`/Mechanical/Edit_DataSheetNS/${machineId}/`, {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Refresh page on success
+                } else {
+                    alert("Failed to update data.");
+                }
+            })
+            .catch(error => console.error("Error updating data:", error));
+        });
+    });
+</script>
+
+<!-- Add this before </body> -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".show-data-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let machineId = this.dataset.id;
+
+                fetch(`/Mechanical/DataSheetNSget_data/${machineId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let modalContent = `
+                            <p><strong>Project:</strong> ${data.project}</p>
+                            <p><strong>${data.oSec01Field01}:</strong> ${data.oSec01Field02}</p>
+                            <p><strong>${data.oSec01Field03}:</strong> ${data.oSec01Field04}</p>
+                            <p><strong>${data.oSec01Field05}:</strong> ${data.oSec01Field06}</p>
+                            <p><strong>${data.oSec01Field07}:</strong> ${data.oSec01Field08}</p>
+                            <p><strong>${data.oSec01Field09}:</strong> ${data.oSec01Field10}</p>
+                            <p><strong>${data.oSec01Field11}:</strong> ${data.oSec01Field12}</p>
+                            <p><strong>${data.oSec01Field13}:</strong> ${data.oSec01Field14}</p>
+                            <p><strong>${data.oSec01Field15}:</strong> ${data.oSec01Field16}</p>
+                            <p><strong>${data.oSec01Field17}:</strong> ${data.oSec01Field18}</p>
+                            <p><strong>${data.oSec01Field19}:</strong> ${data.oSec01Field20}</p>
+                            <br/>
+                            <p><strong>${data.oSec02Field01}:</strong> ${data.oSec02Field02}</p>
+                            <p><strong>${data.oSec02Field03}:</strong> ${data.oSec02Field04}</p>
+                            <p><strong>${data.oSec02Field05}:</strong> ${data.oSec02Field06}</p>
+                            <p><strong>${data.oSec02Field07}:</strong> ${data.oSec02Field08}</p>
+                            <p><strong>${data.oSec02Field09}:</strong> ${data.oSec02Field10}</p>
+                            <p><strong>${data.oSec02Field11}:</strong> ${data.oSec02Field12}</p>
+                            <p><strong>${data.oSec02Field13}:</strong> ${data.oSec02Field14}</p>
+                            <p><strong>${data.oSec02Field15}:</strong> ${data.oSec02Field16}</p>
+                            <p><strong>${data.oSec02Field17}:</strong> ${data.oSec02Field18}</p>
+                            <p><strong>${data.oSec02Field19}:</strong> ${data.oSec02Field20}</p>                            
+                            <br/>
+                            <p><strong>${data.oSec03Field01}:</strong> ${data.oSec03Field02}</p>
+                            <p><strong>${data.oSec03Field03}:</strong> ${data.oSec03Field04}</p>
+                            <p><strong>${data.oSec03Field05}:</strong> ${data.oSec03Field06}</p>
+                            <p><strong>${data.oSec03Field07}:</strong> ${data.oSec03Field08}</p>
+                            <p><strong>${data.oSec03Field09}:</strong> ${data.oSec03Field10}</p>
+                            <p><strong>${data.oSec03Field11}:</strong> ${data.oSec03Field12}</p>
+                            <p><strong>${data.oSec03Field13}:</strong> ${data.oSec03Field14}</p>
+                            <p><strong>${data.oSec03Field15}:</strong> ${data.oSec03Field16}</p>
+                            <p><strong>${data.oSec03Field17}:</strong> ${data.oSec03Field18}</p>
+                            <p><strong>${data.oSec03Field19}:</strong> ${data.oSec03Field20}</p>
+                            <br/>                            
+                            <p><strong>${data.oSec04Field01}:</strong> ${data.oSec04Field02}</p>
+                            <p><strong>${data.oSec04Field03}:</strong> ${data.oSec04Field04}</p>
+                            <p><strong>${data.oSec04Field05}:</strong> ${data.oSec04Field06}</p>
+                            <p><strong>${data.oSec04Field07}:</strong> ${data.oSec04Field08}</p>
+                            <p><strong>${data.oSec04Field09}:</strong> ${data.oSec04Field10}</p>
+                            <p><strong>${data.oSec04Field11}:</strong> ${data.oSec04Field12}</p>
+                            <p><strong>${data.oSec04Field13}:</strong> ${data.oSec04Field14}</p>
+                            <p><strong>${data.oSec04Field15}:</strong> ${data.oSec04Field16}</p>
+                            <p><strong>${data.oSec04Field17}:</strong> ${data.oSec04Field18}</p>
+                            <p><strong>${data.oSec04Field19}:</strong> ${data.oSec04Field20}</p>
+                            <br/>
+                            <p><strong>${data.oSec05Field01}:</strong> ${data.oSec05Field02}</p>
+                            <p><strong>${data.oSec05Field03}:</strong> ${data.oSec05Field04}</p>
+                            <p><strong>${data.oSec05Field05}:</strong> ${data.oSec05Field06}</p>
+                            <p><strong>${data.oSec05Field07}:</strong> ${data.oSec05Field08}</p>
+                            <p><strong>${data.oSec05Field09}:</strong> ${data.oSec05Field10}</p>
+                            <p><strong>${data.oSec05Field11}:</strong> ${data.oSec05Field12}</p>
+                            <p><strong>${data.oSec05Field13}:</strong> ${data.oSec05Field14}</p>
+                            <p><strong>${data.oSec05Field15}:</strong> ${data.oSec05Field16}</p>
+                            <p><strong>${data.oSec05Field17}:</strong> ${data.oSec05Field18}</p>
+                            <p><strong>${data.oSec05Field19}:</strong> ${data.oSec05Field20}</p>                            
+                            <br/>
+                            <p><strong>${data.oSec06Field01}:</strong> ${data.oSec06Field02}</p>
+                            <p><strong>${data.oSec06Field03}:</strong> ${data.oSec06Field04}</p>
+                            <p><strong>${data.oSec06Field05}:</strong> ${data.oSec06Field06}</p>
+                            <p><strong>${data.oSec06Field07}:</strong> ${data.oSec06Field08}</p>
+                            <p><strong>${data.oSec06Field09}:</strong> ${data.oSec06Field10}</p>
+                            <p><strong>${data.oSec06Field11}:</strong> ${data.oSec06Field12}</p>
+                            <p><strong>${data.oSec06Field13}:</strong> ${data.oSec06Field14}</p>
+                            <p><strong>${data.oSec06Field15}:</strong> ${data.oSec06Field16}</p>
+                            <p><strong>${data.oSec06Field17}:</strong> ${data.oSec06Field18}</p>
+                            <p><strong>${data.oSec06Field19}:</strong> ${data.oSec06Field20}</p>
+                            <br/>
+                            <p><strong>${data.oSec07Field01}:</strong> ${data.oSec07Field02}</p>
+                            <p><strong>${data.oSec07Field03}:</strong> ${data.oSec07Field04}</p>
+                            <p><strong>${data.oSec07Field05}:</strong> ${data.oSec07Field06}</p>
+                            <p><strong>${data.oSec07Field07}:</strong> ${data.oSec07Field08}</p>
+                            <p><strong>${data.oSec07Field09}:</strong> ${data.oSec07Field10}</p>
+                            <p><strong>${data.oSec07Field11}:</strong> ${data.oSec07Field12}</p>
+                            <p><strong>${data.oSec07Field13}:</strong> ${data.oSec07Field14}</p>
+                            <p><strong>${data.oSec07Field15}:</strong> ${data.oSec07Field16}</p>
+                            <p><strong>${data.oSec07Field17}:</strong> ${data.oSec07Field18}</p>
+                            <p><strong>${data.oSec07Field19}:</strong> ${data.oSec07Field20}</p>
+                            <br/>                            
+                            <p><strong>${data.oSec08Field01}:</strong> ${data.oSec08Field02}</p>
+                            <p><strong>${data.oSec08Field03}:</strong> ${data.oSec08Field04}</p>
+                            <p><strong>${data.oSec08Field05}:</strong> ${data.oSec08Field06}</p>
+                            <p><strong>${data.oSec08Field07}:</strong> ${data.oSec08Field08}</p>
+                            <p><strong>${data.oSec08Field09}:</strong> ${data.oSec08Field10}</p>
+                            <p><strong>${data.oSec08Field11}:</strong> ${data.oSec08Field12}</p>
+                            <p><strong>${data.oSec08Field13}:</strong> ${data.oSec08Field14}</p>
+                            <p><strong>${data.oSec08Field15}:</strong> ${data.oSec08Field16}</p>
+                            <p><strong>${data.oSec08Field17}:</strong> ${data.oSec08Field18}</p>
+                            <p><strong>${data.oSec08Field19}:</strong> ${data.oSec08Field20}</p>
+                            <br/>
+                            <p><strong>${data.oSec09Field01}:</strong> ${data.oSec09Field02}</p>
+                            <p><strong>${data.oSec09Field03}:</strong> ${data.oSec09Field04}</p>
+                            <p><strong>${data.oSec09Field05}:</strong> ${data.oSec09Field06}</p>
+                            <p><strong>${data.oSec09Field07}:</strong> ${data.oSec09Field08}</p>
+                            <p><strong>${data.oSec09Field09}:</strong> ${data.oSec09Field10}</p>
+                            <p><strong>${data.oSec09Field11}:</strong> ${data.oSec09Field12}</p>
+                            <p><strong>${data.oSec09Field13}:</strong> ${data.oSec09Field14}</p>
+                            <p><strong>${data.oSec09Field15}:</strong> ${data.oSec09Field16}</p>
+                            <p><strong>${data.oSec09Field17}:</strong> ${data.oSec09Field18}</p>
+                            <p><strong>${data.oSec09Field19}:</strong> ${data.oSec09Field20}</p>                            
+                            <br/>
+                            <p><strong>${data.oSec10Field01}:</strong> ${data.oSec10Field02}</p>
+                            <p><strong>${data.oSec10Field03}:</strong> ${data.oSec10Field04}</p>
+                            <p><strong>${data.oSec10Field05}:</strong> ${data.oSec10Field06}</p>
+                            <p><strong>${data.oSec10Field07}:</strong> ${data.oSec10Field08}</p>
+                            <p><strong>${data.oSec10Field09}:</strong> ${data.oSec10Field10}</p>
+                            <p><strong>${data.oSec10Field11}:</strong> ${data.oSec10Field12}</p>
+                            <p><strong>${data.oSec10Field13}:</strong> ${data.oSec10Field14}</p>
+                            <p><strong>${data.oSec10Field15}:</strong> ${data.oSec10Field16}</p>
+                            <p><strong>${data.oSec10Field17}:</strong> ${data.oSec10Field18}</p>
+                            <p><strong>${data.oSec10Field19}:</strong> ${data.oSec10Field20}</p>
+                        `;
+
+                        document.getElementById("modalBody").innerHTML = modalContent;
+                        
+                        let modal = new bootstrap.Modal(document.getElementById("dataModal"));
+                        modal.show();
+                    })
+                    .catch(error => console.error("Error fetching data:", error));
+            });
+        });
+    });
+</script>
+
+
+
+
+{% endblock %}

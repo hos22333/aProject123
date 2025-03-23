@@ -81,31 +81,23 @@ urlpatterns = [
     path('get_machines/<int:project_id>/', views.get_machines, name='get_machines'),    
     path('generate_report/<int:project_id>/', views.generate_report, name='generate_report'),
     
+        
+    path("assign-user/", views.assign_user_to_company, name="assign_user"),
+   
+
+###############
+    path('DeleteMachine/<int:machine_id>/<str:aType>/', views.DeleteMachine, name='DeleteMachine'),
+
+    path('Edit_DataSheetNS/<int:machine_id>/', views.edit_machine, name='Edit_DataSheetNS'),
     
-    # path('DataSheetNS/',                            views.DataSheetNS_load,     name='load_DataSheetNS'),
-    path('DataSheetNS/Save/',                       views.DataSheetNS_Save,     name='Save_DataSheetNS'),
-    path('DataSheetNSdelete/<int:machine_id>/',     views.DataSheetNS_Delete,   name='Delete_DataSheetNS'),
-    path('editDS/<int:id>/',                        views.DataSheetNS_edit,     name='Edit_DataSheetNS'),
     path('DataSheetNSget_data/<int:machine_id>/',   views.DataSheetNS_get_datasheet_data, name='get_datasheet_data'),
 
-    
-    path("assign-user/", views.assign_user_to_company, name="assign_user"),
-    
+    path("PageDataSheet/<str:sheet_key>/", views.LoadPageDataSheet, name="PageDataSheet"),
+    path("PageDataSheet/<str:sheet_key>/Save/", views.SavePageDataSheet, name="SavePageDataSheet"),
+###############
 
+    path("Draw/<int:aMachine_ID>/<str:aType>/", views.General_DXF_ALL, name="General_DXF_ALL"),
     
-    path("data-sheet/<str:sheet_key>/", views.load_data_sheet, name="load_data_sheet"),
-    path("data-sheet-save/<str:data_type>/", views.save_data_sheet, name="save_data_sheet"),
-    
-    path("DrawNS/<int:aMachine_ID>/", views.General_DXF_NS, name="General_DXF_NS"),
-    path("DrawMS/<int:aMachine_ID>/", views.General_DXF_MS, name="General_DXF_MS"),
-    path("DrawBC/<int:aMachine_ID>/", views.General_DXF_BC, name="General_DXF_BC"),
-    path("DrawCO/<int:aMachine_ID>/", views.General_DXF_CO, name="General_DXF_CO"),
-    path("DrawGR/<int:aMachine_ID>/", views.General_DXF_GR, name="General_DXF_GR"),
-    path("DrawSS/<int:aMachine_ID>/", views.General_DXF_SS, name="General_DXF_SS"),
-    path("DrawPST/<int:aMachine_ID>/", views.General_DXF_PST, name="General_DXF_PST"),
-    path("DrawQV/<int:aMachine_ID>/", views.General_DXF_QV, name="General_DXF_QV"),
-    path("DrawTV/<int:aMachine_ID>/", views.General_DXF_TV, name="General_DXF_TV"),
-    path("DrawTH/<int:aMachine_ID>/", views.General_DXF_TH, name="General_DXF_TH"),
 
 
 ]

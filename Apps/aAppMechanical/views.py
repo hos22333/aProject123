@@ -1,3 +1,5 @@
+import pdb
+
 from .models import Project
 from .models import Machine
 from .models import UserCompany
@@ -7,21 +9,7 @@ from .models import FormFieldConfig
 from .forms import formCalcMS, formCalcBC, formCalcGR, formCalcPS, formCalcTH
 from .forms import formCalcMX, formCalcRT, formCalcCT, formCalcSC, formCalcBS
 from .forms import formCalcNS, formCalcPNch, formCalcPNwa
-from .forms import FDS_NS
-from .forms import FDS_BS
-from .forms import FDS_MSc
-from .forms import FDS_MSf
-from .forms import FDS_BC
-from .forms import FDS_SC 
-from .forms import FDS_CO
-from .forms import FDS_GR  
-from .forms import FDS_SS  
-from .forms import FDS_PS  
-from .forms import FDS_QV  
-from .forms import FDS_TV  
-from .forms import FDS_TH  
-from .forms import FDS_MX 
-from .forms import FDS_TA  
+from .forms import FormDataSheet  
 from .forms import UserCompanyForm
 from .forms import ProjectForm
 from .forms import FormFieldConfigForm
@@ -2043,12 +2031,15 @@ def get_machines(request, project_id):
 
 def generate_report(request, project_id):
     try:
+        #pdb.set_trace()
         # Log the action
         aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
         
+        #pdb.set_trace()
         # Get the user’s company and project
         aCompany = UserCompany.objects.get(user=request.user)
 
+        #pdb.set_trace()
         # Determine the company and generate the corresponding report
         if aCompany.id == 1:
             print("Company 1")
@@ -2519,309 +2510,7 @@ def generate_report_BBB(request, project_id):
 
 
 
-def DataSheetNS_Save(request):
-    print(">>> Save_DataSheetNS view called")  # Debugging
 
-    if request.method == 'POST' and 'form_DataSheetNS_submit' in request.POST:
-        print(">>> Received POST request")  # Debugging
-
-        form_DataSheetNS = FDS_NS(request.POST)
-
-        if form_DataSheetNS.is_valid():
-            print(">>> Form is valid")  # Debugging
-
-            instance = form_DataSheetNS.save(commit=False)  # Do not save yet
-
-            # Assign required fields
-            instance.oSec00Field01 = request.user.username  # Username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Timestamp
-            instance.oSec00Field03 = "DataSheetNS"  # Fixed type
-
-            # Ensure a project is assigned before saving
-            project_id = request.POST.get('project')  # Get project_id from form
-            if project_id:
-                try:
-                    instance.project = Project.objects.get(id=project_id)  # Assign project
-                except Project.DoesNotExist:
-                    print(">>> Error: Project ID not found")  # Debugging
-                    return render(request, 'PageDataSheet_ManualScreen.html', {
-                        'form_DataSheetNS': form_DataSheetNS,
-                        'error': 'Invalid Project ID'
-                    })
-
-            else:
-                print(">>> Error: No Project ID provided")  # Debugging
-                return render(request, 'PageDataSheet_ManualScreen.html', {
-                    'form_DataSheetNS': form_DataSheetNS,
-                    'error': 'Project is required'
-                })
-
-            # Save the instance
-            instance.save()
-            print(">>> Data Saved Successfully")  # Debugging
-
-            # Refresh the form with initial values
-            form_DataSheetNS = FDS_NS(initial=form_DataSheetNS.cleaned_data)
-            
-            machines = Machine.objects.filter(oSec00Field03="DataSheetNS")
-            
-
-
-            return render(request, 'PageDataSheet_ManualScreen.html', {
-                'form': form_DataSheetNS,
-                'success': 'Data saved successfully!',
-                "machines": machines
-            })
-
-        else:
-            print(">>> Form is NOT valid:", form_DataSheetNS.errors)  # Debugging
-            return render(request, 'PageDataSheet_ManualScreen.html', {
-                'form_DataSheetNS': form_DataSheetNS,
-                'error': 'Form contains errors',
-                "machines": machines
-            })
-
-    print(">>> Invalid request, redirecting to ms_load")  # Debugging
-    return redirect('ms_load')
-
-
-def DataSheetNS_Delete(request, machine_id):
-    machine = get_object_or_404(Machine, id=machine_id)
-    machine.delete()
-    
-    # Redirect to the 'load_data_sheet' view with sheet_key='A'
-    return redirect(reverse('load_data_sheet', kwargs={'sheet_key': 'A'}))
-
-
-def DataSheetNS_edit(request, id):
-    machine = get_object_or_404(Machine, id=id)  # Fetch the machine instance
-    if request.method == "POST":
-        form = formDataSheetNS(request.POST, instance=machine)  # Bind the existing instance
-        if form.is_valid():
-            form.save()  # Save updates
-            return redirect('load_DataSheetNS')  # Redirect to list page
-    else:
-        form = formDataSheetNS(instance=machine)  # Load form with existing data
-    
-    return render(request, 'PageNS_DataSheet_edit.html', {'form': form, 'machine': machine})
-
-
-def DataSheetNS_get_datasheet_data(request, machine_id):
-    machine = get_object_or_404(Machine, id=machine_id)
-    
-    data = {
-        "project": machine.project.name if machine.project else "No Project",
-        "oSec01Field01": machine.oSec01Field01,
-        "oSec01Field02": machine.oSec01Field02,
-        "oSec01Field03": machine.oSec01Field03,
-        "oSec01Field04": machine.oSec01Field04,
-        "oSec01Field05": machine.oSec01Field05,
-        "oSec01Field06": machine.oSec01Field06,
-        "oSec01Field07": machine.oSec01Field07,
-        "oSec01Field08": machine.oSec01Field08,
-        "oSec01Field09": machine.oSec01Field09,
-        "oSec01Field10": machine.oSec01Field10,
-        # Add other fields if necessary
-    }
-
-    return JsonResponse(data)
-
-
-
-
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-
-
-# Mapping of keys to form classes and templates
-DATA_SHEET_CONFIG = {
-    "A":    {"form_class": FDS_NS,  "template": "PageDataSheet_ManualScreen.html",              "needs_user": True, "DB_Name": "DataSheetNS"},
-    "B":    {"form_class": FDS_BS,  "template": "PageDataSheet_BasketScreen.html",              "needs_user": True, "DB_Name": "DataSheetBS"},
-    "C":    {"form_class": FDS_MSc, "template": "PageDataSheet_MechanicalCoarseScreen.html",    "needs_user": True, "DB_Name": "DataSheetMSc"},
-    "D":    {"form_class": FDS_MSf, "template": "PageDataSheet_MechanicalFineScreen.html",      "needs_user": True, "DB_Name": "DataSheetMSf"},
-    "E":    {"form_class": FDS_BC,  "template": "PageDataSheet_BeltConveyor.html",              "needs_user": True, "DB_Name": "DataSheetBC"},
-    "F":    {"form_class": FDS_SC,  "template": "PageDataSheet_ScrewConveyor.html",             "needs_user": True, "DB_Name": "DataSheetSC"},
-    "G":    {"form_class": FDS_CO,  "template": "PageDataSheet_Container.html",                 "needs_user": True, "DB_Name": "DataSheetCO"},
-    "H":    {"form_class": FDS_GR,  "template": "PageDataSheet_GritGreaseRemoval.html",         "needs_user": True, "DB_Name": "DataSheetGR"},
-    "I":    {"form_class": FDS_SS,  "template": "PageDataSheet_SandSilo.html",                  "needs_user": True, "DB_Name": "DataSheetSS"},
-    "J":    {"form_class": FDS_PS,  "template": "PageDataSheet_PrimarySedimentationTank.html",  "needs_user": True, "DB_Name": "DataSheetPS"},
-    "K":    {"form_class": FDS_QV,  "template": "PageDataSheet_QuickValve.html",                "needs_user": True, "DB_Name": "DataSheetQV"},
-    "L":    {"form_class": FDS_TV,  "template": "PageDataSheet_TelescopicValve.html",           "needs_user": True, "DB_Name": "DataSheetTV"},
-    "M":    {"form_class": FDS_TH,  "template": "PageDataSheet_SludgeThickener.html",           "needs_user": True, "DB_Name": "DataSheetTH"},
-    "N":    {"form_class": FDS_MX,  "template": "PageDataSheet_Mixers.html",                    "needs_user": True, "DB_Name": "DataSheetMX"},
-    "O":    {"form_class": FDS_TA,  "template": "PageDataSheet_Tanks.html",                     "needs_user": True, "DB_Name": "DataSheetTA"},
-}
-
-
-
-def load_data_sheet(request, sheet_key):
-    ###LOG
-    aLogEntry.objects.create(
-            user=request.user,
-            message=f"at {now()} {request.user} accessed Load {sheet_key} "
-        )
-    print(f"at {now()} {User} accessed Load {sheet_key} ")
-    ###LOG
-
-    print(UserCompany.objects.get(user=request.user).company)
-
-    if not request.user.is_authenticated:
-        return redirect("login")  # Redirect unauthenticated users
-
-    config = config = DATA_SHEET_CONFIG.get(sheet_key)
-    if not config:
-        return redirect("some_error_page")  # Handle invalid keys
-
-    form_class = config["form_class"]
-    template = config["template"]
-    needs_user = config["needs_user"]
-    DB_Name = config["DB_Name"]
-
-    # Get the company of the logged-in user
-    user_company = None
-    if request.user.is_authenticated:
-        try:
-            user_company = UserCompany.objects.get(user=request.user).company
-        except UserCompany.DoesNotExist:
-            user_company = None
-
-    # Assign company filter only if the user has a company
-    if user_company:
-        machines = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company)
-        projects = Project.objects.filter(company=user_company)
-    else:
-        machines = Machine.objects.none()  # Return an empty queryset if no company
-        projects = Project.objects.none()  # Return an empty queryset if no company
-
-    # If the form needs user association, provide it
-    form = form_class() if not needs_user else form_class(user=request.user)
-    
-    print(projects)
-
-    return render(request, template, {
-    "form": form,
-    "machines": machines,
-    "projects": projects,  
-    "user_company": user_company,
-})
-
-
-
-
-
-
-# Mapping between data types and their respective forms and templates
-DATA_SHEET_CONFIG_BBB = {
-    "AA":    {"form_class": FDS_NS,  "template": "PageDataSheet_ManualScreen.html",              "needs_user": True, "DB_Name": "DataSheetNS"},
-    "BB":    {"form_class": FDS_BS,  "template": "PageDataSheet_BasketScreen.html",              "needs_user": True, "DB_Name": "DataSheetBS"},
-    "CC":    {"form_class": FDS_MSc, "template": "PageDataSheet_MechanicalCoarseScreen.html",    "needs_user": True, "DB_Name": "DataSheetMSc"},
-    "DD":    {"form_class": FDS_MSf, "template": "PageDataSheet_MechanicalFineScreen.html",      "needs_user": True, "DB_Name": "DataSheetMSf"},
-    "EE":    {"form_class": FDS_BC,  "template": "PageDataSheet_BeltConveyor.html",              "needs_user": True, "DB_Name": "DataSheetBC"},
-    "FF":    {"form_class": FDS_SC,  "template": "PageDataSheet_ScrewConveyor.html",             "needs_user": True, "DB_Name": "DataSheetSC"},
-    "GG":    {"form_class": FDS_CO,  "template": "PageDataSheet_Container.html",                 "needs_user": True, "DB_Name": "DataSheetCO"},
-    "HH":    {"form_class": FDS_GR,  "template": "PageDataSheet_GritGreaseRemoval.html",         "needs_user": True, "DB_Name": "DataSheetGR"},
-    "II":    {"form_class": FDS_SS,  "template": "PageDataSheet_SandSilo.html",                  "needs_user": True, "DB_Name": "DataSheetSS"},
-    "JJ":    {"form_class": FDS_PS,  "template": "PageDataSheet_PrimarySedimentationTank.html",  "needs_user": True, "DB_Name": "DataSheetPS"},
-    "KK":    {"form_class": FDS_QV,  "template": "PageDataSheet_QuickValve.html",                "needs_user": True, "DB_Name": "DataSheetQV"},
-    "LL":    {"form_class": FDS_TV,  "template": "PageDataSheet_TelescopicValve.html",           "needs_user": True, "DB_Name": "DataSheetTV"},
-    "MM":    {"form_class": FDS_TH,  "template": "PageDataSheet_SludgeThickener.html",           "needs_user": True, "DB_Name": "DataSheetTH"},
-    "NN":    {"form_class": FDS_MX,  "template": "PageDataSheet_Mixers.html",                    "needs_user": True, "DB_Name": "DataSheetMX"},
-    "OO":    {"form_class": FDS_TA,  "template": "PageDataSheet_Tanks.html",                     "needs_user": True, "DB_Name": "DataSheetTA"},
-}
-
-
-def save_data_sheet(request, data_type):
-    
-    ###LOG
-    aLogEntry.objects.create(
-            user=request.user,
-            message=f"at {now()} {request.user} accessed Save {data_type} "
-        )    
-    ###LOG
-    
-
-    if not request.user.is_authenticated:
-        return redirect("ms_load")  # Redirect if user is not logged in
-
-    if data_type not in DATA_SHEET_CONFIG_BBB:
-        return redirect("ms_load")  # Redirect if data type is invalid
-
-    config = DATA_SHEET_CONFIG_BBB[data_type]
-    form_class = config["form_class"]
-    template = config["template"]
-    DB_Name = config["DB_Name"]
-
-    if request.method == "POST":
-        form = form_class(request.POST)
-
-        if form.is_valid():
-            instance = form.save(commit=False)  # Don't save to DB yet
-
-            # Assign common fields
-            instance.oSec00Field01 = request.user.username  # Username
-            instance.oSec00Field02 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Timestamp
-            instance.oSec00Field03 = DB_Name  # Fixed type
-
-            # Handle project assignment
-            project_id = request.POST.get("project")
-            if project_id:
-                try:
-                    instance.project = Project.objects.get(id=project_id)
-                except Project.DoesNotExist:
-                    return render(request, template, {"form": form, "error": "Invalid Project ID"})
-            else:
-                return render(request, template, {"form": form, "error": "Project is required"})
-
-            # Get the company associated with the user
-            try:
-                user_company = UserCompany.objects.get(user=request.user).company
-                instance.company = user_company  # Assign company to the instance
-            except UserCompany.DoesNotExist:
-                return render(request, template, {"form": form, "error": "User is not associated with a company"})
-
-            # Save the instance to the database
-            instance.save()
-
-            # Refresh form with initial values
-            form = form_class(initial=form.cleaned_data)
-
-            # Filter machines by the user’s company
-            machines = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company)
-
-            return render(request, template, {"form": form, "success": "Data saved successfully!", "machines": machines})
-
-        else:
-            # If the form has errors, return all machines for this DB_Name (no company filtering)
-            machines = Machine.objects.filter(oSec00Field03=DB_Name)
-            return render(request, template, {"form": form, "error": "Form contains errors", "machines": machines})
-
-    return redirect("ms_load")  # Redirect for invalid requests
-
-
-
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
 #######
 #######
 #######
@@ -2900,162 +2589,733 @@ def process_dxf(request, aMachine_ID, category, modifications, output_filename):
 
     return HttpResponse("Invalid request", status=400)
 
-# Specific DXF handlers
-def General_DXF_NS(request, aMachine_ID):
-    return process_dxf(
-        request,
-        aMachine_ID,
-        "NS",
-        lambda machine: {
-            "ScreenLength": machine.oSec02Field06,
-            "BarLength": "500",
-            "ScreenWidth": machine.oSec02Field04,
-            "BarTh": "10",
-            "BarSpacing": machine.oSec02Field10,
-        },
-        "new_NS.dxf"
-    )
+# DXF Download Views
+def General_DXF_ALL(request, aMachine_ID, aType):
+    
+    print(aType)
+    
+    # Redirect unauthenticated users
+    if not request.user.is_authenticated:
+        return redirect("login")  
+    
+    
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} DXF download {aType} "
+        )
+    
+    
+    # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    
+    if aType == "NS":
+        return process_dxf(
+            request,
+            aMachine_ID,
+            "NS",
+            lambda machine: {
+                "ScreenLength": machine.oSec02Field06,
+                "BarLength": "500",
+                "ScreenWidth": machine.oSec02Field04,
+                "BarTh": "10",
+                "BarSpacing": machine.oSec02Field10,
+            },
+            f"new_NS_{user_company}.dxf"
+        )
+        
+    
+    if aType == "MS":
+        return process_dxf(
+            request,
+            aMachine_ID,
+            "MS",
+            lambda machine: {
+                "ChannelHeight": "0000",
+                "WaterLevel": "000",
+                "Width": machine.oSec02Field08,
+                "Length": machine.oSec02Field10,
+                "Angle": machine.oSec02Field20,
+            },
+            f"new_MS_{user_company}.dxf"
+        )
+        
+    if aType == "BC":
+        return process_dxf(
+            request,
+            aMachine_ID,
+            "BC",
+            lambda machine: {
+                "Length": machine.oSec02Field04,
+                "Width": machine.oSec02Field02,
+                "WidB": "000",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_BC_{user_company}.dxf"
+        )
+        
+    if aType == "CO":
+        return process_dxf(
+            request,
+            aMachine_ID,
+            "CO",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_CO_{user_company}.dxf"
+        )
+        
+    if aType == "GR":
+        return process_dxf(
+            request,
+            aMachine_ID,
+            "GR",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_GR_{user_company}.dxf"
+        )
+        
+    if aType == "SS":
+        return process_dxf(
+            request,
+            aMachine_ID,
+            "SS",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_SS_{user_company}.dxf"
+        )
+        
+    if aType == "PST":
+        return process_dxf(
+            request,
+            aMachine_ID,
+            "PST",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_PST_{user_company}.dxf"
+        )
+        
+    if aType == "QV":
+        return process_dxf(
+            request,
+            aMachine_ID,
+            "QV",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_QV_{user_company}.dxf"
+        )
+        
+    if aType == "TV":
+        return process_dxf(
+            request,
+            aMachine_ID,
+            "TV",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_TV_{user_company}.dxf"
+        )
+        
+    if aType == "TH":
+        return process_dxf(
+            request,
+            aMachine_ID,
+            "TH",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_TH_{user_company}.dxf"
+        )
+        
+    
+       
+    
+    
 
 
-def General_DXF_MS(request, aMachine_ID):
-    return process_dxf(
-        request,
-        aMachine_ID,
-        "MS",
-        lambda machine: {
-            "ChannelHeight": "0000",
-            "WaterLevel": "000",
-            "Width": machine.oSec02Field08,
-            "Length": machine.oSec02Field10,
-            "Angle": machine.oSec02Field20,
-        },
-        "new_MS.dxf"
-    )
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
 
 
-def General_DXF_BC(request, aMachine_ID):
-    return process_dxf(
-        request,
-        aMachine_ID,
-        "BC",
-        lambda machine: {
-            "Length": machine.oSec02Field04,
-            "Width": machine.oSec02Field02,
-            "WidB": "000",
-            "BarTh": "10",
-            "BarSpacing": "25",
-        },
-        "new_BC.dxf"
-    )
 
 
-def General_DXF_CO(request, aMachine_ID):
-    return process_dxf(
-        request,
-        aMachine_ID,
-        "CO",
-        lambda machine: {
-            "ScreenLength": "1000",
-            "BarLength": "500",
-            "ScreenWidth": "600",
-            "BarTh": "10",
-            "BarSpacing": "25",
-        },
-        "new_CO.dxf"
-    )
 
 
-def General_DXF_GR(request, aMachine_ID):
-    return process_dxf(
-        request,
-        aMachine_ID,
-        "GR",
-        lambda machine: {
-            "ScreenLength": "1000",
-            "BarLength": "500",
-            "ScreenWidth": "600",
-            "BarTh": "10",
-            "BarSpacing": "25",
-        },
-        "new_GR.dxf"
-    )
+####
 
 
-def General_DXF_SS(request, aMachine_ID):
-    return process_dxf(
-        request,
-        aMachine_ID,
-        "SS",
-        lambda machine: {
-            "ScreenLength": "1000",
-            "BarLength": "500",
-            "ScreenWidth": "600",
-            "BarTh": "10",
-            "BarSpacing": "25",
-        },
-        "new_SS.dxf"
-    )
+def LoadPageDataSheet(request, sheet_key):
+    print(sheet_key)
+    
+    # Redirect unauthenticated users
+    if not request.user.is_authenticated:
+        return redirect("login")  
+    
+    
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} accessed Load {sheet_key} "
+        )
+    
+    
+    # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    print(user_company)
 
 
-def General_DXF_PST(request, aMachine_ID):
-    return process_dxf(
-        request,
-        aMachine_ID,
-        "PST",
-        lambda machine: {
-            "ScreenLength": "1000",
-            "BarLength": "500",
-            "ScreenWidth": "600",
-            "BarTh": "10",
-            "BarSpacing": "25",
-        },
-        "new_PST.dxf"
-    )
 
 
-def General_DXF_QV(request, aMachine_ID):
-    return process_dxf(
-        request,
-        aMachine_ID,
-        "QV",
-        lambda machine: {
-            "ScreenLength": "1000",
-            "BarLength": "500",
-            "ScreenWidth": "600",
-            "BarTh": "10",
-            "BarSpacing": "25",
-        },
-        "new_QV.dxf"
-    )
+    # Define a dictionary mapping sheet keys to their corresponding values
+    sheet_mapping = {
+        "NS": ("formDataSheetNS",               "DataSheetNS",      "Manual Screen"),
+        "MS": ("FDS_MechanicalScreen",          "DataSheetMS",      "Mechanical Screen"),
+        "BC": ("FDS_BeltConveyor",              "DataSheetBC",      "Belt Conveyor"),
+        "CO": ("FDS_Container",                 "DataSheetCO",      "Container"),
+        "GR": ("FDS_GritGreaseRemoval",         "DataSheetGR",      "Gritremoval"),
+        "SS": ("FDS_SandSilo",                  "DataSheetSS",      "Sand Silo"),
+        "PS": ("FDS_PrimarySedimentationTank",  "DataSheetPS",      "Primary Sedimentation Tank"),
+        "QV": ("FDS_QuickValve",                "DataSheetQV",      "Quick Valve"),
+        "TV": ("FDS_TelescopicValve",           "DataSheetTV",      "Telescopic Valve"),
+        "TH": ("FDS_SludgeThickener",           "DataSheetTH",      "Thickener"),
+    }
+
+    # Retrieve values using the dictionary
+    form_type, DB_Name, aMachineName = sheet_mapping.get(sheet_key, ("None", "None", "None"))
+
+    # Optional: Handle cases where the sheet_key is invalid
+    if form_type is None:
+        print(f"Warning: Unknown sheet_key '{sheet_key}'")
 
 
-def General_DXF_TV(request, aMachine_ID):
-    return process_dxf(
-        request,
-        aMachine_ID,
-        "TV",
-        lambda machine: {
-            "ScreenLength": "1000",
-            "BarLength": "500",
-            "ScreenWidth": "600",
-            "BarTh": "10",
-            "BarSpacing": "25",
-        },
-        "new_TV.dxf"
-    )
 
 
-def General_DXF_TH(request, aMachine_ID):
-    return process_dxf(
-        request,
-        aMachine_ID,
-        "TH",
-        lambda machine: {
-            "ScreenLength": "1000",
-            "BarLength": "500",
-            "ScreenWidth": "600",
-            "BarTh": "10",
-            "BarSpacing": "25",
-        },
-        "new_TH.dxf"
-    )
+    # Assign company filter only if the user has a company
+    if user_company:
+        machines = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company)
+        projects = Project.objects.filter(company=user_company)
+    else:
+        machines = Machine.objects.none()  # Return an empty queryset if no company
+        projects = Project.objects.none()  # Return an empty queryset if no company
+
+
+
+    form = FormDataSheet(user=request.user, form_type=form_type)
+    
+    
+    # print(projects)
+
+    return render(request, "PageDataSheet.html", {
+    "form": form,
+    "machines": machines,
+    "projects": projects,  
+    "aMachineName": aMachineName,  
+    "user_company": user_company,
+    "sheet_key": sheet_key
+})
+
+
+
+
+def SavePageDataSheet(request, sheet_key):    
+    print(sheet_key)
+    
+    # Redirect unauthenticated users
+    if not request.user.is_authenticated:
+        return redirect("login")  
+    
+    
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} accessed Load {sheet_key} "
+        )
+    
+    
+    # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+
+    
+    # Define a dictionary mapping sheet keys to their corresponding values
+    sheet_mapping = {
+        "NS": ("formDataSheetNS",               "DataSheetNS",      "Manual Screen"),
+        "MS": ("FDS_MechanicalScreen",          "DataSheetMS",      "Mechanical Screen"),
+        "BC": ("FDS_BeltConveyor",              "DataSheetBC",      "Belt Conveyor"),
+        "CO": ("FDS_Container",                 "DataSheetCO",      "Container"),
+        "GR": ("FDS_GritGreaseRemoval",         "DataSheetGR",      "Gritremoval"),
+        "SS": ("FDS_SandSilo",                  "DataSheetSS",      "Sand Silo"),
+        "PS": ("FDS_PrimarySedimentationTank",  "DataSheetPS",      "Primary Sedimentation Tank"),
+        "QV": ("FDS_QuickValve",                "DataSheetQV",      "Quick Valve"),
+        "TV": ("FDS_TelescopicValve",           "DataSheetTV",      "Telescopic Valve"),
+        "TH": ("FDS_SludgeThickener",           "DataSheetTH",      "Thickener"),
+    }
+
+    # Retrieve values using the dictionary
+    form_type, DB_Name, aMachineName = sheet_mapping.get(sheet_key, ("None", "None", "None"))
+    
+
+
+    # Assign company filter only if the user has a company
+    if user_company:
+        machines = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company)
+        projects = Project.objects.filter(company=user_company)
+    else:
+        machines = Machine.objects.none()  # Return an empty queryset if no company
+        projects = Project.objects.none()  # Return an empty queryset if no company
+
+    print(form_type)
+    
+
+    if request.method == "POST":
+        form = FormDataSheet(form_type=form_type, data=request.POST)
+
+        if form.is_valid():
+            instance = form.save(commit=False)  # Don't save to DB yet
+
+            # Assign common fields
+            instance.oSec00Field01 = request.user.username  # Username
+            instance.oSec00Field02 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Timestamp
+            instance.oSec00Field03 = DB_Name  # Fixed type
+
+            # Handle project assignment
+            project_id = request.POST.get("project")
+            if project_id:
+                try:
+                    instance.project = Project.objects.get(id=project_id)
+                except Project.DoesNotExist:
+                    return render(request, "PageDataSheet.html", {"form": form, "error": "Invalid Project ID"})
+            else:
+                return render(request, "PageDataSheet.html", {"form": form, "error": "Project is required"})
+
+            # Get the company associated with the user
+            try:
+                user_company = UserCompany.objects.get(user=request.user).company
+                instance.company = user_company  # Assign company to the instance
+            except UserCompany.DoesNotExist:
+                return render(request, "PageDataSheet.html", 
+                              {"form": form, 
+                               "error": "User is not associated with a company",
+                               "aMachineName": aMachineName,
+                               "sheet_key" : sheet_key})
+
+            # Save the instance to the database
+            instance.save()
+
+            # Refresh form with initial values
+            form = FormDataSheet(initial=form.cleaned_data, form_type=form_type)
+
+            # Filter machines by the user’s company
+            machines = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company)
+
+            print("####################### LINE 3343")
+
+            return render(request, "PageDataSheet.html", {
+                "form": form,
+                "machines": machines,
+                "projects": projects,  
+                "aMachineName": aMachineName,  
+                "user_company": user_company,
+                "sheet_key": sheet_key
+            })
+
+        else:
+            # If the form has errors, return all machines for this DB_Name (no company filtering)
+            machines = Machine.objects.filter(oSec00Field03=DB_Name)
+            return render(request, "PageDataSheet.html", {"form": form, "error": "Form contains errors", "machines": machines})
+
+    return redirect("ms_load")  # Redirect for invalid requests
+
+
+
+def DeleteMachine(request, machine_id, aType):  
+    machine = get_object_or_404(Machine, id=machine_id)
+    machine.delete()
+
+    # Redirect after deletion (if needed)
+    return redirect(reverse('PageDataSheet', kwargs={'sheet_key': aType}))
+
+
+
+def edit_machine(request, machine_id):
+    machine = get_object_or_404(Machine, id=machine_id)  # Fetch the existing machine
+
+    if request.method == "POST":
+        #form = FDS_CO(request.POST)  # Bind the form with posted data
+        form = FormDataSheet(data=request.POST)
+        
+        if form.is_valid():
+            # Manually update machine fields
+            machine.project = form.cleaned_data.get('project', None)
+            machine.oSec01Field01 = form.cleaned_data.get('oSec01Field01', '')
+            machine.oSec01Field02 = form.cleaned_data.get('oSec01Field02', '')
+            machine.oSec01Field03 = form.cleaned_data.get('oSec01Field03', '')
+            machine.oSec01Field04 = form.cleaned_data.get('oSec01Field04', '')
+            machine.oSec01Field05 = form.cleaned_data.get('oSec01Field05', '')
+            machine.oSec01Field06 = form.cleaned_data.get('oSec01Field06', '')
+            machine.oSec01Field07 = form.cleaned_data.get('oSec01Field07', '')
+            machine.oSec01Field08 = form.cleaned_data.get('oSec01Field08', '')
+            machine.oSec01Field09 = form.cleaned_data.get('oSec01Field09', '')
+            machine.oSec01Field10 = form.cleaned_data.get('oSec01Field10', '')
+            machine.oSec01Field11 = form.cleaned_data.get('oSec01Field11', '')
+            machine.oSec01Field12 = form.cleaned_data.get('oSec01Field12', '')
+            machine.oSec01Field13 = form.cleaned_data.get('oSec01Field13', '')
+            machine.oSec01Field14 = form.cleaned_data.get('oSec01Field14', '')
+            machine.oSec01Field15 = form.cleaned_data.get('oSec01Field15', '')
+            machine.oSec01Field16 = form.cleaned_data.get('oSec01Field16', '')
+            machine.oSec01Field17 = form.cleaned_data.get('oSec01Field17', '')
+            machine.oSec01Field18 = form.cleaned_data.get('oSec01Field18', '')
+            machine.oSec01Field19 = form.cleaned_data.get('oSec01Field19', '')
+            machine.oSec01Field20 = form.cleaned_data.get('oSec01Field20', '')
+
+            machine.save()  # Save updates to the database
+            return JsonResponse({"success": True})
+        else:
+            return JsonResponse({"success": False, "errors": form.errors})  # Send form validation errors
+
+    return JsonResponse({"success": False, "error": "Invalid request"})
+
+
+
+
+def DataSheetNS_get_datasheet_data(request, machine_id):
+    machine = get_object_or_404(Machine, id=machine_id)
+    
+    data = {
+        "project": machine.project.name if machine.project else "No Project",
+        "oSec01Field01": machine.oSec01Field01,
+        "oSec01Field02": machine.oSec01Field02,
+        "oSec01Field03": machine.oSec01Field03,
+        "oSec01Field04": machine.oSec01Field04,
+        "oSec01Field05": machine.oSec01Field05,
+        "oSec01Field06": machine.oSec01Field06,
+        "oSec01Field07": machine.oSec01Field07,
+        "oSec01Field08": machine.oSec01Field08,
+        "oSec01Field09": machine.oSec01Field09,
+        "oSec01Field10": machine.oSec01Field10,        
+        "oSec01Field11": machine.oSec01Field11,
+        "oSec01Field12": machine.oSec01Field12,
+        "oSec01Field13": machine.oSec01Field13,
+        "oSec01Field14": machine.oSec01Field14,
+        "oSec01Field15": machine.oSec01Field15,
+        "oSec01Field16": machine.oSec01Field16,
+        "oSec01Field17": machine.oSec01Field17,
+        "oSec01Field18": machine.oSec01Field18,
+        "oSec01Field19": machine.oSec01Field19,
+        "oSec01Field20": machine.oSec01Field20,
+        
+        "oSec02Field01": machine.oSec02Field01,
+        "oSec02Field02": machine.oSec02Field02,
+        "oSec02Field03": machine.oSec02Field03,
+        "oSec02Field04": machine.oSec02Field04,
+        "oSec02Field05": machine.oSec02Field05,
+        "oSec02Field06": machine.oSec02Field06,
+        "oSec02Field07": machine.oSec02Field07,
+        "oSec02Field08": machine.oSec02Field08,
+        "oSec02Field09": machine.oSec02Field09,
+        "oSec02Field10": machine.oSec02Field10,        
+        "oSec02Field11": machine.oSec02Field11,
+        "oSec02Field12": machine.oSec02Field12,
+        "oSec02Field13": machine.oSec02Field13,
+        "oSec02Field14": machine.oSec02Field14,
+        "oSec02Field15": machine.oSec02Field15,
+        "oSec02Field16": machine.oSec02Field16,
+        "oSec02Field17": machine.oSec02Field17,
+        "oSec02Field18": machine.oSec02Field18,
+        "oSec02Field19": machine.oSec02Field19,
+        "oSec02Field20": machine.oSec02Field20,
+        
+        "oSec03Field01": machine.oSec03Field01,
+        "oSec03Field02": machine.oSec03Field02,
+        "oSec03Field03": machine.oSec03Field03,
+        "oSec03Field04": machine.oSec03Field04,
+        "oSec03Field05": machine.oSec03Field05,
+        "oSec03Field06": machine.oSec03Field06,
+        "oSec03Field07": machine.oSec03Field07,
+        "oSec03Field08": machine.oSec03Field08,
+        "oSec03Field09": machine.oSec03Field09,
+        "oSec03Field10": machine.oSec03Field10,        
+        "oSec03Field11": machine.oSec03Field11,
+        "oSec03Field12": machine.oSec03Field12,
+        "oSec03Field13": machine.oSec03Field13,
+        "oSec03Field14": machine.oSec03Field14,
+        "oSec03Field15": machine.oSec03Field15,
+        "oSec03Field16": machine.oSec03Field16,
+        "oSec03Field17": machine.oSec03Field17,
+        "oSec03Field18": machine.oSec03Field18,
+        "oSec03Field19": machine.oSec03Field19,
+        "oSec03Field20": machine.oSec03Field20,
+        
+        "oSec04Field01": machine.oSec04Field01,
+        "oSec04Field02": machine.oSec04Field02,
+        "oSec04Field03": machine.oSec04Field03,
+        "oSec04Field04": machine.oSec04Field04,
+        "oSec04Field05": machine.oSec04Field05,
+        "oSec04Field06": machine.oSec04Field06,
+        "oSec04Field07": machine.oSec04Field07,
+        "oSec04Field08": machine.oSec04Field08,
+        "oSec04Field09": machine.oSec04Field09,
+        "oSec04Field10": machine.oSec04Field10,        
+        "oSec04Field11": machine.oSec04Field11,
+        "oSec04Field12": machine.oSec04Field12,
+        "oSec04Field13": machine.oSec04Field13,
+        "oSec04Field14": machine.oSec04Field14,
+        "oSec04Field15": machine.oSec04Field15,
+        "oSec04Field16": machine.oSec04Field16,
+        "oSec04Field17": machine.oSec04Field17,
+        "oSec04Field18": machine.oSec04Field18,
+        "oSec04Field19": machine.oSec04Field19,
+        "oSec04Field20": machine.oSec04Field20,
+        
+        "oSec05Field01": machine.oSec05Field01,
+        "oSec05Field02": machine.oSec05Field02,
+        "oSec05Field03": machine.oSec05Field03,
+        "oSec05Field04": machine.oSec05Field04,
+        "oSec05Field05": machine.oSec05Field05,
+        "oSec05Field06": machine.oSec05Field06,
+        "oSec05Field07": machine.oSec05Field07,
+        "oSec05Field08": machine.oSec05Field08,
+        "oSec05Field09": machine.oSec05Field09,
+        "oSec05Field10": machine.oSec05Field10,        
+        "oSec05Field11": machine.oSec05Field11,
+        "oSec05Field12": machine.oSec05Field12,
+        "oSec05Field13": machine.oSec05Field13,
+        "oSec05Field14": machine.oSec05Field14,
+        "oSec05Field15": machine.oSec05Field15,
+        "oSec05Field16": machine.oSec05Field16,
+        "oSec05Field17": machine.oSec05Field17,
+        "oSec05Field18": machine.oSec05Field18,
+        "oSec05Field19": machine.oSec05Field19,
+        "oSec05Field20": machine.oSec05Field20,
+        
+        "oSec06Field01": machine.oSec06Field01,
+        "oSec06Field02": machine.oSec06Field02,
+        "oSec06Field03": machine.oSec06Field03,
+        "oSec06Field04": machine.oSec06Field04,
+        "oSec06Field05": machine.oSec06Field05,
+        "oSec06Field06": machine.oSec06Field06,
+        "oSec06Field07": machine.oSec06Field07,
+        "oSec06Field08": machine.oSec06Field08,
+        "oSec06Field09": machine.oSec06Field09,
+        "oSec06Field10": machine.oSec06Field10,        
+        "oSec06Field11": machine.oSec06Field11,
+        "oSec06Field12": machine.oSec06Field12,
+        "oSec06Field13": machine.oSec06Field13,
+        "oSec06Field14": machine.oSec06Field14,
+        "oSec06Field15": machine.oSec06Field15,
+        "oSec06Field16": machine.oSec06Field16,
+        "oSec06Field17": machine.oSec06Field17,
+        "oSec06Field18": machine.oSec06Field18,
+        "oSec06Field19": machine.oSec06Field19,
+        "oSec06Field20": machine.oSec06Field20,
+        
+        "oSec07Field01": machine.oSec07Field01,
+        "oSec07Field02": machine.oSec07Field02,
+        "oSec07Field03": machine.oSec07Field03,
+        "oSec07Field04": machine.oSec07Field04,
+        "oSec07Field05": machine.oSec07Field05,
+        "oSec07Field06": machine.oSec07Field06,
+        "oSec07Field07": machine.oSec07Field07,
+        "oSec07Field08": machine.oSec07Field08,
+        "oSec07Field09": machine.oSec07Field09,
+        "oSec07Field10": machine.oSec07Field10,        
+        "oSec07Field11": machine.oSec07Field11,
+        "oSec07Field12": machine.oSec07Field12,
+        "oSec07Field13": machine.oSec07Field13,
+        "oSec07Field14": machine.oSec07Field14,
+        "oSec07Field15": machine.oSec07Field15,
+        "oSec07Field16": machine.oSec07Field16,
+        "oSec07Field17": machine.oSec07Field17,
+        "oSec07Field18": machine.oSec07Field18,
+        "oSec07Field19": machine.oSec07Field19,
+        "oSec07Field20": machine.oSec07Field20,
+        
+        "oSec08Field01": machine.oSec08Field01,
+        "oSec08Field02": machine.oSec08Field02,
+        "oSec08Field03": machine.oSec08Field03,
+        "oSec08Field04": machine.oSec08Field04,
+        "oSec08Field05": machine.oSec08Field05,
+        "oSec08Field06": machine.oSec08Field06,
+        "oSec08Field07": machine.oSec08Field07,
+        "oSec08Field08": machine.oSec08Field08,
+        "oSec08Field09": machine.oSec08Field09,
+        "oSec08Field10": machine.oSec08Field10,        
+        "oSec08Field11": machine.oSec08Field11,
+        "oSec08Field12": machine.oSec08Field12,
+        "oSec08Field13": machine.oSec08Field13,
+        "oSec08Field14": machine.oSec08Field14,
+        "oSec08Field15": machine.oSec08Field15,
+        "oSec08Field16": machine.oSec08Field16,
+        "oSec08Field17": machine.oSec08Field17,
+        "oSec08Field18": machine.oSec08Field18,
+        "oSec08Field19": machine.oSec08Field19,
+        "oSec08Field20": machine.oSec08Field20,
+        
+        "oSec09Field01": machine.oSec09Field01,
+        "oSec09Field02": machine.oSec09Field02,
+        "oSec09Field03": machine.oSec09Field03,
+        "oSec09Field04": machine.oSec09Field04,
+        "oSec09Field05": machine.oSec09Field05,
+        "oSec09Field06": machine.oSec09Field06,
+        "oSec09Field07": machine.oSec09Field07,
+        "oSec09Field08": machine.oSec09Field08,
+        "oSec09Field09": machine.oSec09Field09,
+        "oSec09Field10": machine.oSec09Field10,        
+        "oSec09Field11": machine.oSec09Field11,
+        "oSec09Field12": machine.oSec09Field12,
+        "oSec09Field13": machine.oSec09Field13,
+        "oSec09Field14": machine.oSec09Field14,
+        "oSec09Field15": machine.oSec09Field15,
+        "oSec09Field16": machine.oSec09Field16,
+        "oSec09Field17": machine.oSec09Field17,
+        "oSec09Field18": machine.oSec09Field18,
+        "oSec09Field19": machine.oSec09Field19,
+        "oSec09Field20": machine.oSec09Field20,
+        
+        "oSec10Field01": machine.oSec10Field01,
+        "oSec10Field02": machine.oSec10Field02,
+        "oSec10Field03": machine.oSec10Field03,
+        "oSec10Field04": machine.oSec10Field04,
+        "oSec10Field05": machine.oSec10Field05,
+        "oSec10Field06": machine.oSec10Field06,
+        "oSec10Field07": machine.oSec10Field07,
+        "oSec10Field08": machine.oSec10Field08,
+        "oSec10Field09": machine.oSec10Field09,
+        "oSec10Field10": machine.oSec10Field10,        
+        "oSec10Field11": machine.oSec10Field11,
+        "oSec10Field12": machine.oSec10Field12,
+        "oSec10Field13": machine.oSec10Field13,
+        "oSec10Field14": machine.oSec10Field14,
+        "oSec10Field15": machine.oSec10Field15,
+        "oSec10Field16": machine.oSec10Field16,
+        "oSec10Field17": machine.oSec10Field17,
+        "oSec10Field18": machine.oSec10Field18,
+        "oSec10Field19": machine.oSec10Field19,
+        "oSec10Field20": machine.oSec10Field20,
+        
+        
+        
+        # Add other fields if necessary
+    }
+
+    return JsonResponse(data)
+
+
