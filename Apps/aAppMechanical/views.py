@@ -160,7 +160,7 @@ def assign_user_to_company(request):
         form = UserCompanyForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("assign_user_to_company")  # Redirect to a success page
+            return redirect("assign_user")  # Redirect to a success page
     else:
         form = UserCompanyForm()
     
@@ -2706,11 +2706,11 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             f"new_SS_{user_company}.dxf"
         )
         
-    if aType == "PST":
+    if aType == "PS":
         return process_dxf(
             request,
             aMachine_ID,
-            "PST",
+            "PS",
             lambda machine: {
                 "ScreenLength": "1000",
                 "BarLength": "500",
@@ -2718,7 +2718,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_PST_{user_company}.dxf"
+            f"new_PS_{user_company}.dxf"
         )
         
     if aType == "QV":
@@ -2915,6 +2915,73 @@ def LoadPageDataSheet(request, sheet_key):
 
     form = FormDataSheet(user=request.user, form_type=form_type)
     
+    print(f"Initial value for oSec01Field02: {form.fields['oSec01Field02'].initial}")
+    
+    
+    # Initialize all section variables
+    aSection01Show = "Yes"
+    aSection02Show = "Yes"
+    aSection03Show = "Yes"
+    aSection04Show = "Yes"
+    aSection05Show = "Yes"
+    aSection06Show = "Yes"
+    aSection07Show = "Yes"
+    aSection08Show = "Yes"
+    aSection09Show = "Yes"
+    aSection10Show = "Yes"
+    
+    print(form.fields['oSec01Field01'].initial)
+    print(form.fields['oSec02Field01'].initial)
+    print(form.fields['oSec03Field01'].initial)
+    print(form.fields['oSec04Field01'].initial)
+    print(form.fields['oSec05Field01'].initial)
+    print(form.fields['oSec06Field01'].initial)
+    print(form.fields['oSec07Field01'].initial)
+    print(form.fields['oSec08Field01'].initial)
+    print(form.fields['oSec09Field01'].initial)
+    print(form.fields['oSec10Field01'].initial)
+
+    # Apply conditions to modify the values
+    if form.fields['oSec01Field01'].initial in ["oooo", None]:
+        aSection01Show = "Hide"
+
+    if form.fields['oSec02Field01'].initial in ["oooo", None]:
+        aSection02Show = "Hide"
+
+    if form.fields['oSec03Field01'].initial in ["oooo", None]:
+        aSection03Show = "Hide"
+
+    if form.fields['oSec04Field01'].initial in ["oooo", None]:
+        aSection04Show = "Hide"
+
+    if form.fields['oSec05Field01'].initial in ["oooo", None]:
+        aSection05Show = "Hide"
+
+    if form.fields['oSec06Field01'].initial in ["oooo", None]:
+        aSection06Show = "Hide"
+
+    if form.fields['oSec07Field01'].initial in ["oooo", None]:
+        aSection07Show = "Hide"
+
+    if form.fields['oSec08Field01'].initial in ["oooo", None]:
+        aSection08Show = "Hide"
+
+    if form.fields['oSec09Field01'].initial in ["oooo", None]:
+        aSection09Show = "Hide"
+
+    if form.fields['oSec10Field01'].initial in ["oooo", None]:
+        aSection10Show = "Hide"
+    
+    print(aSection01Show)
+    print(aSection02Show)
+    print(aSection03Show)
+    print(aSection04Show)
+    print(aSection05Show)
+    print(aSection06Show)
+    print(aSection07Show)
+    print(aSection08Show)
+    print(aSection09Show)
+    print(aSection10Show)
     
     # print(projects)
 
@@ -2924,7 +2991,17 @@ def LoadPageDataSheet(request, sheet_key):
     "projects": projects,  
     "aMachineName": aMachineName,  
     "user_company": user_company,
-    "sheet_key": sheet_key
+    "sheet_key": sheet_key,
+    "aSection01Show": aSection01Show,
+    "aSection02Show": aSection02Show,
+    "aSection03Show": aSection03Show,
+    "aSection04Show": aSection04Show,
+    "aSection05Show": aSection05Show,
+    "aSection06Show": aSection06Show,
+    "aSection07Show": aSection07Show,
+    "aSection08Show": aSection08Show,
+    "aSection09Show": aSection09Show,
+    "aSection10Show": aSection10Show,
 })
 
 
@@ -3026,7 +3103,77 @@ def SavePageDataSheet(request, sheet_key):
             # Filter machines by the user’s company
             machines = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company)
 
-            print("####################### LINE 3343")
+            #######################################
+            #######################################
+            #######################################
+            print("#######################")
+        
+            # Initialize all section variables
+            aSection01Show = "Yes"
+            aSection02Show = "Yes"
+            aSection03Show = "Yes"
+            aSection04Show = "Yes"
+            aSection05Show = "Yes"
+            aSection06Show = "Yes"
+            aSection07Show = "Yes"
+            aSection08Show = "Yes"
+            aSection09Show = "Yes"
+            aSection10Show = "Yes"
+            
+            print(form.fields['oSec01Field01'].initial)
+            print(form.fields['oSec02Field01'].initial)
+            print(form.fields['oSec03Field01'].initial)
+            print(form.fields['oSec04Field01'].initial)
+            print(form.fields['oSec05Field01'].initial)
+            print(form.fields['oSec06Field01'].initial)
+            print(form.fields['oSec07Field01'].initial)
+            print(form.fields['oSec08Field01'].initial)
+            print(form.fields['oSec09Field01'].initial)
+            print(form.fields['oSec10Field01'].initial)
+        
+            # Apply conditions to modify the values
+            if form.fields['oSec01Field01'].initial in ["oooo", None]:
+                aSection01Show = "Hide"
+        
+            if form.fields['oSec02Field01'].initial in ["oooo", None]:
+                aSection02Show = "Hide"
+        
+            if form.fields['oSec03Field01'].initial in ["oooo", None]:
+                aSection03Show = "Hide"
+        
+            if form.fields['oSec04Field01'].initial in ["oooo", None]:
+                aSection04Show = "Hide"
+        
+            if form.fields['oSec05Field01'].initial in ["oooo", None]:
+                aSection05Show = "Hide"
+        
+            if form.fields['oSec06Field01'].initial in ["oooo", None]:
+                aSection06Show = "Hide"
+        
+            if form.fields['oSec07Field01'].initial in ["oooo", None]:
+                aSection07Show = "Hide"
+        
+            if form.fields['oSec08Field01'].initial in ["oooo", None]:
+                aSection08Show = "Hide"
+        
+            if form.fields['oSec09Field01'].initial in ["oooo", None]:
+                aSection09Show = "Hide"
+        
+            if form.fields['oSec10Field01'].initial in ["oooo", None]:
+                aSection10Show = "Hide"
+            
+            print(aSection01Show)
+            print(aSection02Show)
+            print(aSection03Show)
+            print(aSection04Show)
+            print(aSection05Show)
+            print(aSection06Show)
+            print(aSection07Show)
+            print(aSection08Show)
+            print(aSection09Show)
+            print(aSection10Show)
+            
+            
 
             return render(request, "PageDataSheet.html", {
                 "form": form,
@@ -3034,7 +3181,17 @@ def SavePageDataSheet(request, sheet_key):
                 "projects": projects,  
                 "aMachineName": aMachineName,  
                 "user_company": user_company,
-                "sheet_key": sheet_key
+                "sheet_key": sheet_key,
+                "aSection01Show": aSection01Show,
+                "aSection02Show": aSection02Show,
+                "aSection03Show": aSection03Show,
+                "aSection04Show": aSection04Show,
+                "aSection05Show": aSection05Show,
+                "aSection06Show": aSection06Show,
+                "aSection07Show": aSection07Show,
+                "aSection08Show": aSection08Show,
+                "aSection09Show": aSection09Show,
+                "aSection10Show": aSection10Show,
             })
 
         else:
