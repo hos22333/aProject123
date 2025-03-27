@@ -463,6 +463,10 @@ class formCalcSC(forms.Form):
     oSec01Field02 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control shadow-sm rounded', 'style': 'color: blue;'}))
     oSec01Field03 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control shadow-sm rounded', 'style': 'color: blue;'}))
     oSec01Field04 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control shadow-sm rounded', 'style': 'color: blue;'}))
+    oSec01Field05 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control shadow-sm rounded', 'style': 'color: blue;'}))
+    oSec01Field06 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control shadow-sm rounded', 'style': 'color: blue;'}))
+    oSec01Field07 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control shadow-sm rounded', 'style': 'color: blue;'}))
+    oSec01Field08 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control shadow-sm rounded', 'style': 'color: blue;'}))
 
     oSec02Field01 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control shadow-sm rounded', 'readonly': 'readonly', 'style': 'color: blue; font-weight: bold;'}))
     oSec02Field02 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control shadow-sm rounded', 'readonly': 'readonly', 'style': 'color: blue; font-weight: bold;'}))
@@ -495,6 +499,10 @@ class formCalcSC(forms.Form):
             oSec01Field02=self.cleaned_data['oSec01Field02'],
             oSec01Field03=self.cleaned_data['oSec01Field03'],
             oSec01Field04=self.cleaned_data['oSec01Field04'],
+            oSec01Field05=self.cleaned_data['oSec01Field05'],
+            oSec01Field06=self.cleaned_data['oSec01Field06'],
+            oSec01Field07=self.cleaned_data['oSec01Field07'],
+            oSec01Field08=self.cleaned_data['oSec01Field08'],
             
             oSec02Field01=self.cleaned_data['oSec02Field01'],
             oSec02Field02=self.cleaned_data['oSec02Field02'],

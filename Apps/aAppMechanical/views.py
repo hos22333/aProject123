@@ -49,6 +49,7 @@ from docx.oxml.ns import qn
 ###################################
 
 def list_configs(request):
+    print("LINE52")
     sort_by = request.GET.get('sort', 'id')  # Default sorting by ID
     order = request.GET.get('order', 'asc')  # Default order is ascending
 
@@ -56,11 +57,17 @@ def list_configs(request):
     if sort_by not in valid_fields:
         sort_by = 'id'
 
+    
+    print("LINE61")
+    
     # Apply sorting order
     if order == 'desc':
         sort_by = f'-{sort_by}'
 
     configs = FormFieldConfig.objects.all().order_by(sort_by)
+    
+    
+    print("LINE70")
     
     return render(request, 'form_config.html', {
         'configs': configs,
@@ -1227,26 +1234,34 @@ def handle_sc_form(request):
             oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
             oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
             oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
+            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
+            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
+            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
+            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
 
             # Calculate new values for fields            
             api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
             req_type = "SC"  
             input_data = {
-                "SC_Density":        oSec01Field01_value,
-                "SC_Length":         oSec01Field02_value,
-                "SC_Diameter":       oSec01Field02_value,
-                "SC_Safety":         oSec01Field02_value,
+                "aInput01":     oSec01Field01_value,
+                "aInput02":     oSec01Field02_value,
+                "aInput03":     oSec01Field03_value,
+                "aInput04":     oSec01Field04_value,
+                "aInput05":     oSec01Field05_value,
+                "aInput06":     oSec01Field06_value,
+                "aInput07":     oSec01Field07_value,
+                "aInput08":     oSec01Field08_value,
             }
 
             # Call the function to interact with the API
             response = interact_with_api(api_url, req_type, input_data)
             
-            oSec02Field01_result = response["SC_o1"]
-            oSec02Field02_result = response["SC_o2"]
-            oSec02Field03_result = response["SC_o3"]
-            oSec02Field04_result = response["SC_o4"]
-            oSec02Field05_result = response["SC_o5"]
-            oSec02Field06_result = response["SC_o6"]
+            oSec02Field01_result = response["Pitch"]
+            oSec02Field02_result = response["SpeedRPM"]
+            oSec02Field03_result = response["MotorPower"]
+            oSec02Field04_result = response["ScrewWeight"]
+            oSec02Field05_result = response["FrameWeight"]
+            oSec02Field06_result = "1111"
 
             # Save the form with updated values
             instance = form1.save(commit=False)  # Do not save to the database yet
