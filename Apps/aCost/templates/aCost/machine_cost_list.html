@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Machine Costs</h2>
+<a href="{% url 'machine_cost_create' %}">Add Machine Cost</a>
+<ul>
+    {% for cost in costs %}
+        <li>
+            {{ cost.total_cost }} - {{ cost.details }}
+            <a href="{% url 'machine_cost_update' cost.id %}">Edit</a>
+            <a href="{% url 'machine_cost_delete' cost.id %}">Delete</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

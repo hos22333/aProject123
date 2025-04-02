@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br>
+<br>
+<br>
+<br>
+
+    <h1>All Category Items Size</h1>
+    <a href="{% url 'category_item_size_create' %}">➕ Add New Item Size</a>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>size</th>
+            <th>item</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        {% for item in category_items_size %}
+        <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.item.name }}</td>
+            <td>{{ item.item.category.name }}</td>
+            <td>{{ item.description }}</td>
+            <td>
+                <a href="{% url 'category_item_size_edit' item.id %}">✏️ Edit</a> | 
+                <a href="{% url 'category_item_size_delete' item.id %}" style="color: red;">🗑️ Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+    

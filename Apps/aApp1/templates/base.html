@@ -247,7 +247,28 @@
 
                   
                   {% if permissions.AthRol %}
-                                    
+                  
+                        
+                  
+                        
+                  <!-- Screens -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu_CS">
+                      <i class="fas fa-money-bill-alt"></i>
+                      <p>Cost</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu_CS">
+                      <ul class="nav nav-collapse">
+                        <li class="sub-item"><a href="{% url 'categories' %}"> <i class="fas fa-circle"></i> <p>Categories</p></a></li>
+                        <li class="sub-item"><a href="{% url 'category_items' %}"> <i class="fas fa-circle"></i> <p>Category Items</p></a></li>                        
+                        <li class="sub-item"><a href="{% url 'category_items_size' %}"> <i class="fas fa-circle"></i> <p>Category Items Size</p></a></li>
+                        <li class="sub-item"><a href="{% url 'category_items_size_price' %}"> <i class="fas fa-circle"></i> <p>Category Items Size price</p></a></li>
+                        <li class="sub-item"><a href="{% url 'cost_form' %}"> <i class="fas fa-circle"></i> <p>Cost Form</p></a></li>
+                    </ul>
+                  
+                    </div>
+                  </li>                  
                         
                   <!-- Screens -->
                   <li class="nav-item">
@@ -279,6 +300,8 @@
                       </ul>
                     </div>
                   </li>
+
+
                   
                   {% endif %}
 

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ action }} Category Item Size</title>
+</head>
+<body>
+    <h1>{{ action }} Category Item Size</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">{{ action }}</button>
+    </form>
+    <a href="{% url 'category_items_size' %}">🔙 Back to List</a>
+</body>
+</html>

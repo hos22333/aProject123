@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br>
+<br>
+<br>
+<br>
+
+    <h1>All Category Items Size Price</h1>
+    <a href="{% url 'category_item_size_price_create' %}">➕ Add New Item Size Price</a>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>price</th>
+            <th>size</th>
+            <th>item</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        {% for price in category_items_size_price %}
+        <tr>
+            <td>{{ price.id }}</td>
+            <td>{{ price.price }}</td>
+            <td>{{ price.size.name }}</td>
+            <td>{{ price.size.item.name }}</td>
+            <td>{{ price.size.item.category.name }}</td>
+            <td>{{ price.description }}</td>
+            <td>
+                <a href="{% url 'category_item_size_price_edit' price.id %}">✏️ Edit</a> | 
+                <a href="{% url 'category_item_size_price_delete' price.id %}" style="color: red;">🗑️ Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+{% endblock %}
+    

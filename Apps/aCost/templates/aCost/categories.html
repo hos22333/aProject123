@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Categories</title>
+</head>
+<body>
+    <h2>Categories...</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Category Name" required>
+        <textarea name="description" placeholder="Category Description"></textarea>
+        <button type="submit">Add Category</button>
+    </form>
+
+    <ul>
+        {% for category in categories %}
+            <li>{{ category.name }} - {{ category.description }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

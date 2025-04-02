@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Size Prices</title>
+</head>
+<body>
+    <h2>Prices for {{ size.name }}</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="number" name="price" placeholder="Price" step="0.01" required>
+        <button type="submit">Add Price</button>
+    </form>
+
+    <ul>
+        {% for price in size.prices.all %}
+            <li>{{ price.price }} ({{ price.date }}) - Added by {{ price.user.username }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'item_sizes' item.id %}">Back to Sizes</a>
+</body>
+</html>

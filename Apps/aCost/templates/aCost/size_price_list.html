@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Prices for {{ size.name }}</h2>
+<a href="{% url 'size_price_create' %}">Add Price</a>
+<ul>
+    {% for price in prices %}
+        <li>
+            {{ price.price }} by {{ price.user.username }} on {{ price.date }}
+            <a href="{% url 'size_price_update' price.id %}">Edit</a>
+            <a href="{% url 'size_price_delete' price.id %}">Delete</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

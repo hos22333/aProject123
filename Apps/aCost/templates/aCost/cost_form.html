@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cost Calculation Form</title>
+    <script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            let cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function loadSizes(itemId, categoryId, row) {
+        if (!itemId) return;
+        
+        fetch(`/Cost/get_sizes/${itemId}/`)
+            .then(response => response.json())
+            .then(data => {
+                let sizeSelect = document.getElementById(`size_${categoryId}_${row}`);
+                sizeSelect.innerHTML = '<option value="">Select Size</option>';
+                
+                data.sizes.forEach(size => {
+                    let option = document.createElement('option');
+                    option.value = size.id;
+                    option.textContent = size.name;
+                    sizeSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching sizes:', error));
+    }
+
+    function loadPrice(sizeId, categoryId, row) {
+        if (!sizeId) return;
+
+        fetch(`/Cost/get_price/${sizeId}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById(`price_${categoryId}_${row}`).value = data.price;
+                calculateCost(categoryId, row);
+            })
+            .catch(error => console.error('Error fetching price:', error));
+    }
+
+    function calculateCost(categoryId, row) {
+        let price = parseFloat(document.getElementById(`price_${categoryId}_${row}`).value) || 0;
+        let quantity = parseInt(document.getElementById(`quantity_${categoryId}_${row}`).value) || 0;
+        document.getElementById(`total_${categoryId}_${row}`).value = (price * quantity).toFixed(2);
+    }
+</script>
+</head>
+<body>
+    <form onsubmit="return false;">
+        {% for category in categories %}
+            <h3>{{ category.name }}</h3>
+            {% for i in "12345" %}
+                <div>
+                    <select id="item_{{ category.id }}_{{ i }}" onchange="loadSizes(this.value, '{{ category.id }}', '{{ i }}')">
+                        <option value="">Select Item</option>
+                        {% for item in category.items.all %}
+                            <option value="{{ item.id }}">{{ item.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select id="size_{{ category.id }}_{{ i }}" onchange="loadPrice(this.value, '{{ category.id }}', '{{ i }}')">
+                        <option value="">Select Size</option>
+                    </select>
+
+                    <input type="number" id="price_{{ category.id }}_{{ i }}" readonly>
+                    <input type="number" id="quantity_{{ category.id }}_{{ i }}" oninput="calculateCost('{{ category.id }}', '{{ i }}')">
+                    <input type="number" id="total_{{ category.id }}_{{ i }}" readonly>
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <button onclick="submitForm(false)">Save as New</button>
+        <button onclick="submitForm(true)">Update Existing</button>
+    </form>
+</body>
+</html>
