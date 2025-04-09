@@ -2117,8 +2117,12 @@ def generate_report_AAA(request, project_id):
     
         # Adding logo
         run_logo = header_para.add_run()  # Corrected reference to header paragraph
-        run_logo.add_picture("LogoAAA.PNG", width=Inches(7.0))  # Adjust width as needed
-    
+        
+        try:
+            run_logo.add_picture("LogoAAA.PNG", width=Inches(7.0))  # Adjust width as needed
+        except Exception as e:
+            print(f"Error adding logo: {e}")
+
         # Footer
         footer = section.footer
         footer_para = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
@@ -2342,7 +2346,12 @@ def generate_report_BBB(request, project_id):
     
         # Adding logo
         run_logo = header_para.add_run()  # Corrected reference to header paragraph
-        run_logo.add_picture("LogoBBB.PNG", width=Inches(7.0))  # Adjust width as needed
+        try:
+            run_logo.add_picture("LogoBBB.PNG", width=Inches(7.0))  # Adjust width as needed
+        except Exception as e:
+            print(f"Error adding logo: {e}")
+
+        
     
         # Footer
         footer = section.footer
@@ -2782,7 +2791,95 @@ def General_DXF_ALL(request, aMachine_ID, aType):
         )
         
     
-       
+    
+    
+    
+  
+
+# DXF Download Views
+def FullDrawing(request, aMachine_ID, aType):
+    
+    # Helper function to modify DXF files
+    def FullDrawing_modify_dxf_file(static_path, modified_path, modifications):
+        doc = ezdxf.readfile(static_path)
+
+        # for entity in doc.modelspace().query("DIMENSION"):
+        #     if entity.dxf.text in modifications:
+        #         entity.dxf.text = modifications[entity.dxf.text]
+
+        #     # Update text height and arrow size
+        #     dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)
+        #     if dimstyle:
+        #         dimstyle.dxf.dimtxt = 0.1  # Set text height
+        #         dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+        #     entity.render()
+
+        doc.saveas(modified_path)    
+        
+    
+    # Main DXF Processing Function
+    def FullDrawing_process_dxf(request, aMachine_ID, category, modifications, output_filename):
+
+        user_company = get_user_company(request)
+        if not user_company:
+            return HttpResponse("Unauthorized", status=403)
+
+        static_path  = os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", "Full Drawing NS.dxf")
+        modified_path = static_path.replace(".dxf", "_newFullDrawing.dxf")
+        
+        if not os.path.exists(static_path):
+            return HttpResponse("File not found", status=404)
+
+        machine = Machine.objects.get(id=aMachine_ID)
+
+        if request.method == "POST":
+            FullDrawing_modify_dxf_file(static_path, modified_path, modifications(machine))
+
+            # Serve the modified file for download
+            with open(modified_path, "rb") as dxf_file:
+                response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+                response["Content-Disposition"] = f'attachment; filename="{output_filename}"'
+                return response
+
+        return HttpResponse("Invalid request", status=400)
+        
+
+    
+    # Redirect unauthenticated users
+    if not request.user.is_authenticated:
+        return redirect("login") 
+        
+    # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None 
+        
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} DXF download {aType} "
+        )
+
+    
+    #if aType == "NS":
+    return FullDrawing_process_dxf(
+        request,
+        aMachine_ID,
+        "NS",
+        lambda machine: {
+            "ScreenLength": machine.oSec02Field06,
+            "BarLength": "500",
+            "ScreenWidth": machine.oSec02Field04,
+            "BarTh": "10",
+            "BarSpacing": machine.oSec02Field10,
+        },
+        f"newFullDrawing_ManualScreen_{user_company}.dxf"
+    )
+        
     
     
 

@@ -1,5 +1,12 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
+
+{% block content %}
+<br>
+<br>
+<br>
+<br>    
+
+
 <head>
     <title>Cost Calculation Form</title>
     <script>
@@ -60,7 +67,7 @@
     <form onsubmit="return false;">
         {% for category in categories %}
             <h3>{{ category.name }}</h3>
-            {% for i in "12345" %}
+            {% for i in "1234" %}
                 <div>
                     <select id="item_{{ category.id }}_{{ i }}" onchange="loadSizes(this.value, '{{ category.id }}', '{{ i }}')">
                         <option value="">Select Item</option>
@@ -83,4 +90,4 @@
         <button onclick="submitForm(true)">Update Existing</button>
     </form>
 </body>
-</html>
+{% endblock %}

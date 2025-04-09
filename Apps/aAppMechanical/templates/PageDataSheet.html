@@ -750,6 +750,10 @@
                             {% csrf_token %}
                             <button type="submit" class="btn btn-secondary btn-sm">Generate General Drawing</button>
                         </form>
+                        <form action="{% url 'FullDrawing' aMachine_ID=machine.id aType=sheet_key%}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary btn-sm">Generate Shop Drawing</button>
+                        </form>
                         
                     </td>
                 </tr>
