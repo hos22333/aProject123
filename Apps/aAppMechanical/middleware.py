@@ -11,7 +11,7 @@ class LoggingMiddleware:
         if request.user.is_authenticated:
             aLogEntry.objects.create(
                 user=request.user,
-                message=f"at {now()} Accessed {request.path} "
+                message=f"Accessed {request.path} "
             )
 
         return response

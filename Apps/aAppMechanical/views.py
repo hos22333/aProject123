@@ -37,10 +37,6 @@ from docx.oxml import OxmlElement, ns
 from docx.shared import Inches
 from docx.shared import Pt
 
-
-from docx import Document
-from docx.oxml import OxmlElement
-from docx.oxml.ns import qn
 ###################################
 ###################################
 ###################################
@@ -2964,18 +2960,22 @@ def FullDrawing(request, aMachine_ID, aType):
 
 
 def LoadPageDataSheet(request, sheet_key):
+    #pdb.set_trace()
     print(sheet_key)
     
     # Redirect unauthenticated users
     if not request.user.is_authenticated:
         return redirect("login")  
     
-    
+    print(request.user)
+    print(f"{request.user} accessed Load {sheet_key}")
     ###LOG
+    
     aLogEntry.objects.create(
-            user=request.user,
-            message=f"at {now()} {request.user} accessed Load {sheet_key} "
-        )
+        user=request.user,
+        message=f"{request.user} >>> {sheet_key}"
+    )
+    
     
     
     # Get the company of the logged-in user    
