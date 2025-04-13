@@ -1,0 +1,1341 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="page-inner">
+        <h2>CalculationsSheet : {{ aMachineName }}</h2>
+        <form method="POST" action="{% url 'SavePageCalculationsSheet' sheet_key=sheet_key %}" class="form-group">
+            {% csrf_token %}
+            <div class="row"> <!-- Row to hold both cards side by side -->
+
+                {% if sheet_key == "NS" %}
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 1</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field05.label }}</label>
+                                    {{ form1.oSec01Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field06.label }}</label>
+                                    {{ form1.oSec01Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field07.label }}</label>
+                                    {{ form1.oSec01Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field08.label }}</label>
+                                    {{ form1.oSec01Field08 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 2</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sheet_key == "BS" %}
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 1</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field05.label }}</label>
+                                    {{ form1.oSec01Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field06.label }}</label>
+                                    {{ form1.oSec01Field06 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 2</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sheet_key == "MS" %}
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Input</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Section 1 -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field05.label }}</label>
+                                    {{ form1.oSec01Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field06.label }}</label>
+                                    {{ form1.oSec01Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field07.label }}</label>
+                                    {{ form1.oSec01Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field08.label }}</label>
+                                    {{ form1.oSec01Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field09.label }}</label>
+                                    {{ form1.oSec01Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field10.label }}</label>
+                                    {{ form1.oSec01Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field11.label }}</label>
+                                    {{ form1.oSec01Field11 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>            
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Output</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Section 2 -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                            </div>
+            
+                            <div class="text-center">
+                                <button type="submit" name="form1_submit" class="btn btn-primary btn-lg mt-3">Calculate</button>
+                                <button type="submit" name="generate_report" formaction="{% url 'generate_ms_report' %}" class="btn btn-success btn-lg mt-3">Report</button>
+                            </div>
+                        </div>
+                    </div>            
+                </div>
+                {% endif %}
+
+                {% if sheet_key == "BC" %}
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Input</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field05.label }}</label>
+                                    {{ form1.oSec01Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field06.label }}</label>
+                                    {{ form1.oSec01Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field07.label }}</label>
+                                    {{ form1.oSec01Field07 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Output</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sheet_key == "SC" %}
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 1</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field05.label }}</label>
+                                    {{ form1.oSec01Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field06.label }}</label>
+                                    {{ form1.oSec01Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field07.label }}</label>
+                                    {{ form1.oSec01Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field08.label }}</label>
+                                    {{ form1.oSec01Field08 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 2</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field04.label }}</label>
+                                    {{ form1.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field05.label }}</label>
+                                    {{ form1.oSec02Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field06.label }}</label>
+                                    {{ form1.oSec02Field06 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sheet_key == "GR" %}
+                 <!-- Section 1 Card -->
+                 <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Input</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field05.label }}</label>
+                                    {{ form1.oSec01Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field06.label }}</label>
+                                    {{ form1.oSec01Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field07.label }}</label>
+                                    {{ form1.oSec01Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field08.label }}</label>
+                                    {{ form1.oSec01Field08 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Output</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field04.label }}</label>
+                                    {{ form1.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field05.label }}</label>
+                                    {{ form1.oSec02Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field06.label }}</label>
+                                    {{ form1.oSec02Field06 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sheet_key == "PS" %}
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Input</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Output</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field04.label }}</label>
+                                    {{ form1.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field05.label }}</label>
+                                    {{ form1.oSec02Field05 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sheet_key == "TH" %}
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Input</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Output</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field04.label }}</label>
+                                    {{ form1.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field05.label }}</label>
+                                    {{ form1.oSec02Field05 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sheet_key == "MX" %}
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Input</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field05.label }}</label>
+                                    {{ form1.oSec01Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field06.label }}</label>
+                                    {{ form1.oSec01Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field07.label }}</label>
+                                    {{ form1.oSec01Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field08.label }}</label>
+                                    {{ form1.oSec01Field08 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Output</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field04.label }}</label>
+                                    {{ form1.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field05.label }}</label>
+                                    {{ form1.oSec02Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field06.label }}</label>
+                                    {{ form1.oSec02Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field07.label }}</label>
+                                    {{ form1.oSec02Field07 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sheet_key == "RT" %}
+                 <!-- Section 1 Card -->
+                 <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Input</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field05.label }}</label>
+                                    {{ form1.oSec01Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field06.label }}</label>
+                                    {{ form1.oSec01Field06 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Output</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sheet_key == "CT" %}
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Input</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Output</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field04.label }}</label>
+                                    {{ form1.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field05.label }}</label>
+                                    {{ form1.oSec02Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field06.label }}</label>
+                                    {{ form1.oSec02Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field07.label }}</label>
+                                    {{ form1.oSec02Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field08.label }}</label>
+                                    {{ form1.oSec02Field08 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sheet_key == "PNch" %}
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 1</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field05.label }}</label>
+                                    {{ form1.oSec01Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field06.label }}</label>
+                                    {{ form1.oSec01Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field07.label }}</label>
+                                    {{ form1.oSec01Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field08.label }}</label>
+                                    {{ form1.oSec01Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field09.label }}</label>
+                                    {{ form1.oSec01Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field10.label }}</label>
+                                    {{ form1.oSec01Field10 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 2</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field04.label }}</label>
+                                    {{ form1.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field05.label }}</label>
+                                    {{ form1.oSec02Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field06.label }}</label>
+                                    {{ form1.oSec02Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field07.label }}</label>
+                                    {{ form1.oSec02Field07 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if sheet_key == "PNwa" %}
+                <!-- Section 1 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 1</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field01.label }}</label>
+                                    {{ form1.oSec01Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field02.label }}</label>
+                                    {{ form1.oSec01Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field03.label }}</label>
+                                    {{ form1.oSec01Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field04.label }}</label>
+                                    {{ form1.oSec01Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field05.label }}</label>
+                                    {{ form1.oSec01Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field06.label }}</label>
+                                    {{ form1.oSec01Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field07.label }}</label>
+                                    {{ form1.oSec01Field07 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field08.label }}</label>
+                                    {{ form1.oSec01Field08 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field09.label }}</label>
+                                    {{ form1.oSec01Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec01Field10.label }}</label>
+                                    {{ form1.oSec01Field10 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2 Card -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Section 2</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field01.label }}</label>
+                                    {{ form1.oSec02Field01 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field02.label }}</label>
+                                    {{ form1.oSec02Field02 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field03.label }}</label>
+                                    {{ form1.oSec02Field03 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field04.label }}</label>
+                                    {{ form1.oSec02Field04 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field05.label }}</label>
+                                    {{ form1.oSec02Field05 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field06.label }}</label>
+                                    {{ form1.oSec02Field06 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field07.label }}</label>
+                                    {{ form1.oSec02Field07 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div> <!-- Close row div -->
+
+            <div class="text-center">
+                <button type="submit" name="form1_submit" class="btn btn-primary btn-lg mt-3">Calculate</button>                                
+                <button type="submit" name="generate_report" formaction="{% url '#' %}" class="btn btn-success btn-lg mt-3">Report</button>
+            </div>
+
+        </form>
+
+        
+
+        
+    </div>
+</div>
+
+
+
+
+
+<!-- Add this to <head> in base.html -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll("input[style*='display: none;']").forEach(function(input) {
+            input.closest('.col-md-6').style.display = "none";
+        });
+    });
+</script>
+
+<!-- <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".edit-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let machineId = this.dataset.id;
+                
+                fetch(`/Mechanical/DataSheetNSget_data/${machineId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("editMachineId").value = machineId;
+                        document.getElementById("editProject").value = data.project_id;
+
+                        document.getElementById("edit_oSec01Field01").value = data.oSec01Field01;
+                        document.getElementById("edit_oSec01Field02").value = data.oSec01Field02;
+                        document.getElementById("edit_oSec01Field03").value = data.oSec01Field03;
+                        document.getElementById("edit_oSec01Field04").value = data.oSec01Field04;
+                        document.getElementById("edit_oSec01Field05").value = data.oSec01Field05;
+                        document.getElementById("edit_oSec01Field06").value = data.oSec01Field06;
+                        document.getElementById("edit_oSec01Field07").value = data.oSec01Field07;
+                        document.getElementById("edit_oSec01Field08").value = data.oSec01Field08;
+                        document.getElementById("edit_oSec01Field09").value = data.oSec01Field09;
+                        document.getElementById("edit_oSec01Field10").value = data.oSec01Field10;
+                        document.getElementById("edit_oSec01Field11").value = data.oSec01Field11;
+                        document.getElementById("edit_oSec01Field12").value = data.oSec01Field12;
+                        document.getElementById("edit_oSec01Field13").value = data.oSec01Field13;
+                        document.getElementById("edit_oSec01Field14").value = data.oSec01Field14;
+                        document.getElementById("edit_oSec01Field15").value = data.oSec01Field15;
+                        document.getElementById("edit_oSec01Field16").value = data.oSec01Field16;
+                        document.getElementById("edit_oSec01Field17").value = data.oSec01Field17;
+                        document.getElementById("edit_oSec01Field18").value = data.oSec01Field18;
+                        document.getElementById("edit_oSec01Field19").value = data.oSec01Field19;
+                        document.getElementById("edit_oSec01Field20").value = data.oSec01Field20;
+                        
+                        document.getElementById("edit_oSec02Field01").value = data.oSec02Field01;
+                        document.getElementById("edit_oSec02Field02").value = data.oSec02Field02;
+                        document.getElementById("edit_oSec02Field03").value = data.oSec02Field03;
+                        document.getElementById("edit_oSec02Field04").value = data.oSec02Field04;
+                        document.getElementById("edit_oSec02Field05").value = data.oSec02Field05;
+                        document.getElementById("edit_oSec02Field06").value = data.oSec02Field06;
+                        document.getElementById("edit_oSec02Field07").value = data.oSec02Field07;
+                        document.getElementById("edit_oSec02Field08").value = data.oSec02Field08;
+                        document.getElementById("edit_oSec02Field09").value = data.oSec02Field09;
+                        document.getElementById("edit_oSec02Field10").value = data.oSec02Field10;
+                        document.getElementById("edit_oSec02Field11").value = data.oSec02Field11;
+                        document.getElementById("edit_oSec02Field12").value = data.oSec02Field12;
+                        document.getElementById("edit_oSec02Field13").value = data.oSec02Field13;
+                        document.getElementById("edit_oSec02Field14").value = data.oSec02Field14;
+                        document.getElementById("edit_oSec02Field15").value = data.oSec02Field15;
+                        document.getElementById("edit_oSec02Field16").value = data.oSec02Field16;
+                        document.getElementById("edit_oSec02Field17").value = data.oSec02Field17;
+                        document.getElementById("edit_oSec02Field18").value = data.oSec02Field18;
+                        document.getElementById("edit_oSec02Field19").value = data.oSec02Field19;
+                        document.getElementById("edit_oSec02Field20").value = data.oSec02Field10;
+                                                
+                        document.getElementById("edit_oSec03Field01").value = data.oSec03Field01;
+                        document.getElementById("edit_oSec03Field02").value = data.oSec03Field02;
+                        document.getElementById("edit_oSec03Field03").value = data.oSec03Field03;
+                        document.getElementById("edit_oSec03Field04").value = data.oSec03Field04;
+                        document.getElementById("edit_oSec03Field05").value = data.oSec03Field05;
+                        document.getElementById("edit_oSec03Field06").value = data.oSec03Field06;
+                        document.getElementById("edit_oSec03Field07").value = data.oSec03Field07;
+                        document.getElementById("edit_oSec03Field08").value = data.oSec03Field08;
+                        document.getElementById("edit_oSec03Field09").value = data.oSec03Field09;
+                        document.getElementById("edit_oSec03Field10").value = data.oSec03Field10;
+                        
+                        document.getElementById("edit_oSec04Field01").value = data.oSec04Field01;
+                        document.getElementById("edit_oSec04Field02").value = data.oSec04Field02;
+                        document.getElementById("edit_oSec04Field03").value = data.oSec04Field03;
+                        document.getElementById("edit_oSec04Field04").value = data.oSec04Field04;
+                        document.getElementById("edit_oSec04Field05").value = data.oSec04Field05;
+                        document.getElementById("edit_oSec04Field06").value = data.oSec04Field06;
+                        document.getElementById("edit_oSec04Field07").value = data.oSec04Field07;
+                        document.getElementById("edit_oSec04Field08").value = data.oSec04Field08;
+                        document.getElementById("edit_oSec04Field09").value = data.oSec04Field09;
+                        document.getElementById("edit_oSec04Field10").value = data.oSec04Field10;
+                        
+                        document.getElementById("edit_oSec05Field01").value = data.oSec05Field01;
+                        document.getElementById("edit_oSec05Field02").value = data.oSec05Field02;
+                        document.getElementById("edit_oSec05Field03").value = data.oSec05Field03;
+                        document.getElementById("edit_oSec05Field04").value = data.oSec05Field04;
+                        document.getElementById("edit_oSec05Field05").value = data.oSec05Field05;
+                        document.getElementById("edit_oSec05Field06").value = data.oSec05Field06;
+                        document.getElementById("edit_oSec05Field07").value = data.oSec05Field07;
+                        document.getElementById("edit_oSec05Field08").value = data.oSec05Field08;
+                        document.getElementById("edit_oSec05Field09").value = data.oSec05Field09;
+                        document.getElementById("edit_oSec05Field10").value = data.oSec05Field10;
+                        
+                        document.getElementById("edit_oSec06Field01").value = data.oSec06Field01;
+                        document.getElementById("edit_oSec06Field02").value = data.oSec06Field02;
+                        document.getElementById("edit_oSec06Field03").value = data.oSec06Field03;
+                        document.getElementById("edit_oSec06Field04").value = data.oSec06Field04;
+                        document.getElementById("edit_oSec06Field05").value = data.oSec06Field05;
+                        document.getElementById("edit_oSec06Field06").value = data.oSec06Field06;
+                        document.getElementById("edit_oSec06Field07").value = data.oSec06Field07;
+                        document.getElementById("edit_oSec06Field08").value = data.oSec06Field08;
+                        document.getElementById("edit_oSec06Field09").value = data.oSec06Field09;
+                        document.getElementById("edit_oSec06Field10").value = data.oSec06Field10;
+                                                
+                        document.getElementById("edit_oSec07Field01").value = data.oSec07Field01;
+                        document.getElementById("edit_oSec07Field02").value = data.oSec07Field02;
+                        document.getElementById("edit_oSec07Field03").value = data.oSec07Field03;
+                        document.getElementById("edit_oSec07Field04").value = data.oSec07Field04;
+                        document.getElementById("edit_oSec07Field05").value = data.oSec07Field05;
+                        document.getElementById("edit_oSec07Field06").value = data.oSec07Field06;
+                        document.getElementById("edit_oSec07Field07").value = data.oSec07Field07;
+                        document.getElementById("edit_oSec07Field08").value = data.oSec07Field08;
+                        document.getElementById("edit_oSec07Field09").value = data.oSec07Field09;
+                        document.getElementById("edit_oSec07Field10").value = data.oSec07Field10;
+                        
+                        document.getElementById("edit_oSec08Field01").value = data.oSec08Field01;
+                        document.getElementById("edit_oSec08Field02").value = data.oSec08Field02;
+                        document.getElementById("edit_oSec08Field03").value = data.oSec08Field03;
+                        document.getElementById("edit_oSec08Field04").value = data.oSec08Field04;
+                        document.getElementById("edit_oSec08Field05").value = data.oSec08Field05;
+                        document.getElementById("edit_oSec08Field06").value = data.oSec08Field06;
+                        document.getElementById("edit_oSec08Field07").value = data.oSec08Field07;
+                        document.getElementById("edit_oSec08Field08").value = data.oSec08Field08;
+                        document.getElementById("edit_oSec08Field09").value = data.oSec08Field09;
+                        document.getElementById("edit_oSec08Field10").value = data.oSec08Field10;
+                                                   
+                        document.getElementById("edit_oSec09Field01").value = data.oSec09Field01;
+                        document.getElementById("edit_oSec09Field02").value = data.oSec09Field02;
+                        document.getElementById("edit_oSec09Field03").value = data.oSec09Field03;
+                        document.getElementById("edit_oSec09Field04").value = data.oSec09Field04;
+                        document.getElementById("edit_oSec09Field05").value = data.oSec09Field05;
+                        document.getElementById("edit_oSec09Field06").value = data.oSec09Field06;
+                        document.getElementById("edit_oSec09Field07").value = data.oSec09Field07;
+                        document.getElementById("edit_oSec09Field08").value = data.oSec09Field08;
+                        document.getElementById("edit_oSec09Field09").value = data.oSec09Field09;
+                        document.getElementById("edit_oSec09Field10").value = data.oSec09Field10;
+                        
+                        document.getElementById("edit_oSec10Field01").value = data.oSec10Field01;
+                        document.getElementById("edit_oSec10Field02").value = data.oSec10Field02;
+                        document.getElementById("edit_oSec10Field03").value = data.oSec10Field03;
+                        document.getElementById("edit_oSec10Field04").value = data.oSec10Field04;
+                        document.getElementById("edit_oSec10Field05").value = data.oSec10Field05;
+                        document.getElementById("edit_oSec10Field06").value = data.oSec10Field06;
+                        document.getElementById("edit_oSec10Field07").value = data.oSec10Field07;
+                        document.getElementById("edit_oSec10Field08").value = data.oSec10Field08;
+                        document.getElementById("edit_oSec10Field09").value = data.oSec10Field09;
+                        document.getElementById("edit_oSec10Field10").value = data.oSec10Field10;
+                           
+
+
+                        // Show the modal
+                        let editModal = new bootstrap.Modal(document.getElementById("editModal"));
+                        editModal.show();
+                    })
+                    .catch(error => console.error("Error fetching data:", error));
+            });
+        });
+
+        // Handle form submission
+        document.getElementById("editForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            let formData = new FormData(this);
+            let machineId = document.getElementById("editMachineId").value;
+
+            fetch(`/Mechanical/Edit_DataSheetNS/${machineId}/`, {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Refresh page on success
+                } else {
+                    alert("Failed to update data.");
+                }
+            })
+            .catch(error => console.error("Error updating data:", error));
+        });
+    });
+</script> -->
+
+<!-- Add this before </body> -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".show-data-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let machineId = this.dataset.id;
+
+                fetch(`/Mechanical/DataSheetNSget_data/${machineId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let modalContent = `
+                            <p><strong>Project:</strong> ${data.project}</p>
+                            <p><strong>${data.oSec01Field01}:</strong> ${data.oSec01Field02}</p>
+                            <p><strong>${data.oSec01Field03}:</strong> ${data.oSec01Field04}</p>
+                            <p><strong>${data.oSec01Field05}:</strong> ${data.oSec01Field06}</p>
+                            <p><strong>${data.oSec01Field07}:</strong> ${data.oSec01Field08}</p>
+                            <p><strong>${data.oSec01Field09}:</strong> ${data.oSec01Field10}</p>
+                            <p><strong>${data.oSec01Field11}:</strong> ${data.oSec01Field12}</p>
+                            <p><strong>${data.oSec01Field13}:</strong> ${data.oSec01Field14}</p>
+                            <p><strong>${data.oSec01Field15}:</strong> ${data.oSec01Field16}</p>
+                            <p><strong>${data.oSec01Field17}:</strong> ${data.oSec01Field18}</p>
+                            <p><strong>${data.oSec01Field19}:</strong> ${data.oSec01Field20}</p>
+                            <br/>
+                            <p><strong>${data.oSec02Field01}:</strong> ${data.oSec02Field02}</p>
+                            <p><strong>${data.oSec02Field03}:</strong> ${data.oSec02Field04}</p>
+                            <p><strong>${data.oSec02Field05}:</strong> ${data.oSec02Field06}</p>
+                            <p><strong>${data.oSec02Field07}:</strong> ${data.oSec02Field08}</p>
+                            <p><strong>${data.oSec02Field09}:</strong> ${data.oSec02Field10}</p>
+                            <p><strong>${data.oSec02Field11}:</strong> ${data.oSec02Field12}</p>
+                            <p><strong>${data.oSec02Field13}:</strong> ${data.oSec02Field14}</p>
+                            <p><strong>${data.oSec02Field15}:</strong> ${data.oSec02Field16}</p>
+                            <p><strong>${data.oSec02Field17}:</strong> ${data.oSec02Field18}</p>
+                            <p><strong>${data.oSec02Field19}:</strong> ${data.oSec02Field20}</p>                            
+                            <br/>
+                            <p><strong>${data.oSec03Field01}:</strong> ${data.oSec03Field02}</p>
+                            <p><strong>${data.oSec03Field03}:</strong> ${data.oSec03Field04}</p>
+                            <p><strong>${data.oSec03Field05}:</strong> ${data.oSec03Field06}</p>
+                            <p><strong>${data.oSec03Field07}:</strong> ${data.oSec03Field08}</p>
+                            <p><strong>${data.oSec03Field09}:</strong> ${data.oSec03Field10}</p>
+                            <p><strong>${data.oSec03Field11}:</strong> ${data.oSec03Field12}</p>
+                            <p><strong>${data.oSec03Field13}:</strong> ${data.oSec03Field14}</p>
+                            <p><strong>${data.oSec03Field15}:</strong> ${data.oSec03Field16}</p>
+                            <p><strong>${data.oSec03Field17}:</strong> ${data.oSec03Field18}</p>
+                            <p><strong>${data.oSec03Field19}:</strong> ${data.oSec03Field20}</p>
+                            <br/>                            
+                            <p><strong>${data.oSec04Field01}:</strong> ${data.oSec04Field02}</p>
+                            <p><strong>${data.oSec04Field03}:</strong> ${data.oSec04Field04}</p>
+                            <p><strong>${data.oSec04Field05}:</strong> ${data.oSec04Field06}</p>
+                            <p><strong>${data.oSec04Field07}:</strong> ${data.oSec04Field08}</p>
+                            <p><strong>${data.oSec04Field09}:</strong> ${data.oSec04Field10}</p>
+                            <p><strong>${data.oSec04Field11}:</strong> ${data.oSec04Field12}</p>
+                            <p><strong>${data.oSec04Field13}:</strong> ${data.oSec04Field14}</p>
+                            <p><strong>${data.oSec04Field15}:</strong> ${data.oSec04Field16}</p>
+                            <p><strong>${data.oSec04Field17}:</strong> ${data.oSec04Field18}</p>
+                            <p><strong>${data.oSec04Field19}:</strong> ${data.oSec04Field20}</p>
+                            <br/>
+                            <p><strong>${data.oSec05Field01}:</strong> ${data.oSec05Field02}</p>
+                            <p><strong>${data.oSec05Field03}:</strong> ${data.oSec05Field04}</p>
+                            <p><strong>${data.oSec05Field05}:</strong> ${data.oSec05Field06}</p>
+                            <p><strong>${data.oSec05Field07}:</strong> ${data.oSec05Field08}</p>
+                            <p><strong>${data.oSec05Field09}:</strong> ${data.oSec05Field10}</p>
+                            <p><strong>${data.oSec05Field11}:</strong> ${data.oSec05Field12}</p>
+                            <p><strong>${data.oSec05Field13}:</strong> ${data.oSec05Field14}</p>
+                            <p><strong>${data.oSec05Field15}:</strong> ${data.oSec05Field16}</p>
+                            <p><strong>${data.oSec05Field17}:</strong> ${data.oSec05Field18}</p>
+                            <p><strong>${data.oSec05Field19}:</strong> ${data.oSec05Field20}</p>                            
+                            <br/>
+                            <p><strong>${data.oSec06Field01}:</strong> ${data.oSec06Field02}</p>
+                            <p><strong>${data.oSec06Field03}:</strong> ${data.oSec06Field04}</p>
+                            <p><strong>${data.oSec06Field05}:</strong> ${data.oSec06Field06}</p>
+                            <p><strong>${data.oSec06Field07}:</strong> ${data.oSec06Field08}</p>
+                            <p><strong>${data.oSec06Field09}:</strong> ${data.oSec06Field10}</p>
+                            <p><strong>${data.oSec06Field11}:</strong> ${data.oSec06Field12}</p>
+                            <p><strong>${data.oSec06Field13}:</strong> ${data.oSec06Field14}</p>
+                            <p><strong>${data.oSec06Field15}:</strong> ${data.oSec06Field16}</p>
+                            <p><strong>${data.oSec06Field17}:</strong> ${data.oSec06Field18}</p>
+                            <p><strong>${data.oSec06Field19}:</strong> ${data.oSec06Field20}</p>
+                            <br/>
+                            <p><strong>${data.oSec07Field01}:</strong> ${data.oSec07Field02}</p>
+                            <p><strong>${data.oSec07Field03}:</strong> ${data.oSec07Field04}</p>
+                            <p><strong>${data.oSec07Field05}:</strong> ${data.oSec07Field06}</p>
+                            <p><strong>${data.oSec07Field07}:</strong> ${data.oSec07Field08}</p>
+                            <p><strong>${data.oSec07Field09}:</strong> ${data.oSec07Field10}</p>
+                            <p><strong>${data.oSec07Field11}:</strong> ${data.oSec07Field12}</p>
+                            <p><strong>${data.oSec07Field13}:</strong> ${data.oSec07Field14}</p>
+                            <p><strong>${data.oSec07Field15}:</strong> ${data.oSec07Field16}</p>
+                            <p><strong>${data.oSec07Field17}:</strong> ${data.oSec07Field18}</p>
+                            <p><strong>${data.oSec07Field19}:</strong> ${data.oSec07Field20}</p>
+                            <br/>                            
+                            <p><strong>${data.oSec08Field01}:</strong> ${data.oSec08Field02}</p>
+                            <p><strong>${data.oSec08Field03}:</strong> ${data.oSec08Field04}</p>
+                            <p><strong>${data.oSec08Field05}:</strong> ${data.oSec08Field06}</p>
+                            <p><strong>${data.oSec08Field07}:</strong> ${data.oSec08Field08}</p>
+                            <p><strong>${data.oSec08Field09}:</strong> ${data.oSec08Field10}</p>
+                            <p><strong>${data.oSec08Field11}:</strong> ${data.oSec08Field12}</p>
+                            <p><strong>${data.oSec08Field13}:</strong> ${data.oSec08Field14}</p>
+                            <p><strong>${data.oSec08Field15}:</strong> ${data.oSec08Field16}</p>
+                            <p><strong>${data.oSec08Field17}:</strong> ${data.oSec08Field18}</p>
+                            <p><strong>${data.oSec08Field19}:</strong> ${data.oSec08Field20}</p>
+                            <br/>
+                            <p><strong>${data.oSec09Field01}:</strong> ${data.oSec09Field02}</p>
+                            <p><strong>${data.oSec09Field03}:</strong> ${data.oSec09Field04}</p>
+                            <p><strong>${data.oSec09Field05}:</strong> ${data.oSec09Field06}</p>
+                            <p><strong>${data.oSec09Field07}:</strong> ${data.oSec09Field08}</p>
+                            <p><strong>${data.oSec09Field09}:</strong> ${data.oSec09Field10}</p>
+                            <p><strong>${data.oSec09Field11}:</strong> ${data.oSec09Field12}</p>
+                            <p><strong>${data.oSec09Field13}:</strong> ${data.oSec09Field14}</p>
+                            <p><strong>${data.oSec09Field15}:</strong> ${data.oSec09Field16}</p>
+                            <p><strong>${data.oSec09Field17}:</strong> ${data.oSec09Field18}</p>
+                            <p><strong>${data.oSec09Field19}:</strong> ${data.oSec09Field20}</p>                            
+                            <br/>
+                            <p><strong>${data.oSec10Field01}:</strong> ${data.oSec10Field02}</p>
+                            <p><strong>${data.oSec10Field03}:</strong> ${data.oSec10Field04}</p>
+                            <p><strong>${data.oSec10Field05}:</strong> ${data.oSec10Field06}</p>
+                            <p><strong>${data.oSec10Field07}:</strong> ${data.oSec10Field08}</p>
+                            <p><strong>${data.oSec10Field09}:</strong> ${data.oSec10Field10}</p>
+                            <p><strong>${data.oSec10Field11}:</strong> ${data.oSec10Field12}</p>
+                            <p><strong>${data.oSec10Field13}:</strong> ${data.oSec10Field14}</p>
+                            <p><strong>${data.oSec10Field15}:</strong> ${data.oSec10Field16}</p>
+                            <p><strong>${data.oSec10Field17}:</strong> ${data.oSec10Field18}</p>
+                            <p><strong>${data.oSec10Field19}:</strong> ${data.oSec10Field20}</p>
+                        `;
+
+                        document.getElementById("modalBody").innerHTML = modalContent;
+                        
+                        let modal = new bootstrap.Modal(document.getElementById("dataModal"));
+                        modal.show();
+                    })
+                    .catch(error => console.error("Error fetching data:", error));
+            });
+        });
+    });
+</script> -->
+
+
+
+
+{% endblock %}

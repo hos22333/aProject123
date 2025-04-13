@@ -27,6 +27,7 @@ from django.utils.timezone import now
 from django.contrib.auth.models import User
 from django.conf import settings
 
+
 import os
 import ezdxf
 
@@ -1987,12 +1988,12 @@ def edit_project(request, project_id):
         else:
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'errors': form.errors})
-
-    # If it's a normal GET request, render the edit page
-    form = ProjectForm(instance=project)
+    else:
+        # If it's a normal GET request, render the edit page
+        form = ProjectForm(instance=project)
     
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return JsonResponse({'success': True, 'form': form.as_p()})
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'form': form.as_p()})
     
     return render(request, 'edit_project.html', {'form': form})
 

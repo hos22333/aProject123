@@ -74,7 +74,6 @@ urlpatterns = [
     path('delete/<int:config_id>/', views.delete_config, name='delete_config'),
     
     
-    
     path('projects/', views.project_list, name='project_list'),
     path('editprojects/<int:project_id>/', views.edit_project, name='edit_project'),
     path('deleteprojects/<int:project_id>/', views.delete_project, name='delete_project'),    

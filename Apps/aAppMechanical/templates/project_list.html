@@ -29,7 +29,8 @@
                     <td>{{ project.name }}</td>
                     <td>{{ project.client_name }}</td>
                     <td>
-                        <a href="{% url 'edit_project' project.id %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'edit_project' project.id %}" class="btn btn-warning btn-sm" >Edit</a>
+                        <!-- <button onclick="loadEditProjectForm('{{ project.id }}')" class="btn btn-warning btn-sm">Edit</button> -->
                         <form action="{% url 'delete_project' project.id %}" method="POST" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
@@ -46,6 +47,7 @@
         </table>
     </div>
 </div>
+
 
 <!-- Modal -->
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
