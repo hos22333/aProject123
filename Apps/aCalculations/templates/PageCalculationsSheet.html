@@ -4,11 +4,11 @@
 <div class="container">
     <div class="page-inner">
         <h2>CalculationsSheet : {{ aMachineName }}</h2>
-        <form method="POST" action="{% url 'SavePageCalculationsSheet' sheet_key=sheet_key %}" class="form-group">
+        <form method="POST" class="form-group">
             {% csrf_token %}
             <div class="row"> <!-- Row to hold both cards side by side -->
 
-                {% if sheet_key == "NS" %}
+                {% if aSection01Show == "Yes" %}                 
                 <!-- Section 1 Card -->
                 <div class="col-md-6">
                     <div class="card shadow mb-4">
@@ -16,134 +16,6 @@
                             <h5 class="mb-0">Section 1</h5>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field03.label }}</label>
-                                    {{ form1.oSec01Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field04.label }}</label>
-                                    {{ form1.oSec01Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field05.label }}</label>
-                                    {{ form1.oSec01Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field06.label }}</label>
-                                    {{ form1.oSec01Field06 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field07.label }}</label>
-                                    {{ form1.oSec01Field07 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field08.label }}</label>
-                                    {{ form1.oSec01Field08 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section 2 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Section 2</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if sheet_key == "BS" %}
-                <!-- Section 1 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Section 1</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field03.label }}</label>
-                                    {{ form1.oSec01Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field04.label }}</label>
-                                    {{ form1.oSec01Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field05.label }}</label>
-                                    {{ form1.oSec01Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field06.label }}</label>
-                                    {{ form1.oSec01Field06 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section 2 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Section 2</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field02.label }}</label>
-                                    {{ form1.oSec02Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field03.label }}</label>
-                                    {{ form1.oSec02Field03 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if sheet_key == "MS" %}
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Input</h5>
-                        </div>
-                        <div class="card-body">
-                            <!-- Section 1 -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form1.oSec01Field01.label }}</label>
@@ -189,103 +61,41 @@
                                     <label>{{ form1.oSec01Field11.label }}</label>
                                     {{ form1.oSec01Field11 }}
                                 </div>
-                            </div>
-                        </div>
-                    </div>            
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Output</h5>
-                        </div>
-                        <div class="card-body">
-                            <!-- Section 2 -->
-                            <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
+                                    <label>{{ form1.oSec01Field12.label }}</label>
+                                    {{ form1.oSec01Field12 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field02.label }}</label>
-                                    {{ form1.oSec02Field02 }}
+                                    <label>{{ form1.oSec01Field13.label }}</label>
+                                    {{ form1.oSec01Field13 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field03.label }}</label>
-                                    {{ form1.oSec02Field03 }}
-                                </div>
-                            </div>
-            
-                            <div class="text-center">
-                                <button type="submit" name="form1_submit" class="btn btn-primary btn-lg mt-3">Calculate</button>
-                                <button type="submit" name="generate_report" formaction="{% url 'generate_ms_report' %}" class="btn btn-success btn-lg mt-3">Report</button>
-                            </div>
-                        </div>
-                    </div>            
-                </div>
-                {% endif %}
-
-                {% if sheet_key == "BC" %}
-                <!-- Section 1 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Input</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
+                                    <label>{{ form1.oSec01Field14.label }}</label>
+                                    {{ form1.oSec01Field14 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
+                                    <label>{{ form1.oSec01Field15.label }}</label>
+                                    {{ form1.oSec01Field15 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field03.label }}</label>
-                                    {{ form1.oSec01Field03 }}
+                                    <label>{{ form1.oSec01Field16.label }}</label>
+                                    {{ form1.oSec01Field16 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field04.label }}</label>
-                                    {{ form1.oSec01Field04 }}
+                                    <label>{{ form1.oSec01Field17.label }}</label>
+                                    {{ form1.oSec01Field17 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field05.label }}</label>
-                                    {{ form1.oSec01Field05 }}
+                                    <label>{{ form1.oSec01Field18.label }}</label>
+                                    {{ form1.oSec01Field18 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field06.label }}</label>
-                                    {{ form1.oSec01Field06 }}
+                                    <label>{{ form1.oSec01Field19.label }}</label>
+                                    {{ form1.oSec01Field19 }}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field07.label }}</label>
-                                    {{ form1.oSec01Field07 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section 2 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Output</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field02.label }}</label>
-                                    {{ form1.oSec02Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field03.label }}</label>
-                                    {{ form1.oSec02Field03 }}
+                                    <label>{{ form1.oSec01Field20.label }}</label>
+                                    {{ form1.oSec01Field20 }}
                                 </div>
                             </div>
                         </div>
@@ -293,473 +103,12 @@
                 </div>
                 {% endif %}
 
-                {% if sheet_key == "SC" %}
-                <!-- Section 1 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Section 1</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field03.label }}</label>
-                                    {{ form1.oSec01Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field04.label }}</label>
-                                    {{ form1.oSec01Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field05.label }}</label>
-                                    {{ form1.oSec01Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field06.label }}</label>
-                                    {{ form1.oSec01Field06 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field07.label }}</label>
-                                    {{ form1.oSec01Field07 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field08.label }}</label>
-                                    {{ form1.oSec01Field08 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
+                {% if aSection02Show == "Yes" %} 
                 <!-- Section 2 Card -->
                 <div class="col-md-6">
                     <div class="card shadow mb-4">
                         <div class="card-header bg-primary text-white">
                             <h5 class="mb-0">Section 2</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field02.label }}</label>
-                                    {{ form1.oSec02Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field03.label }}</label>
-                                    {{ form1.oSec02Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field04.label }}</label>
-                                    {{ form1.oSec02Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field05.label }}</label>
-                                    {{ form1.oSec02Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field06.label }}</label>
-                                    {{ form1.oSec02Field06 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if sheet_key == "GR" %}
-                 <!-- Section 1 Card -->
-                 <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Input</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field03.label }}</label>
-                                    {{ form1.oSec01Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field04.label }}</label>
-                                    {{ form1.oSec01Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field05.label }}</label>
-                                    {{ form1.oSec01Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field06.label }}</label>
-                                    {{ form1.oSec01Field06 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field07.label }}</label>
-                                    {{ form1.oSec01Field07 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field08.label }}</label>
-                                    {{ form1.oSec01Field08 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section 2 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Output</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field02.label }}</label>
-                                    {{ form1.oSec02Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field03.label }}</label>
-                                    {{ form1.oSec02Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field04.label }}</label>
-                                    {{ form1.oSec02Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field05.label }}</label>
-                                    {{ form1.oSec02Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field06.label }}</label>
-                                    {{ form1.oSec02Field06 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if sheet_key == "PS" %}
-                <!-- Section 1 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Input</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field03.label }}</label>
-                                    {{ form1.oSec01Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field04.label }}</label>
-                                    {{ form1.oSec01Field04 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section 2 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Output</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field02.label }}</label>
-                                    {{ form1.oSec02Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field03.label }}</label>
-                                    {{ form1.oSec02Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field04.label }}</label>
-                                    {{ form1.oSec02Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field05.label }}</label>
-                                    {{ form1.oSec02Field05 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if sheet_key == "TH" %}
-                <!-- Section 1 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Input</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field03.label }}</label>
-                                    {{ form1.oSec01Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field04.label }}</label>
-                                    {{ form1.oSec01Field04 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section 2 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Output</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field02.label }}</label>
-                                    {{ form1.oSec02Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field03.label }}</label>
-                                    {{ form1.oSec02Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field04.label }}</label>
-                                    {{ form1.oSec02Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field05.label }}</label>
-                                    {{ form1.oSec02Field05 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if sheet_key == "MX" %}
-                <!-- Section 1 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Input</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field03.label }}</label>
-                                    {{ form1.oSec01Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field04.label }}</label>
-                                    {{ form1.oSec01Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field05.label }}</label>
-                                    {{ form1.oSec01Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field06.label }}</label>
-                                    {{ form1.oSec01Field06 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field07.label }}</label>
-                                    {{ form1.oSec01Field07 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field08.label }}</label>
-                                    {{ form1.oSec01Field08 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section 2 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Output</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field02.label }}</label>
-                                    {{ form1.oSec02Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field03.label }}</label>
-                                    {{ form1.oSec02Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field04.label }}</label>
-                                    {{ form1.oSec02Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field05.label }}</label>
-                                    {{ form1.oSec02Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field06.label }}</label>
-                                    {{ form1.oSec02Field06 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field07.label }}</label>
-                                    {{ form1.oSec02Field07 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if sheet_key == "RT" %}
-                 <!-- Section 1 Card -->
-                 <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Input</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field03.label }}</label>
-                                    {{ form1.oSec01Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field04.label }}</label>
-                                    {{ form1.oSec01Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field05.label }}</label>
-                                    {{ form1.oSec01Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field06.label }}</label>
-                                    {{ form1.oSec01Field06 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section 2 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Output</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if sheet_key == "CT" %}
-                <!-- Section 1 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Input</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section 2 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Output</h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -795,209 +144,69 @@
                                     <label>{{ form1.oSec02Field08.label }}</label>
                                     {{ form1.oSec02Field08 }}
                                 </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field09.label }}</label>
+                                    {{ form1.oSec02Field09 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field10.label }}</label>
+                                    {{ form1.oSec02Field10 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field11.label }}</label>
+                                    {{ form1.oSec02Field11 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field12.label }}</label>
+                                    {{ form1.oSec02Field12 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field13.label }}</label>
+                                    {{ form1.oSec02Field13 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field14.label }}</label>
+                                    {{ form1.oSec02Field14 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field15.label }}</label>
+                                    {{ form1.oSec02Field15 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field16.label }}</label>
+                                    {{ form1.oSec02Field16 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field17.label }}</label>
+                                    {{ form1.oSec02Field17 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field18.label }}</label>
+                                    {{ form1.oSec02Field18 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field19.label }}</label>
+                                    {{ form1.oSec02Field19 }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form1.oSec02Field20.label }}</label>
+                                    {{ form1.oSec02Field20 }}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 {% endif %}
 
-                {% if sheet_key == "PNch" %}
-                <!-- Section 1 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Section 1</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field03.label }}</label>
-                                    {{ form1.oSec01Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field04.label }}</label>
-                                    {{ form1.oSec01Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field05.label }}</label>
-                                    {{ form1.oSec01Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field06.label }}</label>
-                                    {{ form1.oSec01Field06 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field07.label }}</label>
-                                    {{ form1.oSec01Field07 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field08.label }}</label>
-                                    {{ form1.oSec01Field08 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field09.label }}</label>
-                                    {{ form1.oSec01Field09 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field10.label }}</label>
-                                    {{ form1.oSec01Field10 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 
-                <!-- Section 2 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Section 2</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field02.label }}</label>
-                                    {{ form1.oSec02Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field03.label }}</label>
-                                    {{ form1.oSec02Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field04.label }}</label>
-                                    {{ form1.oSec02Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field05.label }}</label>
-                                    {{ form1.oSec02Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field06.label }}</label>
-                                    {{ form1.oSec02Field06 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field07.label }}</label>
-                                    {{ form1.oSec02Field07 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
+
                 
-                {% if sheet_key == "PNwa" %}
-                <!-- Section 1 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Section 1</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field01.label }}</label>
-                                    {{ form1.oSec01Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field02.label }}</label>
-                                    {{ form1.oSec01Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field03.label }}</label>
-                                    {{ form1.oSec01Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field04.label }}</label>
-                                    {{ form1.oSec01Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field05.label }}</label>
-                                    {{ form1.oSec01Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field06.label }}</label>
-                                    {{ form1.oSec01Field06 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field07.label }}</label>
-                                    {{ form1.oSec01Field07 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field08.label }}</label>
-                                    {{ form1.oSec01Field08 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field09.label }}</label>
-                                    {{ form1.oSec01Field09 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec01Field10.label }}</label>
-                                    {{ form1.oSec01Field10 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section 2 Card -->
-                <div class="col-md-6">
-                    <div class="card shadow mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Section 2</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field01.label }}</label>
-                                    {{ form1.oSec02Field01 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field02.label }}</label>
-                                    {{ form1.oSec02Field02 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field03.label }}</label>
-                                    {{ form1.oSec02Field03 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field04.label }}</label>
-                                    {{ form1.oSec02Field04 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field05.label }}</label>
-                                    {{ form1.oSec02Field05 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field06.label }}</label>
-                                    {{ form1.oSec02Field06 }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>{{ form1.oSec02Field07.label }}</label>
-                                    {{ form1.oSec02Field07 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
 
             </div> <!-- Close row div -->
 
             <div class="text-center">
                 <button type="submit" name="form1_submit" class="btn btn-primary btn-lg mt-3">Calculate</button>                                
-                <button type="submit" name="generate_report" formaction="{% url '#' %}" class="btn btn-success btn-lg mt-3">Report</button>
+                <button type="submit" name="generate_report" class="btn btn-success btn-lg mt-3">Report</button>
             </div>
 
         </form>

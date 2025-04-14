@@ -6,11 +6,13 @@ from Apps.aAppMechanical.models import Machine
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppMechanical.models import aLogEntry
 from Apps.aAppMechanical.models import FormFieldConfig
+from Apps.aAppMechanical.views import interact_with_api
 
-from .forms import FormCalculationsSheet
+from . import forms
 
 
 from datetime import datetime
+from docx import Document
 from Apps.aApp1.models import UserRole, RoleAutho, Autho
 import requests
 
@@ -23,7 +25,7 @@ from django.utils.timezone import now
 from django.contrib.auth.models import User
 from django.conf import settings
 
-# Create your views here.
+""" # Create your views here.
 def LoadPageCalculationsSheet(request, sheet_key):
     #pdb.set_trace()
     print(sheet_key)
@@ -58,16 +60,19 @@ def LoadPageCalculationsSheet(request, sheet_key):
 
     # Define a dictionary mapping sheet keys to their corresponding values
     sheet_mapping = {
-        "NS": ("formDataSheetNS",               "DataSheetNS",      "Manual Screen"),
-        "MS": ("FDS_MechanicalScreen",          "DataSheetMS",      "Mechanical Screen"),
-        "BC": ("FDS_BeltConveyor",              "DataSheetBC",      "Belt Conveyor"),
-        "CO": ("FDS_Container",                 "DataSheetCO",      "Container"),
-        "GR": ("FDS_GritGreaseRemoval",         "DataSheetGR",      "Gritremoval"),
-        "SS": ("FDS_SandSilo",                  "DataSheetSS",      "Sand Silo"),
-        "PS": ("FDS_PrimarySedimentationTank",  "DataSheetPS",      "Primary Sedimentation Tank"),
-        "QV": ("FDS_QuickValve",                "DataSheetQV",      "Quick Valve"),
-        "TV": ("FDS_TelescopicValve",           "DataSheetTV",      "Telescopic Valve"),
-        "TH": ("FDS_SludgeThickener",           "DataSheetTH",      "Thickener"),
+        "MS": ("FCS_MechanicalScreen",          "CalculationsSheetMS",      "Mechanical Screen"),
+        "BC": ("FCS_BeltConveyor",              "CalculationsSheetBC",      "Belt Conveyor"),
+        "GR": ("FCS_GritGreaseRemoval",         "CalculationsSheetGR",      "Gritremoval"),
+        "PS": ("FCS_PrimarySedimentationTank",  "CalculationsSheetPS",      "Primary Sedimentation Tank"),
+        "TH": ("FCS_SludgeThickener",           "CalculationsSheetTH",      "Thickener"),
+        "MX": ("FCS_Rectangular Mixers",           "CalculationsSheetMX",      "Rectangular Mixers"),
+        "RT": ("FCS_Rectangular Tanks",           "CalculationsSheetRT",      "Rectangular Tanks"),
+        "CT": ("FCS_Circular Tanks",           "CalculationsSheetCT",      "Circular Tanks"),
+        "SC": ("FCS_Screw Conveyor",           "CalculationsSheetSC",      "Screw Conveyor"),
+        "BS": ("FCS_Basket Screen",           "CalculationsSheetBS",      "Basket Screen"),
+        "NS": ("formCalculationsSheetNS",               "CalculationsSheetNS",      "Manual Screen"),
+        "PNch": ("FCS_Channel Penstock",                 "CalculationsSheetPNch",      "Channel Penstock"),
+        "PNwa": ("FCS_Wall Penstock",                  "CalculationsSheetPNwa",      "Wall Penstock"),
     }
 
     # Retrieve values using the dictionary
@@ -98,25 +103,9 @@ def LoadPageCalculationsSheet(request, sheet_key):
     # Initialize all section variables
     aSection01Show = "Yes"
     aSection02Show = "Yes"
-    aSection03Show = "Yes"
-    aSection04Show = "Yes"
-    aSection05Show = "Yes"
-    aSection06Show = "Yes"
-    aSection07Show = "Yes"
-    aSection08Show = "Yes"
-    aSection09Show = "Yes"
-    aSection10Show = "Yes"
     
     print(form.fields['oSec01Field01'].initial)
     print(form.fields['oSec02Field01'].initial)
-    print(form.fields['oSec03Field01'].initial)
-    print(form.fields['oSec04Field01'].initial)
-    print(form.fields['oSec05Field01'].initial)
-    print(form.fields['oSec06Field01'].initial)
-    print(form.fields['oSec07Field01'].initial)
-    print(form.fields['oSec08Field01'].initial)
-    print(form.fields['oSec09Field01'].initial)
-    print(form.fields['oSec10Field01'].initial)
 
     # Apply conditions to modify the values
     if form.fields['oSec01Field01'].initial in ["oooo", None]:
@@ -125,40 +114,10 @@ def LoadPageCalculationsSheet(request, sheet_key):
     if form.fields['oSec02Field01'].initial in ["oooo", None]:
         aSection02Show = "Hide"
 
-    if form.fields['oSec03Field01'].initial in ["oooo", None]:
-        aSection03Show = "Hide"
-
-    if form.fields['oSec04Field01'].initial in ["oooo", None]:
-        aSection04Show = "Hide"
-
-    if form.fields['oSec05Field01'].initial in ["oooo", None]:
-        aSection05Show = "Hide"
-
-    if form.fields['oSec06Field01'].initial in ["oooo", None]:
-        aSection06Show = "Hide"
-
-    if form.fields['oSec07Field01'].initial in ["oooo", None]:
-        aSection07Show = "Hide"
-
-    if form.fields['oSec08Field01'].initial in ["oooo", None]:
-        aSection08Show = "Hide"
-
-    if form.fields['oSec09Field01'].initial in ["oooo", None]:
-        aSection09Show = "Hide"
-
-    if form.fields['oSec10Field01'].initial in ["oooo", None]:
-        aSection10Show = "Hide"
+   
     
     print(aSection01Show)
     print(aSection02Show)
-    print(aSection03Show)
-    print(aSection04Show)
-    print(aSection05Show)
-    print(aSection06Show)
-    print(aSection07Show)
-    print(aSection08Show)
-    print(aSection09Show)
-    print(aSection10Show)
     
     # print(projects)
 
@@ -171,14 +130,6 @@ def LoadPageCalculationsSheet(request, sheet_key):
     "sheet_key": sheet_key,
     "aSection01Show": aSection01Show,
     "aSection02Show": aSection02Show,
-    "aSection03Show": aSection03Show,
-    "aSection04Show": aSection04Show,
-    "aSection05Show": aSection05Show,
-    "aSection06Show": aSection06Show,
-    "aSection07Show": aSection07Show,
-    "aSection08Show": aSection08Show,
-    "aSection09Show": aSection09Show,
-    "aSection10Show": aSection10Show,
 })
 
 
@@ -599,4 +550,531 @@ def DataSheetNS_get_datasheet_data(request, machine_id):
         # Add other fields if necessary
     }
 
-    return JsonResponse(data)
+    return JsonResponse(data) """
+
+
+SHEET_CONFIG = {
+    'MS': {
+        'form_class': forms.formCalcMS,
+        'aMachineName': 'Mechanical Screen',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'MS',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03',
+            'oSec01Field04', 'oSec01Field05', 'oSec01Field06', 'oSec01Field07',
+            'oSec01Field08', 'oSec01Field09', 'oSec01Field10', 'oSec01Field11',
+        ],
+        'output_fields': ['oSec02Field01', 'oSec02Field02', 'oSec02Field03'],
+        'api_fields': {
+            "MS_ChannelHeight":     'oSec01Field01',
+                "MS_ScreenWidth":       'oSec01Field02',
+                "MS_BeltHeight":        'oSec01Field03',
+                "MS_WaterLevel":        'oSec01Field04',
+                "MS_BarSpacing":        'oSec01Field05',
+                "MS_BarThickness":      'oSec01Field06',
+                "MS_BarWidth":          'oSec01Field07',
+                "MS_InclinationDegree": 'oSec01Field08',
+                "MS_SprocketDiameter":  'oSec01Field09',
+                "MS_Velocity":          'oSec01Field10',
+                "MS_FOS":               'oSec01Field11',
+        },
+    },
+    'BC': {
+        'form_class': forms.formCalcBC,
+        'aMachineName': 'Belt Conveyor',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'BC',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03',
+            'oSec01Field04', 'oSec01Field05', 'oSec01Field06', 'oSec01Field07',
+        ],
+        'output_fields': ['oSec02Field01', 'oSec02Field02', 'oSec02Field03'],
+        'api_fields': {
+            'BC_Length': 'oSec01Field01',
+            'BC_Width': 'oSec01Field02',
+            'BC_DrumDia': 'oSec01Field03',
+            'BC_Friction': 'oSec01Field04',
+            'BC_Velocity': 'oSec01Field05',
+            'BC_FOS': 'oSec01Field06',
+            'BC_Belt_weight_per_meter': 'oSec01Field07',
+        },
+    },
+    'GR': {
+        'form_class': forms.formCalcGR,
+        'aMachineName': 'Grit Removal',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'GR',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+            'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
+        ],
+        'output_fields': [
+            'oSec02Field01', 'oSec02Field02', 'oSec02Field03',
+            'oSec02Field04', 'oSec02Field05', 'oSec02Field06',
+        ],
+        'api_fields': {
+            'GR_n_channel': 'oSec01Field01',
+            'GR_channel_width': 'oSec01Field02',
+            'GR_civil_width': 'oSec01Field03',
+            'GR_bridge_length': 'oSec01Field04',
+            'GR_wheel_diameter': 'oSec01Field05',
+            'GR_Friction': 'oSec01Field06',
+            'GR_Velocity': 'oSec01Field07',
+            'GR_FOS': 'oSec01Field08',
+        },
+    },
+    'PS': {
+        'form_class': forms.formCalcPS,
+        'aMachineName': 'PST',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'PS',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+        ],
+        'output_fields': [
+            'oSec02Field01', 'oSec02Field02', 'oSec02Field03',
+            'oSec02Field04', 'oSec02Field05'
+        ],
+        'api_fields': {
+                "PS_walkway_length":     'oSec01Field01',
+                "PS_Friction":       'oSec01Field02',
+                "PS_Velocity":        'oSec01Field03',
+                "PS_FOS":        'oSec01Field04',
+        },
+    },
+    'TH': {
+        'form_class': forms.formCalcTH,
+        'aMachineName': 'Thickener',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'TH',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+        ],
+        'output_fields': [
+            'oSec02Field01', 'oSec02Field02', 'oSec02Field03',
+            'oSec02Field04', 'oSec02Field05',
+        ],
+        'api_fields': {
+            "TH_diameter":     'oSec01Field01',
+                "TH_n_arm":       'oSec01Field02',
+                "TH_Velocity":        'oSec01Field03',
+                "TH_FOS":        'oSec01Field04',
+        },
+    },
+    'MX': {
+        'form_class': forms.formCalcMX,
+        'aMachineName': 'Rectangular Mixers',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'MX',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+            'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
+        ],
+        'output_fields': [
+            'oSec02Field01', 'oSec02Field02', 'oSec02Field03', 'oSec02Field04', 
+            'oSec02Field05', 'oSec02Field06', 'oSec02Field07',
+        ],
+        'api_fields': {
+            "MX_length":        'oSec01Field01',
+             "MX_width":         'oSec01Field02',
+             "MX_water_depth":           'oSec01Field03',
+             "MX_tank_depth":            'oSec01Field04',
+             "MX_impeller_coefficient":  'oSec01Field05',
+             "MX_velocity_gradient":     'oSec01Field06',
+             "MX_impeller_diameter_factor":  'oSec01Field07',
+             "MX_safety_factor":             'oSec01Field08',
+        },
+    },
+    'RT': {
+        'form_class': forms.formCalcRT,
+        'aMachineName': 'Rectangular Tanks',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'RT',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+            'oSec01Field05', 'oSec01Field06',
+        ],
+        'output_fields': [
+            'oSec02Field01', 
+        ],
+        'api_fields': {
+            "RT_Length":        'oSec01Field01',
+            "RT_Width":         'oSec01Field02',
+            "RT_Hight":           'oSec01Field03',
+            "RT_ShellTH":            'oSec01Field04',
+            "RT_BaseTH":    'oSec01Field05',
+            "RT_N_Spliter":     'oSec01Field06',
+        },
+    },
+    'CT': {
+        'form_class': forms.formCalcCT,
+        'aMachineName': 'Circular Tanks',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'GR',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02',
+        ],
+        'output_fields': [
+            'oSec02Field01', 'oSec02Field02', 'oSec02Field03', 'oSec02Field04', 
+            'oSec02Field05', 'oSec02Field06', 'oSec02Field07', 'oSec02Field08',
+        ],
+        'api_fields': {
+            "CT_Diameter":        'oSec01Field01',
+            "CT_Height":         'oSec01Field02',
+        },
+    },
+    'SC': {
+        'form_class': forms.formCalcSC,
+        'aMachineName': 'Screw Conveyor',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'SC',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+            'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
+        ],
+        'output_fields': [
+            'oSec02Field01', 'oSec02Field02', 'oSec02Field03',
+            'oSec02Field04', 'oSec02Field05', 'oSec02Field06',
+        ],
+        'api_fields': {
+            'aInput01': 'oSec01Field01',
+            'aInput02': 'oSec01Field02',
+            'aInput03': 'oSec01Field03',
+            'aInput04': 'oSec01Field04',
+            'aInput05': 'oSec01Field05',
+            'aInput06': 'oSec01Field06',
+            'aInput07': 'oSec01Field07',
+            'aInput08': 'oSec01Field08',
+        },
+    },
+    'BS': {
+        'form_class': forms.formCalcBS,
+        'aMachineName': 'Basket Screen',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'BS',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+            'oSec01Field05', 'oSec01Field06',
+        ],
+        'output_fields': [
+            'oSec02Field01', 'oSec02Field02', 'oSec02Field03',
+        ],
+        'api_fields': {
+            'BS_Bar_Dia': 'oSec01Field01',
+            'BS_Bar_Space': 'oSec01Field02',
+            'BS_Screen_Height': 'oSec01Field03',
+            'BS_Screen_Width': 'oSec01Field04',
+            'BS_Screen_Depth': 'oSec01Field05',
+            'BS_Plate_Th': 'oSec01Field06',
+        },
+    },
+    'NS': {
+        'form_class': forms.formCalcNS,
+        'aMachineName': 'Manual Screen',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'NS',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+            'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
+        ],
+        'output_fields': [
+            'oSec02Field01',
+        ],
+        'api_fields': {
+            'NS_Ch_Height': 'oSec01Field01',
+            'NS_Ch_Width': 'oSec01Field02',
+            'NS_WaterLv': 'oSec01Field03',
+            'NS_WaterLv_Margin': 'oSec01Field04',
+            'NS_Bar_Spacing': 'oSec01Field05',
+            'NS_Bar_Th': 'oSec01Field06',
+            'NS_Bar_Width': 'oSec01Field07',
+            'NS_Angle': 'oSec01Field08',
+        },
+    },
+    'PNch': {
+        'form_class': forms.formCalcPNch,
+        'aMachineName': 'Channel Penstock',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'PNch',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+            'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
+            'oSec01Field09', 'oSec01Field10',
+        ],
+        'output_fields': [
+            'oSec02Field01', 'oSec02Field02', 'oSec02Field03', 'oSec02Field04', 
+            'oSec02Field05', 'oSec02Field06', 'oSec02Field07', 
+        ],
+        'api_fields': {
+            'PNch_Channel_Height': 'oSec01Field01',
+            'PNch_Frame_Height_Over_Channel': 'oSec01Field02',
+            'PNch_Channel_Width': 'oSec01Field03',
+            'PNch_Gate_Margin_Width': 'oSec01Field04',
+            'PNch_Water_Lv': 'oSec01Field05',
+            'PNch_Gate_Margin_Over_Water_Lv': 'oSec01Field06',
+            'PNch_Gate_Th': 'oSec01Field07',
+            'PNch_Gate_Other_PLs': 'oSec01Field08',
+            'PNch_HeadStock': 'oSec01Field09',
+            'PNch_Frame_Weight_Per_M': 'oSec01Field10',
+        },
+    },
+    'PNwa': {
+        'form_class': forms.formCalcPNwa,
+        'aMachineName': 'Wall Penstock',
+        'template': 'PageCalculationsSheet.html',
+        'api_type': 'PNwa',
+        'input_fields': [
+            'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+            'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
+            'oSec01Field09', 'oSec01Field10',
+        ],
+        'output_fields': [
+            'oSec02Field01', 'oSec02Field02', 'oSec02Field03', 'oSec02Field04', 
+            'oSec02Field05', 'oSec02Field06', 'oSec02Field07', 
+        ],
+        'api_fields': {
+            'aInput01': 'oSec01Field01',
+            'aInput02': 'oSec01Field02',
+            'aInput03': 'oSec01Field03',
+            'aInput04': 'oSec01Field04',
+            'aInput05': 'oSec01Field05',
+            'aInput06': 'oSec01Field06',
+            'aInput07': 'oSec01Field07',
+            'aInput08': 'oSec01Field08',
+            'aInput09': 'oSec01Field09',
+            'aInput010': 'oSec01Field10',
+        },
+    },
+    
+}
+
+def LoadPageCalculationsSheet(request, sheet_key):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    config = SHEET_CONFIG.get(sheet_key)
+    if not config:
+        return HttpResponse("Invalid sheet key", status=404)
+
+    aMachineName = config['aMachineName']
+    form_class = config['form_class']
+    template = config['template']
+    api_type = config['api_type']
+    api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
+
+    if request.method == "GET":
+        form = form_class()
+        # Initialize all section variables
+        aSection01Show = "Yes"
+        aSection02Show = "Yes"
+
+        print(form.fields['oSec01Field01'].initial)
+        print(form.fields['oSec02Field01'].initial)
+
+        # Apply conditions to modify the values
+        if form.fields['oSec01Field01'].initial in ["oooo", None]:
+            aSection01Show = "Hide"
+
+        if form.fields['oSec02Field01'].initial in ["oooo", None]:
+            aSection02Show = "Hide"
+
+    
+
+        print(aSection01Show)
+        print(aSection02Show)
+        return render(request, template, {
+            'form1': form,
+            'aMachineName':aMachineName,
+            "aSection01Show": aSection01Show,
+            "aSection02Show": aSection02Show,
+            })
+
+    if request.method == "POST":
+        form = form_class(request.POST)
+        if 'generate_report' in request.POST:
+            doc = Document()
+            doc.add_heading(f'{sheet_key} Report', level=1)
+
+            sections = {
+                "Input": config['input_fields'],
+                "Output": config['output_fields'],
+            }
+
+            for section, fields in sections.items():
+                doc.add_heading(section, level=2)
+                for field in fields:
+                    label = form.fields[field].label
+                    value = request.POST.get(field, "N/A")
+                    doc.add_paragraph(f"{label}: {value}")
+
+            response = HttpResponse(
+                content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            )
+            response['Content-Disposition'] = f'attachment; filename="{sheet_key}_Report.docx"'
+            doc.save(response)
+            return response
+        
+        if 'form1_submit' in request.POST:
+            if form.is_valid():
+                cleaned = form.cleaned_data
+                input_data = {
+                    api_key: cleaned.get(form_field)
+                    for api_key, form_field in config['api_fields'].items()
+                }
+    
+                # Call external API
+                response = interact_with_api(api_url, api_type, input_data)
+    
+                # Update output fields
+                instance = form.save(commit=False)
+                for field in config['output_fields']:
+                    if field in response:
+                        setattr(instance, field, response[field])
+    
+                instance.oSec00Field01 = request.user.username
+                instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                instance.oSec00Field03 = sheet_key
+                instance.save()
+    
+                # Re-initialize with new values for display
+                initial_data = {field: cleaned.get(field) for field in config['input_fields']}
+                initial_data.update({field: response.get(field) for field in config['output_fields']})
+                form = form_class(initial=initial_data)
+                # Initialize all section variables
+                aSection01Show = "Yes"
+                aSection02Show = "Yes"
+    
+                print(form.fields['oSec01Field01'].initial)
+                print(form.fields['oSec02Field01'].initial)
+    
+                # Apply conditions to modify the values
+                if form.fields['oSec01Field01'].initial in ["oooo", None]:
+                    aSection01Show = "Hide"
+    
+                if form.fields['oSec02Field01'].initial in ["oooo", None]:
+                    aSection02Show = "Hide"
+    
+    
+    
+                print(aSection01Show)
+                print(aSection02Show)
+    
+            return render(request, template, {
+                'form1': form,
+                'aMachineName':aMachineName,
+                "aSection01Show": aSection01Show,
+                "aSection02Show": aSection02Show,
+                })
+
+    return HttpResponse("Invalid request method", status=405)
+
+""" def generate_report(request, form, config, sheet_key):
+    doc = Document()
+    doc.add_heading(f'{sheet_key} Report', level=1)
+
+    sections = {
+        "Input": config['input_fields'],
+        "Output": config['output_fields'],
+    }
+
+    for section, fields in sections.items():
+        doc.add_heading(section, level=2)
+        for field in fields:
+            label = form.fields[field].label
+            value = request.POST.get(field, "N/A")
+            doc.add_paragraph(f"{label}: {value}")
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+    response['Content-Disposition'] = f'attachment; filename="{sheet_key}_Report.docx"'
+    doc.save(response)
+    return response """
+
+
+
+""" def handle_calc_form(request, sheet_key):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    form_classes = {
+        "MS": form.formCalcMS,
+        "BC": form.formCalcBC,
+        # Add other forms if needed
+    }
+
+    req_types = {
+        "MS": "MS",
+        "BC": "BC",
+    }
+
+    api_field_map = {
+        "MS": {
+            "input_fields": [
+                "MS_ChannelHeight", "MS_ScreenWidth", "MS_BeltHeight",
+                "MS_WaterLevel", "MS_BarSpacing", "MS_BarThickness",
+                "MS_BarWidth", "MS_InclinationDegree", "MS_SprocketDiameter",
+                "MS_Velocity", "MS_FOS",
+            ],
+            "field_keys": [
+                'oSec01Field01', 'oSec01Field02', 'oSec01Field03',
+                'oSec01Field04', 'oSec01Field05', 'oSec01Field06',
+                'oSec01Field07', 'oSec01Field08', 'oSec01Field09',
+                'oSec01Field10', 'oSec01Field11',
+            ],
+            "response_keys": ["MS_w", "MS_p", "MS_s"],
+        },
+        "BC": {
+            "input_fields": [
+                "BC_Length", "BC_Width", "BC_DrumDia",
+                "BC_Friction", "BC_Velocity", "BC_FOS",
+                "BC_Belt_weight_per_meter",
+            ],
+            "field_keys": [
+                'oSec01Field01', 'oSec01Field02', 'oSec01Field03',
+                'oSec01Field04', 'oSec01Field05', 'oSec01Field06',
+                'oSec01Field07',
+            ],
+            "response_keys": ["BC_w", "BC_p", "BC_s"],
+        },
+    }
+
+    if request.method == 'POST' and 'form1_submit' in request.POST:
+        form_class = form_classes.get(sheet_key)
+        config = api_field_map.get(sheet_key)
+        if not form_class or not config:
+            return redirect('PageCalculationsSheet.html')  # fallback if sheet_key is not supported
+
+        form = form_class(request.POST)
+        if form.is_valid():
+            input_data = {
+                api_name: form.cleaned_data.get(field_name)
+                for api_name, field_name in zip(config["input_fields"], config["field_keys"])
+            }
+
+            # Call the API
+            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
+            req_type = req_types[sheet_key]
+            response = interact_with_api(api_url, req_type, input_data)
+
+            instance = form.save(commit=False)
+            instance.oSec00Field01 = request.user.username
+            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            instance.oSec00Field03 = sheet_key
+
+            # Fill response data
+            for i, key in enumerate(config["response_keys"], start=1):
+                setattr(instance, f'oSec02Field0{i}', response.get(key))
+
+            instance.save()
+
+            # Refill the form with both input and response
+            initial_data = {field: form.cleaned_data.get(field) for field in config["field_keys"]}
+            for i, key in enumerate(config["response_keys"], start=1):
+                initial_data[f'oSec02Field0{i}'] = response.get(key)
+
+            form = form_class(initial=initial_data)
+
+            return render(request, "PageCalculationsSheet.html", {"form1": form, "sheet_key": sheet_key})
+
+    return redirect(f"{sheet_key.lower()}_load")  # Redirect to fallback """
