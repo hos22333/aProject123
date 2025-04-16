@@ -1967,10 +1967,28 @@ def project_list(request):
     
     #projects = Project.objects.all()
     return render(request, 'project_list.html', {'form': form, 'projects': projects})
-
-
-
+    
 def edit_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    
+    if request.method == "POST":
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            return redirect('project_list')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'form': form.as_p()})
+    else:
+        form = ProjectForm(instance=project)
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'form': form.as_p()})
+
+    return render(request, 'edit_project.html', {'form': form})
+
+""" def edit_project(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     
     if request.method == "POST":
@@ -1995,7 +2013,7 @@ def edit_project(request, project_id):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': True, 'form': form.as_p()})
     
-    return render(request, 'edit_project.html', {'form': form})
+    return render(request, 'edit_project.html', {'form': form}) """
 
 
 

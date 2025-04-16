@@ -29,8 +29,8 @@
                     <td>{{ project.name }}</td>
                     <td>{{ project.client_name }}</td>
                     <td>
-                        <a href="{% url 'edit_project' project.id %}" class="btn btn-warning btn-sm" >Edit</a>
-                        <!-- <button onclick="loadEditProjectForm('{{ project.id }}')" class="btn btn-warning btn-sm">Edit</button> -->
+                        <!-- <a href="{% url 'edit_project' project.id %}" class="btn btn-warning btn-sm" >Edit</a> -->
+                        <a href="{% url 'edit_project' project.id %}" class="btn btn-warning btn-sm edit-project-btn" data-project-id="{{ project.id }}"> Edit </a>
                         <form action="{% url 'delete_project' project.id %}" method="POST" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
@@ -48,6 +48,22 @@
     </div>
 </div>
 
+
+
+<!--Edit Modal  -->
+<div id="editProjectModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Project</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="edit-project-form-container"></div>
+        </div>
+      </div>
+    </div>
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
@@ -121,20 +137,82 @@
                 <p><strong>Created At:</strong> <span id="detailCreatedAt"></span></p>
                 <p><strong>Type:</strong> <span id="detailType"></span></p>
                 <hr>
-                <p><strong><span id="labelField1"></span> <span id="points"></span> </strong> <span id="detailField1"></span></p>
-                <p><strong><span id="labelField2"></span> <span id="points"></span></strong> <span id="detailField2"></span></p>
-                <p><strong><span id="labelField3"></span> <span id="points"></span></strong> <span id="detailField3"></span></p>
-                <p><strong><span id="labelField4"></span> <span id="points"></span></strong> <span id="detailField4"></span></p>
-                <p><strong><span id="labelField5"></span> <span id="points"></span></strong> <span id="detailField5"></span></p>
-                <p><strong><span id="labelField6"></span> <span id="points"></span></strong> <span id="detailField6"></span></p>
-                <p><strong><span id="labelField7"></span> <span id="points"></span></strong> <span id="detailField7"></span></p>
-                <p><strong><span id="labelField8"></span> <span id="points"></span></strong> <span id="detailField8"></span></p>
-                <p><strong><span id="labelField9"></span> <span id="points"></span></strong> <span id="detailField9"></span></p>
-                <p><strong><span id="labelField10"></span> <span id="points"></span></strong> <span id="detailField10"></span></p>
+                <p><strong><span id="labelField1"></span> : </strong> <span id="detailField1"></span></p>
+                <p><strong><span id="labelField2"></span> :</strong> <span id="detailField2"></span></p>
+                <p><strong><span id="labelField3"></span> :</strong> <span id="detailField3"></span></p>
+                <p><strong><span id="labelField4"></span> :</strong> <span id="detailField4"></span></p>
+                <p><strong><span id="labelField5"></span> :</strong> <span id="detailField5"></span></p>
+                <p><strong><span id="labelField6"></span> :</strong> <span id="detailField6"></span></p>
+                <p><strong><span id="labelField7"></span> :</strong> <span id="detailField7"></span></p>
+                <p><strong><span id="labelField8"></span> :</strong> <span id="detailField8"></span></p>
+                <p><strong><span id="labelField9"></span> :</strong> <span id="detailField9"></span></p>
+                <p><strong><span id="labelField10"></span> :</strong> <span id="detailField10"></span></p>
             </div>
         </div>
     </div>
 </div>
+
+
+<script>
+    // When the edit button is clicked
+  document.addEventListener('click', function(e) {
+    if (e.target.matches('.edit-project-btn')) {
+      e.preventDefault();
+      const url = e.target.getAttribute('href');
+
+      fetch(url, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('edit-project-form-container').innerHTML = `
+            <form id="edit-project-form" method="post">
+                {% csrf_token %}
+              ${data.form}
+              <button type="submit" class="btn btn-success">Update</button>
+            </form>`;
+          // Show the modal
+          $('#editProjectModal').modal('show');
+        }
+      });
+    }
+  });
+
+  // Handle form submission via AJAX
+  document.addEventListener('submit', function(e) {
+    if (e.target.matches('#edit-project-form')) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      const url = document.querySelector('.edit-project-btn').getAttribute('href');
+
+      fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          $('#editProjectModal').modal('hide');
+            location.reload(); 
+        } else {
+          // Re-render the form with error messages
+          document.getElementById('edit-project-form-container').innerHTML = `
+            <form id="edit-project-form" method="post">
+              ${data.form}
+              <button type="submit" class="btn btn-success">Update</button>
+            </form>`;
+        }
+      });
+    }
+  });
+</script>
 
 
 <script>
@@ -160,7 +238,7 @@ function showDetails(name, client, capacity) {
                 machinesTableBody.innerHTML = "";  
     
                 if (data.machines.length > 0) {
-                    data.machines.forEach(machine => {
+                    /* data.machines.forEach(machine => {
                         let row = "<tr>";
                         
                         // Loop through each field in the machine object
@@ -179,8 +257,42 @@ function showDetails(name, client, capacity) {
                     
                         row += "</tr>";
                         machinesTableBody.innerHTML += row;
+                    }); */
+                    data.machines.forEach(machine => {
+                        let row = `<tr>
+                            <td>${machine.oSec00Field01}</td>
+                            <td>${machine.oSec00Field02}</td>
+                            <td>${machine.oSec00Field03}</td>
+                            <td>
+                                <button class="btn btn-info btn-sm" onclick="showMachineDetails(
+                                    '${machine.oSec00Field01}', 
+                                    '${machine.oSec00Field02}', 
+                                    '${machine.oSec00Field03}', 
+                                    '${machine.oSec01Field01}', 
+                                    '${machine.oSec01Field02}', 
+                                    '${machine.oSec01Field03}', 
+                                    '${machine.oSec01Field04}', 
+                                    '${machine.oSec01Field05}', 
+                                    '${machine.oSec01Field06}', 
+                                    '${machine.oSec01Field07}', 
+                                    '${machine.oSec01Field08}', 
+                                    '${machine.oSec01Field09}', 
+                                    '${machine.oSec01Field10}', 
+                                    '${machine.oSec01Field11}', 
+                                    '${machine.oSec01Field12}', 
+                                    '${machine.oSec01Field13}', 
+                                    '${machine.oSec01Field14}', 
+                                    '${machine.oSec01Field15}', 
+                                    '${machine.oSec01Field16}', 
+                                    '${machine.oSec01Field17}', 
+                                    '${machine.oSec01Field18}', 
+                                    '${machine.oSec01Field19}', 
+                                    '${machine.oSec01Field20}'
+                                )">View Details</button>
+                            </td>
+                        </tr>`;
+                        machinesTableBody.innerHTML += row;
                     });
-                    
                 } else {
                     machinesTableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No machines found.</td></tr>";
                 }
@@ -199,64 +311,74 @@ function showDetails(name, client, capacity) {
         document.getElementById('detailCreatedAt').textContent = createdAt || "N/A";
         document.getElementById('detailType').textContent = type || "N/A";
     
-        if ((field1) || (field2)) {
+        if ((field1)&&(field1 !="undefined")) {
             document.getElementById('labelField1').textContent = field1 || "N/A";
-            document.getElementById('points').textContent = ":";
+        }
+        if ((field2)&&(field2 !="undefined")) {
             document.getElementById('detailField1').textContent = field2 || "N/A";
         }
     
-        if ((field4) || (field3)) {
-            document.getElementById('labelField1').textContent = field3 || "N/A";
-            document.getElementById('points').textContent = ":";
-            document.getElementById('detailField1').textContent = field4 || "N/A";
+        if ((field3)&&(field3 !="undefined")) {
+            document.getElementById('labelField2').textContent = field3 || "N/A";
+        }
+        if ((field4)&&(field4 !="undefined")) {
+            document.getElementById('detailField2').textContent = field4 || "N/A";
         }
     
-        if ((field5) || (field6)) {
-            document.getElementById('labelField1').textContent = field5 || "N/A";
-            document.getElementById('points').textContent = ":";
-            document.getElementById('detailField1').textContent = field6 || "N/A";
+        if ((field5)&&(field5 !="undefined")) {
+            document.getElementById('labelField3').textContent = field5 || "N/A";
+        }
+        if ((field6)&&(field6 !="undefined")) {
+            document.getElementById('detailField3').textContent = field6 || "N/A";
         }
     
-        if ((field8) || (field7)) {
-            document.getElementById('labelField1').textContent = field7 || "N/A";
-            document.getElementById('points').textContent = ":";
-            document.getElementById('detailField1').textContent = field8 || "N/A";
+        if ((field7)&&(field7 !="undefined")) {
+            document.getElementById('labelField4').textContent = field7 || "N/A";
+        }
+        if ((field8)&&(field8 !="undefined")) {
+            document.getElementById('detailField4').textContent = field8 || "N/A";
         }
     
-        if ((field9) || (field10)) {
-            document.getElementById('labelField1').textContent = field9 || "N/A";
-            document.getElementById('points').textContent = ":";
-            document.getElementById('detailField1').textContent = field10 || "N/A";
+        if ((field9)&&(field9 !="undefined")) {
+            document.getElementById('labelField5').textContent = field9 || "N/A";
+        }
+        if ((field10)&&(field10 !="undefined")) {
+            document.getElementById('detailField5').textContent = field10 || "N/A";
         }
     
-        if ((field11) || (field12)) {
-            document.getElementById('labelField1').textContent = field11 || "N/A";
-            document.getElementById('points').textContent = ":";
-            document.getElementById('detailField1').textContent = field12 || "N/A";
+        if ((field11)&&(field11 !="undefined")) {
+            document.getElementById('labelField6').textContent = field11 || "N/A";
+        }
+        if  ((field12)&&(field12 !="undefined")) {
+            document.getElementById('detailField6').textContent = field12 || "N/A";
         }
     
-        if ((field13) || (field14)) {
-            document.getElementById('labelField1').textContent = field13 || "N/A";
-            document.getElementById('points').textContent = ":";
-            document.getElementById('detailField1').textContent = field14 || "N/A";
+        if ((field13)&&(field13 !="undefined")) {
+            document.getElementById('labelField7').textContent = field13 || "N/A";
+        }
+        if ((field14)&&(field14 !="undefined")) {
+            document.getElementById('detailField7').textContent = field14 || "N/A";
         }
     
-        if ((field15) || (field16)) {
-            document.getElementById('labelField1').textContent = field15 || "N/A";
-            document.getElementById('points').textContent = ":";
-            document.getElementById('detailField1').textContent = field16 || "N/A";
+        if ((field15)&&(field15 !="undefined")) {
+            document.getElementById('labelField8').textContent = field15 || "N/A";
+        }
+        if ((field16)&&(field16 !="undefined")) {
+            document.getElementById('detailField8').textContent = field16 || "N/A";
         }
     
-        if ((field17) || (field18)) {
-            document.getElementById('labelField1').textContent = field17 || "N/A";
-            document.getElementById('points').textContent = ":";
-            document.getElementById('detailField1').textContent = field18 || "N/A";
+        if ((field17)&&(field17 !="undefined")) {
+            document.getElementById('labelField9').textContent = field17 || "N/A";
+        }
+        if ((field18)&&(field18 !="undefined")) {
+            document.getElementById('detailField9').textContent = field18 || "N/A";
         }
     
-        if ((field19) || (field20)) {
-            document.getElementById('labelField1').textContent = field19 || "N/A";
-            document.getElementById('points').textContent = ":";
-            document.getElementById('detailField1').textContent = field20 || "N/A";
+        if ((field19)&&(field19 !="undefined")) {
+            document.getElementById('labelField10').textContent = field19 || "N/A";
+        }
+        if ((field20)&&(field20 !="undefined")) {
+            document.getElementById('detailField10').textContent = field20 || "N/A";
         }
     
         $('#machineDetailsModal').modal('show');
@@ -265,5 +387,6 @@ function showDetails(name, client, capacity) {
 
     
 </script>
+
     
 {% endblock %}
