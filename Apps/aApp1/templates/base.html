@@ -316,7 +316,10 @@
                         <li class="sub-item"><a href="{% url 'create_autho' %}"> <i class="fas fa-arrows-alt"></i> <p>Create Autho  </p></a></li>
                   
                         {% if permissions.Hist %} 
-                        <li class="nav-item"><a href="{% url 'modelcalc_list' %}">      <i class="fas fa-arrows-alt"></i><p>History</p></a></li>
+                        <li class="nav-item"><a href="{% url 'modelcalc_list' %}">      <i class="fas fa-arrows-alt"></i><p>Claculations History</p></a></li>
+                        {% endif %}                        
+                        {% if permissions.Hist %} 
+                        <li class="nav-item"><a href="{% url 'modelmachine_list' %}">      <i class="fas fa-arrows-alt"></i><p>Submittal History</p></a></li>
                         {% endif %}                        
                   
                         {% if permissions.Settings %} 

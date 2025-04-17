@@ -1988,33 +1988,6 @@ def edit_project(request, project_id):
 
     return render(request, 'edit_project.html', {'form': form})
 
-""" def edit_project(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    
-    if request.method == "POST":
-        form = ProjectForm(request.POST, instance=project)
-        if form.is_valid():
-            form.save()
-            
-            # Check if request is AJAX
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'success': True})
-            
-            # Redirect to project list page for normal form submission
-            return redirect('project_list')
-
-        else:
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'errors': form.errors})
-    else:
-        # If it's a normal GET request, render the edit page
-        form = ProjectForm(instance=project)
-    
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'success': True, 'form': form.as_p()})
-    
-    return render(request, 'edit_project.html', {'form': form}) """
-
 
 
 def delete_project(request, project_id):

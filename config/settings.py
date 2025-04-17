@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Apps.aAppMechanical',
     'Apps.aCost',
     'Apps.aCalculations',
+    'Apps.aProject',
 ]
 
 MIDDLEWARE = [

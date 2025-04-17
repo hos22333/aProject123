@@ -9,6 +9,7 @@ from .models import RoleAutho
 
 from django.contrib.auth.models import User
 from Apps.aAppMechanical.models import modelcalc
+from Apps.aAppMechanical.models import Machine
 from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.decorators import login_required
@@ -212,6 +213,23 @@ def modelcalc_list(request):
         })
 
     return render(request, 'modelcalc_list.html', {'data': data})
+
+
+def modelmachine_list(request):
+    records = Machine.objects.all()
+    data = []
+
+    for record in records:
+        fields = []
+        for field in record._meta.fields:
+            if field.name not in ['id', 'oSec00Field01', 'oSec00Field02', 'oSec00Field03']:
+                fields.append({'name': field.verbose_name, 'value': getattr(record, field.name)})
+        data.append({
+            'record': record,
+            'fields': fields
+        })
+
+    return render(request, 'modelmachine_list.html', {'data': data})
 
 
 

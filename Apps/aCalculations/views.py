@@ -1,29 +1,46 @@
 import pdb
 
-
-from Apps.aAppMechanical.models import Project
-from Apps.aAppMechanical.models import Machine
-from Apps.aAppMechanical.models import UserCompany
-from Apps.aAppMechanical.models import aLogEntry
-from Apps.aAppMechanical.models import FormFieldConfig
-from Apps.aAppMechanical.views import interact_with_api , check_user_autho
-
 from . import forms
 
 
 from datetime import datetime
 from docx import Document
-from Apps.aApp1.models import UserRole, RoleAutho, Autho
 import requests
 
 from django.http import HttpResponse
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.utils.timezone import now 
-from django.contrib.auth.models import User
-from django.conf import settings
+
+def interact_with_api(api_url, req_type, input_data):
+    """
+    Interact with the specified API by sending a POST request.
+
+    Parameters:
+        api_url (str): The API endpoint URL.
+        req_type (str): The request type (e.g., 'MS').
+        input_data (dict): A dictionary of input parameters.
+
+    Returns:
+        dict: The API response parsed into a Python dictionary.
+    """
+    # Prepare the payload
+    payload = {
+        "reqType": req_type,
+        **input_data  # Merge the input data into the payload
+    }
+
+    try:
+        # Send POST request
+        response = requests.post(api_url, json=payload)
+
+        # Raise an error for bad responses
+        response.raise_for_status()
+
+        # Parse and return the JSON response
+        return response.json()
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error while interacting with API: {e}")
+        return None
 
 
 SHEET_CONFIG = {
@@ -397,6 +414,7 @@ def LoadPageCalculationsSheet(request, sheet_key):
 
                 # Call external API
                 response = interact_with_api(api_url, api_type, input_data)
+                
 
                 # Update output fields
                 instance = form.save(commit=False)
