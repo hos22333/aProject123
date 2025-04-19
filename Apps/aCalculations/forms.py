@@ -1,8 +1,6 @@
 from django import forms
 from Apps.aAppMechanical.models import modelcalc
 from Apps.aAppMechanical.models import FormFieldConfig
-from Apps.aAppMechanical.models import Project, Machine
-from Apps.aAppMechanical.models import UserCompany
 
 
 

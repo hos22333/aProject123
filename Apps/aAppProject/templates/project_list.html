@@ -321,7 +321,7 @@ function showDetails(name, client, capacity) {
     function reviewMachines(projectId) {
         document.getElementById('modalProjectName').textContent = "Loading...";
         
-        fetch(`/Mechanical/get_machines/${projectId}/`)
+        fetch(`/Project/get_machines/${projectId}/`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('modalProjectName').textContent = data.project_name;

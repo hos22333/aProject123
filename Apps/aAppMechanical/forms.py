@@ -1,8 +1,9 @@
 from django import forms
 from .models import modelcalc
 from .models import FormFieldConfig
-from .models import Project, Machine
+from .models import Machine
 from .models import UserCompany
+from Apps.aAppProject.models import APP_Project
 #######################################
 
 class FormFieldConfigForm(forms.ModelForm):
@@ -20,15 +21,7 @@ class FormFieldConfigForm(forms.ModelForm):
 
 
 
-class ProjectForm(forms.ModelForm):
-    class Meta:
-        model = Project
-        fields = ['name', 'client_name', 'capacity']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter project name'}),
-            'client_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter client name'}),
-            'capacity': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter capacity'}),
-        }
+
 
 
 
@@ -754,7 +747,7 @@ class formCalcPNwa(forms.Form):
 
 class FormDataSheet(forms.Form):
     project = forms.ModelChoiceField(
-        queryset=Project.objects.all(),
+        queryset=APP_Project.objects.all(),
         required=False,  # Allows an empty selection
         widget=forms.Select(attrs={'class': 'form-control shadow-sm rounded'})
     )

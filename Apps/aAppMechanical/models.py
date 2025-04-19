@@ -18,17 +18,7 @@ class Companies(models.Model):
         return self.nameCompanies  # Use the correct field name
     
     
- 
-class Project(models.Model):
-    name            = models.CharField(max_length=255)
-    client_name     = models.CharField(max_length=255)
-    capacity        = models.CharField(max_length=100)
-    company         = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
 
-    def __str__(self):
-        return self.name
- 
- 
    
     
 class UserCompany(models.Model):
@@ -113,7 +103,7 @@ class modelcalc(models.Model):
 
 
 class Machine(models.Model):
-    project         = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='machines')
+    project         = models.ForeignKey('aAppProject.APP_Project', on_delete=models.CASCADE, related_name='machines')
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
 
     

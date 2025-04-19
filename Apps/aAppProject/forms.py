@@ -1,10 +1,9 @@
 from django import forms
-from Apps.aAppMechanical.models import Project
-
+from .models import APP_Project
 
 class ProjectForm(forms.ModelForm):
     class Meta:
-        model = Project
+        model = APP_Project
         fields = ['name', 'client_name', 'capacity']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter project name'}),

@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class AprojectConfig(AppConfig):
+class AappprojectConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'Apps.aProject'
+    name = 'Apps.aAppProject'

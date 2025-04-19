@@ -1,13 +1,9 @@
-import pdb
-
-from Apps.aAppMechanical.models import Project
-from Apps.aAppMechanical.models import Machine
-from Apps.aAppMechanical.models import UserCompany
-from Apps.aAppMechanical.models import aLogEntry
-
-
+from django.shortcuts import render
 from .forms import ProjectForm
-
+from .models import APP_Project
+from Apps.aAppMechanical.models import UserCompany
+from Apps.aAppMechanical.models import Machine
+from Apps.aAppMechanical.models import aLogEntry
 
 import requests
 
@@ -20,6 +16,9 @@ from django.utils.timezone import now
 from django.contrib.auth.models import User
 from django.conf import settings
 
+
+import os
+import ezdxf
 
 from docx import Document
 from docx.shared import Pt, RGBColor
@@ -63,15 +62,15 @@ def project_list(request):
     # Assign company filter only if the user has a company
     if user_company:
         #machines = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company)
-        projects = Project.objects.filter(company=user_company)
+        projects = APP_Project.objects.filter(company=user_company)
     else:
-        projects = Project.objects.none()  # Return an empty queryset if no company
+        projects = APP_Project.objects.none()  # Return an empty queryset if no company
     
     #projects = Project.objects.all()
     return render(request, 'project_list.html', {'form': form, 'projects': projects})
     
 def edit_project(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
+    project = get_object_or_404(APP_Project, id=project_id)
     
     if request.method == "POST":
         form = ProjectForm(request.POST, instance=project)
@@ -94,7 +93,7 @@ def edit_project(request, project_id):
 
 def delete_project(request, project_id):
     if request.method == "POST":
-        project = get_object_or_404(Project, id=project_id)
+        project = get_object_or_404(APP_Project, id=project_id)
         project.delete()
 
         # Otherwise, redirect to the project list page
@@ -106,7 +105,7 @@ def delete_project(request, project_id):
 
 def get_machines(request, project_id):
     try:
-        project = Project.objects.get(id=project_id)
+        project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
         
         data = {
@@ -184,7 +183,7 @@ def get_machines(request, project_id):
                                              "oSec10Field19", "oSec10Field20"))
         }
         return JsonResponse(data)
-    except Project.DoesNotExist:
+    except APP_Project.DoesNotExist:
         return JsonResponse({"error": "Project not found"}, status=404)
 
 
@@ -224,7 +223,7 @@ def generate_report(request, project_id):
     except UserCompany.DoesNotExist:
         return HttpResponse("User does not belong to a company", status=403)
 
-    except Project.DoesNotExist:
+    except APP_Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
 
 
@@ -340,7 +339,7 @@ def generate_report_AAA(request, project_id):
         ###LOG
 
         aCompany = UserCompany.objects.get(user=request.user)
-        project = Project.objects.get(id=project_id)
+        project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
         
         
@@ -440,7 +439,7 @@ def generate_report_AAA(request, project_id):
         doc.save(response)
         return response
 
-    except Project.DoesNotExist:
+    except APP_Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
 
 
@@ -570,7 +569,7 @@ def generate_report_BBB(request, project_id):
         ###LOG
 
         aCompany = UserCompany.objects.get(user=request.user)
-        project = Project.objects.get(id=project_id)
+        project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
         
         
@@ -670,5 +669,5 @@ def generate_report_BBB(request, project_id):
         doc.save(response)
         return response
 
-    except Project.DoesNotExist:
+    except APP_Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
