@@ -212,6 +212,10 @@ def generate_report(request, project_id):
         if aCompany.id == 1:
             print("Company 1")
             return generate_report_AAA(request, project_id)
+        
+        if aCompany.id == 13:
+            print("Company 13")
+            return generate_report_BBB(request, project_id)
 
         elif aCompany.id == 2:
             print("Company 2")
@@ -457,7 +461,7 @@ def generate_report_BBB(request, project_id):
 
         # Remove all table borders manually
         tbl = table._tbl  # Get the table's XML element
-        tblPr = tbl.find(qn("w:tblPr"))  # Find existing table properties
+        tblPr = tbl.find(ns.qn("w:tblPr"))  # Find existing table properties
 
         if tblPr is None:
             tblPr = OxmlElement("w:tblPr")  # Create table properties if missing
@@ -466,7 +470,7 @@ def generate_report_BBB(request, project_id):
         tblBorders = OxmlElement("w:tblBorders")  # Create <w:tblBorders>
         for border_name in ["top", "left", "bottom", "right", "insideH", "insideV"]:
             border = OxmlElement(f"w:{border_name}")
-            border.set(qn("w:val"), "nil")  # Remove the border
+            border.set(ns.qn("w:val"), "nil")  # Remove the border
             tblBorders.append(border)
 
         tblPr.append(tblBorders)  # Append border settings to the table properties
@@ -479,8 +483,8 @@ def generate_report_BBB(request, project_id):
                 # Apply background color only to the header row (first row)
                 if i == 0:
                     shading_elm = OxmlElement("w:shd")
-                    shading_elm.set(qn("w:val"), "clear")  # Set shading value
-                    shading_elm.set(qn("w:fill"), "ADD8E6")  # Light blue color
+                    shading_elm.set(ns.qn("w:val"), "clear")  # Set shading value
+                    shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Light blue color
                     cell._tc.get_or_add_tcPr().append(shading_elm)
    
     

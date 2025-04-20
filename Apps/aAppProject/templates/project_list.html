@@ -713,26 +713,6 @@ function showDetails(name, client, capacity) {
         document.getElementById('detailUsername').textContent = username || "N/A";
         document.getElementById('detailCreatedAt').textContent = createdAt || "N/A";
         document.getElementById('detailType').textContent = type || "N/A";
-
-        /* for (let i = 0; i < 100; i++) {
-            const label = field[i * 2];
-            const value = field[i * 2 + 1];
-            
-            const isValidLabel = label && label !== "undefined" && label !== "oooo";
-            const isValidValue = value && value !== "undefined" && value !== "oooo";
-            
-            if (isValidLabel) {
-                document.getElementById(`labelField${i + 1}`).textContent = label || "N/A";
-            }
-        
-            if (isValidLabel || isValidValue) {
-                document.getElementById(`points${i + 1}`).textContent = ":";
-            }
-        
-            if (isValidValue) {
-                document.getElementById(`detailField${i + 1}`).textContent = value || "N/A";
-            }
-        } */
     
         if ((field1)&&(field1 !="undefined")&&(field1 !="oooo")) {
             document.getElementById('labelField1').textContent = field1 || "N/A";

@@ -216,7 +216,8 @@ def modelcalc_list(request):
 
 
 def modelmachine_list(request):
-    records = Machine.objects.all()
+    """ records = Machine.objects.all() """
+    records = Machine.objects.select_related('project', 'company').all()
     data = []
 
     for record in records:
