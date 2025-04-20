@@ -209,11 +209,11 @@ def generate_report(request, project_id):
 
         #pdb.set_trace()
         # Determine the company and generate the corresponding report
-        if aCompany.id == 1:
+        if aCompany.company.nameCompanies == "IETOS":
             print("Company 1")
             return generate_report_AAA(request, project_id)
 
-        elif aCompany.id == 2:
+        elif aCompany.company.nameCompanies == "ELZAHRAA":
             print("Company 2")
             return generate_report_BBB(request, project_id)
 
