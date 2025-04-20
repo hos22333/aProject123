@@ -212,10 +212,6 @@ def generate_report(request, project_id):
         if aCompany.id == 1:
             print("Company 1")
             return generate_report_AAA(request, project_id)
-        
-        if aCompany.id == 13:
-            print("Company 13")
-            return generate_report_BBB(request, project_id)
 
         elif aCompany.id == 2:
             print("Company 2")
