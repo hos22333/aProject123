@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .forms import ProjectForm
 from .models import APP_Project
 from Apps.aAppMechanical.models import UserCompany
-from Apps.aAppMechanical.models import Machine
+from Apps.aAppSubmittal.models import Machine
 from Apps.aAppMechanical.models import aLogEntry
 
 import requests

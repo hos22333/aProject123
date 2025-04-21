@@ -1,4 +1,4 @@
-from Apps.aApp1.models import RoleAutho
+from Apps.aAdmin.models import RoleAutho
 from Apps.aAppMechanical.models import UserCompany  # Import your UserCompany model
 
 def user_permissions(request):

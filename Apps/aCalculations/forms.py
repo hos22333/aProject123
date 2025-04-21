@@ -1,5 +1,5 @@
 from django import forms
-from Apps.aAppMechanical.models import modelcalc
+from Apps.aAppCalculation.models import modelcalc
 from Apps.aAppMechanical.models import FormFieldConfig
 
 

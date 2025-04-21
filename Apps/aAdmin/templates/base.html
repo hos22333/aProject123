@@ -1,0 +1,479 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Mechanical Design</title>
+    <meta
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+      name="viewport"
+    />
+    <link
+      rel="icon"
+      href="{% static 'aApp1/img/kaiadmin/favicon.ico' %}"
+      type="image/x-icon"
+    />
+
+    <!-- Fonts and icons -->
+    <script src="{% static 'aApp1/js/plugin/webfont/webfont.min.js' %}"></script>
+    <script>
+      WebFont.load({
+        google: { families: ["Public Sans:300,400,500,600,700"] },
+        custom: {
+          families: [
+            "Font Awesome 5 Solid",
+            "Font Awesome 5 Regular",
+            "Font Awesome 5 Brands",
+            "simple-line-icons",
+          ],
+          urls: ["{% static 'aApp1/css/fonts.min.css' %}"],
+        },
+        active: function () {
+          sessionStorage.fonts = true;
+        },
+      });
+    </script>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="{% static 'aApp1/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'aApp1/css/plugins.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'aApp1/css/kaiadmin.min.css' %}" />
+
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="{% static 'aApp1/css/demo.css' %}" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <!-- Sidebar -->
+      <div class="sidebar" data-background-color="dark">
+        <div class="sidebar-logo">
+          <!-- Logo Header -->
+          <div class="logo-header" data-background-color="dark">
+            <a href="/"> Design Calc </a>
+            <div class="nav-toggle">
+              <button class="btn btn-toggle toggle-sidebar">
+                <i class="gg-menu-right"></i>
+              </button>
+              <button class="btn btn-toggle sidenav-toggler">
+                <i class="gg-menu-left"></i>
+              </button>
+            </div>
+            <button class="topbar-toggler more">
+              <i class="gg-more-vertical-alt"></i>
+            </button>
+          </div>
+          <!-- End Logo Header -->
+
+          </div><div class="sidebar-wrapper scrollbar scrollbar-inner">
+            <div class="sidebar-content">
+              <ul class="nav nav-secondary">
+          
+                {% if user.is_authenticated %}
+                  <!-- Group1 -->
+                  
+
+
+
+
+
+                  {% if permissions.DataSheet %} 
+                  <li class="nav-item">
+                    <a href="{% url 'project_list' %}">
+                      <i class="fas fa-book-open"></i>
+                      <p>Projects</p>
+                    </a>
+                  </li>
+
+                  
+                  
+                  {% endif %}
+                  
+
+
+
+
+                  
+                  
+                      
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu">
+                      <i class="fas fa-calculator"></i>
+                      <p>Calculations</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu">
+                      <ul class="nav nav-collapse">
+                        
+                        <li>
+                          <a data-bs-toggle="collapse" href="#subnav1">
+                            <span class="sub-item">Screens</span>
+                            <span class="caret"></span>
+                          </a>
+                          <div class="collapse" id="subnav1">
+                            <ul class="nav nav-collapse subnav">
+                              <li><a href="{% url 'NS' %}"> <span class="sub-item">Manual Screens</span></a></li>
+                              <li><a href="{% url 'BS' %}"> <span class="sub-item">Basket screens</span></a></li> 
+                              <li><a href="{% url 'MS' %}"> <span class="sub-item">Mechanical Screens</span></a></li> 
+                              <li><a href="#"> <span class="sub-item">Screw Conveyor  </span></a></li> 
+                              <li><a href="#"> <span class="sub-item">Screw Conveyor  </span></a></li>                            
+                            </ul>
+                          </div>
+                        </li>
+                        
+                        <li>
+                          <a data-bs-toggle="collapse" href="#subnav2">
+                            <span class="sub-item">Conveyors</span>
+                            <span class="caret"></span>
+                          </a>
+                          <div class="collapse" id="subnav2">
+                            <ul class="nav nav-collapse subnav">
+                              <li><a href="{% url 'BC' %}"> <span class="sub-item">Belt Conveyor   </span></a></li>
+                              <li><a href="{% url 'SC' %}"> <span class="sub-item">Screw Conveyor  </span></a></li>                            
+                            </ul>
+                          </div>
+                        </li>
+                        
+                        <li>
+                          <a data-bs-toggle="collapse" href="#subnav3">
+                            <span class="sub-item">Gritremoval</span>
+                            <span class="caret"></span>
+                          </a>
+                          <div class="collapse" id="subnav3">
+                            <ul class="nav nav-collapse subnav">
+                              <li><a href="{% url 'GR' %}"> <span class="sub-item">Gritremoval (Scrapers) </span></a></li>
+                              <li><a href="#"> <span class="sub-item">Gritremoval (Air Lift Pump) </span></a></li>
+                            </ul>
+                          </div>
+                        </li>
+                        
+                        <li>
+                          <a data-bs-toggle="collapse" href="#subnav4">
+                            <span class="sub-item">PSTs</span>
+                            <span class="caret"></span>
+                          </a>
+                          <div class="collapse" id="subnav4">
+                            <ul class="nav nav-collapse subnav">
+                              <li><a href="{% url 'PS' %}"> <span class="sub-item">PST Half bridge</span></a></li>
+                              <li><a href="#"> <span class="sub-item">PST Full bridge </span></a></li>
+                            </ul>
+                          </div>
+                        </li>
+                        
+                        <li>
+                          <a data-bs-toggle="collapse" href="#subnav5">
+                            <span class="sub-item">Thickeners</span>
+                            <span class="caret"></span>
+                          </a>
+                          <div class="collapse" id="subnav5">
+                            <ul class="nav nav-collapse subnav">
+                              <li><a href="{% url 'TH' %}"> <span class="sub-item">Thickener 3 arm</span></a></li>
+                              <li><a href="#"> <span class="sub-item">Thickener 2 arm </span></a></li>
+                            </ul>
+                          </div>
+                        </li>
+                        
+                        <li>
+                          <a data-bs-toggle="collapse" href="#subnav6">
+                            <span class="sub-item">Mixers</span>
+                            <span class="caret"></span>
+                          </a>
+                          <div class="collapse" id="subnav6">
+                            <ul class="nav nav-collapse subnav">
+                              <li><a href="{% url 'MX' %}"> <span class="sub-item">Rectangular Mixers</span></a></li>
+                              <li><a href="#"> <span class="sub-item">Circular Mixers </span></a></li>
+                            </ul>
+                          </div>
+                        </li>
+                        
+                        <li>
+                          <a data-bs-toggle="collapse" href="#subnav7">
+                            <span class="sub-item">Tanks</span>
+                            <span class="caret"></span>
+                          </a>
+                          <div class="collapse" id="subnav7">
+                            <ul class="nav nav-collapse subnav">
+                              <li><a href="{% url 'RT' %}"> <span class="sub-item">Rectangular Tanks</span></a></li>
+                              <li><a href="{% url 'CT' %}"> <span class="sub-item">Circular Tanks</span></a></li>
+                            </ul>
+                          </div>
+                        </li>
+                        
+                        <li>
+                          <a data-bs-toggle="collapse" href="#subnav8">
+                            <span class="sub-item">Penstocks</span>
+                            <span class="caret"></span>
+                          </a>
+                          <div class="collapse" id="subnav8">
+                            <ul class="nav nav-collapse subnav">
+                              <li><a href="{% url 'PNch' %}"> <span class="sub-item">Channel Penstocks</span></a></li>
+                              <li><a href="#"> <span class="sub-item">Wall Penstocks</span></a></li>
+                              <li><a href="#"> <span class="sub-item">Wier Penstocks</span></a></li>
+                            </ul>
+                          </div>
+                        </li>
+
+                      </ul>
+                    </div>
+                  </li>
+                  
+                  
+                  
+                        
+                  {% if permissions.DataSheet %} 
+                        
+                  <!-- Screens -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu_DS">
+                      <i class="fas fa-book"></i>
+                      <p>Submittal</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu_DS">
+                      <ul class="nav nav-collapse">
+                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='NS' %}"> <i class="fas fa-circle"></i> <p>Manual Screen </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='MS' %}"> <i class="fas fa-circle"></i> <p>Mechanical Screen </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='BC' %}"> <i class="fas fa-circle"></i> <p>BeltConveyor </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='CO' %}"> <i class="fas fa-circle"></i> <p>Container </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='GR' %}"> <i class="fas fa-circle"></i> <p>GritGreaseRemoval </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='SS' %}"> <i class="fas fa-circle"></i> <p>SandSilo </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='PS' %}"> <i class="fas fa-circle"></i> <p>PST </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='QV' %}"> <i class="fas fa-circle"></i> <p>QuickValve </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='TV' %}"> <i class="fas fa-circle"></i> <p>TelescopicValve </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='TH' %}"> <i class="fas fa-circle"></i> <p>SludgeThickener </p></a></li>
+                      </ul>
+                    </div>
+                  </li>
+                  {% endif %}
+                  
+                  
+                  
+                  
+                  
+
+                  
+                  {% if permissions.AthRol %}
+                  
+                        
+                  
+                        
+                  <!-- Screens -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu_CS">
+                      <i class="fas fa-money-bill-alt"></i>
+                      <p>Cost</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu_CS">
+                      <ul class="nav nav-collapse">
+                        <li class="sub-item"><a href="{% url 'categories' %}"> <i class="fas fa-circle"></i> <p>Categories</p></a></li>
+                        <li class="sub-item"><a href="{% url 'category_items' %}"> <i class="fas fa-circle"></i> <p>Category Items</p></a></li>                        
+                        <li class="sub-item"><a href="{% url 'category_items_size' %}"> <i class="fas fa-circle"></i> <p>Category Items Size</p></a></li>
+                        <li class="sub-item"><a href="{% url 'category_items_size_price' %}"> <i class="fas fa-circle"></i> <p>Category Items Size price</p></a></li>
+                        <li class="sub-item"><a href="{% url 'cost_form' %}"> <i class="fas fa-circle"></i> <p>Cost Form</p></a></li>
+                    </ul>
+                  
+                    </div>
+                  </li>                  
+                        
+                  <!-- Screens -->
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu0">
+                      <i class="fas fa-arrows-alt"></i>
+                      <p>Admins</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu0">
+                      <ul class="nav nav-collapse">
+                        <li class="sub-item"><a href="{% url 'user_roles_autho' %}"> <i class="fas fa-arrows-alt"></i> <p>User, Roles, Autho</p></a></li>
+                        <li class="sub-item"><a href="{% url 'assign_user_role' %}"> <i class="fas fa-arrows-alt"></i> <p>Assign User to Role </p></a></li>
+                        <li class="sub-item"><a href="{% url 'assign_role_autho' %}"> <i class="fas fa-arrows-alt"></i> <p>Assign Role to Autho</p></a></li>
+                        <li class="sub-item"><a href="{% url 'create_role' %}"> <i class="fas fa-arrows-alt"></i> <p>Create Role</p></a></li>
+                        <li class="sub-item"><a href="{% url 'create_autho' %}"> <i class="fas fa-arrows-alt"></i> <p>Create Autho  </p></a></li>
+                  
+                        {% if permissions.Hist %} 
+                        <li class="nav-item"><a href="{% url 'modelcalc_list' %}">      <i class="fas fa-arrows-alt"></i><p>Claculations History</p></a></li>
+                        {% endif %}                        
+                        {% if permissions.Hist %} 
+                        <li class="nav-item"><a href="{% url 'modelmachine_list' %}">      <i class="fas fa-arrows-alt"></i><p>Submittal History</p></a></li>
+                        {% endif %}                        
+                  
+                        {% if permissions.Settings %} 
+                        <li class="nav-item"><a href="{% url 'list_configs' %}">      <i class="fas fa-arrows-alt"></i><p>Settings</p></a></li>
+                        {% endif %}                       
+                  
+                        {% if permissions.Users %} 
+                        <li class="nav-item"><a href="{% url 'users_list' %}">      <i class="fas fa-arrows-alt"></i><p>Users</p></a></li>
+                        {% endif %}
+
+                      </ul>
+                    </div>
+                  </li>
+
+
+                  
+                  {% endif %}
+
+                       
+                  
+          
+                {% else %}
+                  <!-- Group4 -->
+                  <li class="nav-item"><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i><p>Login</p></a></li>
+                  <li class="nav-item"><a href="{% url 'register' %}"><i class="fas fa-user-plus"></i><p>Register</p></a></li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+          
+
+
+
+      </div>
+        
+      <!-- End Sidebar -->
+
+      <div class="main-panel">
+        <div class="main-header">
+          <div class="main-header-logo">
+            <!-- Logo Header -->
+            <div class="logo-header" data-background-color="dark">
+              <a href="index.html" class="logo">
+                <img
+                  src="{% static 'aApp1/img/kaiadmin/logo_light.svg' %}"
+                  alt="navbar brand"
+                  class="navbar-brand"
+                  height="20"
+                />
+              </a>
+              <div class="nav-toggle">
+                <button class="btn btn-toggle toggle-sidebar">
+                  <i class="gg-menu-right"></i>
+                </button>
+                <button class="btn btn-toggle sidenav-toggler">
+                  <i class="gg-menu-left"></i>
+                </button>
+              </div>
+              <button class="topbar-toggler more">
+                <i class="gg-more-vertical-alt"></i>
+              </button>
+            </div>
+            <!-- End Logo Header -->
+          </div>
+          <!-- Navbar Header -->
+          <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+            <div class="container-fluid">              
+
+              <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">                               
+                                
+                  {% if user.is_authenticated %}                                        
+                    <form method="post" action="{% url 'logout' %}">
+                      {% csrf_token %}                      
+                          <button type="button" class="btn btn-primary btn-border" style="width: 100; height: 50px; text-align: left;">
+                              Hi, {{ user.username }}
+                          </button>  
+
+                      {% if user_company %}
+                          <button type="button" class="btn btn-primary btn-border" style="width: 150px; height: 50px; text-align: left;">
+                              {{ user_company.company.nameCompanies }}
+                          </button>
+                      {% endif %}
+
+                      <button type="submit" class="btn btn-primary" style="width: 100; height: 50px; text-align: left;">
+                          Logout
+                      </button>                  
+                      <button type="button" class="btn btn-primary" style="width: 100; height: 50px; text-align: left;" onclick="window.location.href='{% url 'profile' %}'">
+                          User Data
+                      </button>
+                    
+                    </form>                   
+                  {% else %}
+                  
+                  {% endif %}
+
+              </ul>
+
+            </div>
+          </nav>
+          <!-- End Navbar -->
+        </div>
+
+
+
+{% block content %}
+<!-- Your content goes here -->
+
+
+{% endblock %}
+
+
+
+      </div>
+
+      
+    </div>
+    <!--   Core JS Files   -->
+    <script src="{% static 'aApp1/js/core/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'aApp1/js/core/popper.min.js' %}"></script>
+    <script src="{% static 'aApp1/js/core/bootstrap.min.js' %}"></script>
+
+    <!-- jQuery Scrollbar -->
+    <script src="{% static 'aApp1/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js' %}"></script>
+
+    <!-- Chart JS -->
+    <script src="{% static 'aApp1/js/plugin/chart.js/chart.min.js' %}"></script>
+
+    <!-- jQuery Sparkline -->
+    <script src="{% static 'aApp1/js/plugin/jquery.sparkline/jquery.sparkline.min.js' %}"></script>
+
+    <!-- Chart Circle -->
+    <script src="{% static 'aApp1/js/plugin/chart-circle/circles.min.js' %}"></script>
+
+    <!-- Datatables -->
+    <script src="{% static 'aApp1/js/plugin/datatables/datatables.min.js' %}"></script>
+
+    <!-- Bootstrap Notify -->
+    <script src="{% static 'aApp1/js/plugin/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
+
+    <!-- jQuery Vector Maps -->
+    <script src="{% static 'aApp1/js/plugin/jsvectormap/jsvectormap.min.js' %}"></script>
+    <script src="{% static 'aApp1/js/plugin/jsvectormap/world.js' %}"></script>
+
+    <!-- Sweet Alert -->
+    <script src="{% static 'aApp1/js/plugin/sweetalert/sweetalert.min.js' %}"></script>
+
+    <!-- Kaiadmin JS -->
+    <script src="{% static 'aApp1/js/kaiadmin.min.js' %}"></script>
+
+ 
+    <script>
+      $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
+        type: "line",
+        height: "70",
+        width: "100%",
+        lineWidth: "2",
+        lineColor: "#177dff",
+        fillColor: "rgba(23, 125, 255, 0.14)",
+      });
+
+      $("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
+        type: "line",
+        height: "70",
+        width: "100%",
+        lineWidth: "2",
+        lineColor: "#f3545d",
+        fillColor: "rgba(243, 84, 93, .14)",
+      });
+
+      $("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
+        type: "line",
+        height: "70",
+        width: "100%",
+        lineWidth: "2",
+        lineColor: "#ffa534",
+        fillColor: "rgba(255, 165, 52, .14)",
+      });
+    </script>
+
+  </body>
+</html>
+
