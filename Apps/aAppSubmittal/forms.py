@@ -1,8 +1,22 @@
 from django import forms
 from Apps.aAppProject.models import APP_Project
+from .models import AddMachine
 from .models import Machine
 from Apps.aAppMechanical.models import FormFieldConfig
 from Apps.aAppMechanical.models import UserCompany
+
+
+class MachineForm(forms.ModelForm):
+    class Meta:
+        model = AddMachine
+        fields = ['keyValue', 'nameForm', 'nameDB', 'nameMachine']
+        widgets = {
+            'keyValue': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter key value'}),
+            'nameForm': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter form name'}),
+            'nameDB': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter DB name'}),
+            'nameMachine': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter machine name'}),
+        }
+
 
 class FormDataSheet(forms.Form):
     project = forms.ModelChoiceField(

@@ -3,6 +3,17 @@ from Apps.aAppMechanical.models import Companies
 from Apps.aAppProject.models import APP_Project
 
 # Create your models here.
+
+class AddMachine(models.Model):
+    keyValue            = models.CharField(max_length=255)
+    nameForm     = models.CharField(max_length=255)
+    nameDB      = models.CharField(max_length=255)
+    nameMachine     = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.nameMachine
+
+
 class Machine(models.Model):
     project         = models.ForeignKey(APP_Project, on_delete=models.CASCADE, related_name='machines')
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
@@ -228,4 +239,6 @@ class Machine(models.Model):
 
     class Meta:
         db_table = 'aAppMechanical_machine'
-    
+
+
+

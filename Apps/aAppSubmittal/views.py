@@ -1,12 +1,14 @@
 import pdb
 
 from Apps.aAppProject.models import APP_Project
+from .models import AddMachine
 from .models import Machine
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppMechanical.models import aLogEntry
 
 
 from .forms import FormDataSheet  
+from .forms import MachineForm  
 
 
 from datetime import datetime
@@ -31,6 +33,46 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml import OxmlElement, ns
 from docx.shared import Inches
 from docx.shared import Pt
+
+
+# Create Company
+def add_machine(request):
+    if request.method == 'POST':
+        form = MachineForm(request.POST)
+        if form.is_valid():
+            form.save()
+    else:
+        form = MachineForm()
+
+    # Fetch all current roles
+    machines = AddMachine.objects.all()
+
+    return render(request, 'machine_list.html', {'form': form, 'machines': machines})
+
+# Delete Company
+def delete_machine(request, machine_id):
+    machine = get_object_or_404(AddMachine, id=machine_id)
+    machine.delete()
+    return redirect('add_machine')  # Redirect back to the list
+
+
+
+# Edit Company
+def edit_amachine(request, machine_id):
+    machine = get_object_or_404(AddMachine, id=machine_id)
+
+    if request.method == 'POST':
+        form = MachineForm(request.POST, instance=machine)
+        if form.is_valid():
+            form.save()
+            return redirect('add_machine')  # Redirect back to the main page
+    else:
+        form = MachineForm(instance=machine)
+
+    return render(request, 'edit_machine.html', {'form': form, 'machine': machine})
+
+
+
 
 # Create your views here.
 def LoadPageDataSheet(request, sheet_key):
@@ -63,24 +105,17 @@ def LoadPageDataSheet(request, sheet_key):
     print(user_company)
 
 
-
-
-    # Define a dictionary mapping sheet keys to their corresponding values
-    sheet_mapping = {
-        "NS": ("formDataSheetNS",               "DataSheetNS",      "Manual Screen"),
-        "MS": ("FDS_MechanicalScreen",          "DataSheetMS",      "Mechanical Screen"),
-        "BC": ("FDS_BeltConveyor",              "DataSheetBC",      "Belt Conveyor"),
-        "CO": ("FDS_Container",                 "DataSheetCO",      "Container"),
-        "GR": ("FDS_GritGreaseRemoval",         "DataSheetGR",      "Gritremoval"),
-        "SS": ("FDS_SandSilo",                  "DataSheetSS",      "Sand Silo"),
-        "PS": ("FDS_PrimarySedimentationTank",  "DataSheetPS",      "Primary Sedimentation Tank"),
-        "QV": ("FDS_QuickValve",                "DataSheetQV",      "Quick Valve"),
-        "TV": ("FDS_TelescopicValve",           "DataSheetTV",      "Telescopic Valve"),
-        "TH": ("FDS_SludgeThickener",           "DataSheetTH",      "Thickener"),
-    }
-
-    # Retrieve values using the dictionary
-    form_type, DB_Name, aMachineName = sheet_mapping.get(sheet_key, ("None", "None", "None"))
+    #Define Retrieve values from AddMachine model
+    try:
+        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        form_type = machine_config.nameForm
+        DB_Name = machine_config.nameDB
+        aMachineName = machine_config.nameMachine
+    except AddMachine.DoesNotExist:
+        form_type = "None"
+        DB_Name = "None"
+        aMachineName = "None"
+        
 
     # Optional: Handle cases where the sheet_key is invalid
     if form_type is None:
@@ -217,23 +252,17 @@ def SavePageDataSheet(request, sheet_key):
             user_company = None
 
 
-    
-    # Define a dictionary mapping sheet keys to their corresponding values
-    sheet_mapping = {
-        "NS": ("formDataSheetNS",               "DataSheetNS",      "Manual Screen"),
-        "MS": ("FDS_MechanicalScreen",          "DataSheetMS",      "Mechanical Screen"),
-        "BC": ("FDS_BeltConveyor",              "DataSheetBC",      "Belt Conveyor"),
-        "CO": ("FDS_Container",                 "DataSheetCO",      "Container"),
-        "GR": ("FDS_GritGreaseRemoval",         "DataSheetGR",      "Gritremoval"),
-        "SS": ("FDS_SandSilo",                  "DataSheetSS",      "Sand Silo"),
-        "PS": ("FDS_PrimarySedimentationTank",  "DataSheetPS",      "Primary Sedimentation Tank"),
-        "QV": ("FDS_QuickValve",                "DataSheetQV",      "Quick Valve"),
-        "TV": ("FDS_TelescopicValve",           "DataSheetTV",      "Telescopic Valve"),
-        "TH": ("FDS_SludgeThickener",           "DataSheetTH",      "Thickener"),
-    }
-
-    # Retrieve values using the dictionary
-    form_type, DB_Name, aMachineName = sheet_mapping.get(sheet_key, ("None", "None", "None"))
+    #Define Retrieve values from AddMachine model
+    try:
+        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        form_type = machine_config.nameForm
+        DB_Name = machine_config.nameDB
+        aMachineName = machine_config.nameMachine
+    except AddMachine.DoesNotExist:
+        form_type = "None"
+        DB_Name = "None"
+        aMachineName = "None"
+        
     
 
 

@@ -2,6 +2,7 @@ from django import forms
 from Apps.aAppCalculation.models import modelcalc
 from .models import FormFieldConfig
 from .models import UserCompany
+from .models import Companies
 #######################################
 
 class FormFieldConfigForm(forms.ModelForm):
@@ -19,7 +20,10 @@ class FormFieldConfigForm(forms.ModelForm):
 
 
 
-
+class CompanyForm(forms.ModelForm):
+    class Meta:
+        model = Companies
+        fields = ['nameCompanies']
 
 
 
@@ -32,21 +36,3 @@ class UserCompanyForm(forms.ModelForm):
 #######################################
 #######################################
 #######################################
-
-
-
-
-#######################################
-#######################################
-#######################################
-
-
-
-
-
-
-
-
-
-
-

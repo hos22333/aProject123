@@ -2,6 +2,7 @@ import pdb
 
 from Apps.aAppProject.models import APP_Project
 from Apps.aAppSubmittal.models import Machine
+from .models import Companies
 from .models import UserCompany
 from .models import aLogEntry
 from .models import FormFieldConfig
@@ -9,6 +10,7 @@ from .models import FormFieldConfig
 
 from .forms import FormFieldConfigForm
 from .forms import UserCompanyForm
+from .forms import CompanyForm
 
 from datetime import datetime
 from Apps.aAdmin.models import UserRole, RoleAutho, Autho
@@ -88,6 +90,45 @@ def delete_config(request, config_id):
 
 ###################################
 ###################################
+# Create Company
+def add_company(request):
+    if request.method == 'POST':
+        form = CompanyForm(request.POST)
+        if form.is_valid():
+            form.save()
+    else:
+        form = CompanyForm()
+
+    # Fetch all current roles
+    companies = Companies.objects.all()
+
+    return render(request, 'add_company.html', {'form': form, 'companies': companies})
+
+# Delete Company
+def delete_company(request, company_id):
+    company = get_object_or_404(Companies, id=company_id)
+    company.delete()
+    return redirect('add_company')  # Redirect back to the list
+
+
+
+# Edit Company
+def edit_company(request, company_id):
+    company = get_object_or_404(Companies, id=company_id)
+
+    if request.method == 'POST':
+        form = CompanyForm(request.POST, instance=company)
+        if form.is_valid():
+            form.save()
+            return redirect('add_company')  # Redirect back to the main page
+    else:
+        form = CompanyForm(instance=company)
+
+    return render(request, 'edit_company.html', {'form': form, 'company': company})
+
+def companies_list(request):
+    companies = Companies.objects.all()  # Fetch all users
+    return render(request, 'companies_list.html', {'companies': companies})
 
 def assign_user_to_company(request):
     if request.method == "POST":
@@ -97,145 +138,17 @@ def assign_user_to_company(request):
             return redirect("assign_user")  # Redirect to a success page
     else:
         form = UserCompanyForm()
+
+    user_companies = UserCompany.objects.all()
     
-    return render(request, "assign_user_to_company.html", {"form": form})
+    return render(request, "assign_user_to_company.html", {"form": form, 'user_companies': user_companies})
+
+def delete_user_company(request, user_company_id):
+    user_company = get_object_or_404(UserCompany, id=user_company_id)
+    if request.method == 'POST':
+        user_company.delete()
+    return redirect('assign_user')  # Redirect back to the assign page
 
 
 ############################
 ############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-############################
-
-
-
-
-
-
-
-###
-###
-
-
-
-
-###
-###
-
-
-
-
-
-
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-#######
-
-
-# Helper function to get the user's company
-
-
-    
-    
-
-
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-
-
-
-
-
-
-####
-
-
-
