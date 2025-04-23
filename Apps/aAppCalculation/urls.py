@@ -65,4 +65,8 @@ urlpatterns = [
     path('PNwa/',                 views.load_pnwa_page, name='PNwa'),
     path('PNwa/submit/',          views.handle_pnwa_form, name='PNwa_submit'), 
     path('generate_pnwa_report/', views.generate_pnwa_report, name='generate_pnwa_report'),
+
+    path("PageCalculationSheet/<str:sheet_key>/", views.LoadPageCalculationSheet, name="PageCalculationSheet"),
+    path('generate_report/<str:sheet_key>/', views.generate_report, name='generate_report'),
+    path('submit/<str:sheet_key>/', views.handle_form, name='submit'),
 ]

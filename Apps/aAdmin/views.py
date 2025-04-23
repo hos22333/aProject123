@@ -10,6 +10,7 @@ from .models import RoleAutho
 from django.contrib.auth.models import User
 from Apps.aAppCalculation.models import modelcalc
 from Apps.aAppSubmittal.models import Machine
+from Apps.aAppSubmittal.models import AddMachine
 from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.decorators import login_required

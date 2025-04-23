@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'Apps.aAppProject',
     'Apps.aAppSubmittal',
     'Apps.aAppCalculation',
+    'Apps.aCalculations',
 ]
 
 MIDDLEWARE = [

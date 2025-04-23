@@ -84,14 +84,6 @@
                     </a>
                   </li>
                   
-                  <li class="nav-item">
-                    <a href="{% url 'add_machine' %}">
-                      <i class="fas fa-book-open"></i>
-                      <p>Machines</p>
-                    </a>
-                  </li>
-
-                  
                   
                   {% endif %}
                   
@@ -253,6 +245,30 @@
                   {% endif %}
                   
                   
+                  <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#submenu_CSS">
+                      <i class="fas fa-book"></i>
+                      <p>Calculatios1</p>
+                      <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="submenu_CSS">
+                      <ul class="nav nav-collapse">
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='NS' %}"> <i class="fas fa-circle"></i> <p>Manual Screen </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='MS' %}"> <i class="fas fa-circle"></i> <p>Mechanical Screen </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='BC' %}"> <i class="fas fa-circle"></i> <p>BeltConveyor </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='GR' %}"> <i class="fas fa-circle"></i> <p>GritGreaseRemoval </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='PS' %}"> <i class="fas fa-circle"></i> <p>PST </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='TH' %}"> <i class="fas fa-circle"></i> <p>SludgeThickener </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='MX' %}"> <i class="fas fa-circle"></i> <p>Rectangular Mixers </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='RT' %}"> <i class="fas fa-circle"></i> <p>Rectangular Tanks </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='CT' %}"> <i class="fas fa-circle"></i> <p>Circular Tanks </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='SC' %}"> <i class="fas fa-circle"></i> <p>Screw Conveyor </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='BS' %}"> <i class="fas fa-circle"></i> <p>Basket screens </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='PNch' %}"> <i class="fas fa-circle"></i> <p>Channel Penstocks </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' sheet_key='PNwa' %}"> <i class="fas fa-circle"></i> <p>Wall Penstocks </p></a></li>
+                      </ul>
+                    </div>
+                  </li>
                   
                   
                   
@@ -337,13 +353,25 @@
                           </div>
                         </li>
                         
-                        {% if permissions.Users %}
                         <li>
                           <a data-bs-toggle="collapse" href="#subadmin4">
-                            <span class="sub-item">Users</span>
+                            <span class="sub-item">Machine</span>
                             <span class="caret"></span>
                           </a>
                           <div class="collapse" id="subadmin4">
+                            <ul class="nav nav-collapse subnav">
+                              <li class="sub-item"><a href="{% url 'add_machine' %}"> <i class="fas fa-arrows-alt"></i> <p>Machines</p></a></li>
+                            </ul>
+                          </div>
+                        </li>
+                        
+                        {% if permissions.Users %}
+                        <li>
+                          <a data-bs-toggle="collapse" href="#subadmin5">
+                            <span class="sub-item">Users</span>
+                            <span class="caret"></span>
+                          </a>
+                          <div class="collapse" id="subadmin5">
                             <ul class="nav nav-collapse subnav">
                               <li class="nav-item"><a href="{% url 'users_list' %}">      <i class="fas fa-arrows-alt"></i><p>Users</p></a></li>
                             </ul>
@@ -353,11 +381,11 @@
                         
                         {% if permissions.Settings %} 
                         <li>
-                          <a data-bs-toggle="collapse" href="#subadmin5">
+                          <a data-bs-toggle="collapse" href="#subadmin6">
                             <span class="sub-item">Settings</span>
                             <span class="caret"></span>
                           </a>
-                          <div class="collapse" id="subadmin5">
+                          <div class="collapse" id="subadmin6">
                             <ul class="nav nav-collapse subnav">
                               <li class="nav-item"><a href="{% url 'list_configs' %}">      <i class="fas fa-arrows-alt"></i><p>Settings</p></a></li>
                             </ul>

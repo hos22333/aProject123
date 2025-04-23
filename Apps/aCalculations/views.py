@@ -405,6 +405,7 @@ def LoadPageCalculationsSheet(request, sheet_key):
             return response
         
         if 'form1_submit' in request.POST:
+            form = form_class(request.POST)
             if form.is_valid():
                 cleaned = form.cleaned_data
                 input_data = {
