@@ -666,25 +666,16 @@ def HandleCalculationSheetForm(request, sheet_key):
 
 def generate_report(request, sheet_key):
     
-    # Define a dictionary mapping sheet keys to their corresponding values
-    sheet_mapping = {
-        "NS": ("formCalcNS",               "CalculationSheetNS",      "Manual Screen"),
-        "MS": ("formCalcMS",          "CalculationSheetMS",      "Mechanical Screen"),
-        "BC": ("formCalcBC",              "CalculationSheetBC",      "Belt Conveyor"),
-        "GR": ("formCalcGR",         "CalculationSheetGR",      "Gritremoval"),
-        "PS": ("formCalcPS",  "CalculationSheetPS",      "Primary Sedimentation Tank"),
-        "TH": ("formCalcTH",           "CalculationSheetTH",      "Thickener"),
-        "MX": ("formCalcMX",           "CalculationSheetMX",      "Rectangular Mixers"),
-        "RT": ("formCalcRT",           "CalculationSheetRT",      "Rectangular Tanks"),
-        "CT": ("formCalcCT",           "CalculationSheetCT",      "Circular Tanks"),
-        "SC": ("formCalcSC",           "CalculationSheetSC",      "Screw Conveyor"),
-        "BS": ("formCalcBS",           "CalculationSheetBS",      "Basket screens"),
-        "PNch": ("formCalcPNch",           "CalculationSheetPNch",      "Channel Penstocks"),
-        "PNwa": ("formCalcPNwa",           "CalculationSheetPNwa",      "Wall Penstocks"),
-    }
-
-    # Retrieve values using the dictionary
-    form_type, DB_Name, aMachineName = sheet_mapping.get(sheet_key, ("None", "None", "None"))
+    #Define Retrieve values from AddMachine model
+    try:
+        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        form_type = machine_config.nameFormCalcXX
+        DB_Name = machine_config.nameDB
+        aMachineName = machine_config.nameMachine
+    except AddMachine.DoesNotExist:
+        form_type = "None"
+        DB_Name = "None"
+        aMachineName = "None"
 
     # Optional: Handle cases where the sheet_key is invalid
     if form_type is None:

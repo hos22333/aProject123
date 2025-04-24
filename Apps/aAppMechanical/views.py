@@ -35,6 +35,9 @@ from django.conf import settings
 ###################################
 ###################################
 
+def configurations(request):
+    return render(request, 'form_config_list.html')
+
 def list_configs(request):
     print("LINE52")
     sort_by = request.GET.get('sort', 'id')  # Default sorting by ID

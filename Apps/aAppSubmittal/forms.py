@@ -16,8 +16,16 @@ class MachineForm(forms.ModelForm):
             'nameFormCalcXX': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Calculation form name'}),
             'nameDB': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter DB name'}),
             'nameMachine': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter machine name'}),
-            'company': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter company name'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Add Bootstrap class to make it large
+        self.fields['company'].widget.attrs.update({'class': 'form-control form-control-lg'})
+        
+        # Add empty label as placeholder
+        self.fields['company'].empty_label = "Select a company..."
 
 
 class FormDataSheet(forms.Form):
