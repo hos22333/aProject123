@@ -9,8 +9,10 @@
             <div class="row">
                 <div class="col-md-4">{{ form.keyValue }}</div>
                 <div class="col-md-4">{{ form.nameForm }}</div>
+                <div class="col-md-4">{{ form.nameFormCalcXX }}</div>
                 <div class="col-md-4">{{ form.nameDB }}</div>
                 <div class="col-md-4">{{ form.nameMachine }}</div>
+                <div class="col-md-4">{{ form.company }}</div>
             </div>
             <button type="submit" class="btn btn-primary mt-2">Save Machine</button>
         </form>
@@ -22,8 +24,10 @@
                     <th>#</th>
                     <th>key Value</th>
                     <th>Form Name</th>
+                    <th>Calculation Form Name</th>
                     <th>DB Name</th>
                     <th>Machine Name</th>
+                    <th>Company Name</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -33,8 +37,10 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ machine.keyValue }}</td>
                         <td>{{ machine.nameForm }}</td>
+                        <td>{{ machine.nameFormCalcXX }}</td>
                         <td>{{ machine.nameDB }}</td>
                         <td>{{ machine.nameMachine }}</td>
+                        <td>{{ machine.company }}</td>
                         <td>
                             <!-- Edit button -->
                             <a href="{% url 'edit_machine' machine.id %}" class="btn btn-warning btn-sm">Edit</a>

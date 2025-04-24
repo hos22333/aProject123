@@ -9,5 +9,4 @@ urlpatterns = [
     path('Project/', include('Apps.aAppProject.urls')),
     path('submittal/', include('Apps.aAppSubmittal.urls')),
     path('Calculation/', include('Apps.aAppCalculation.urls')),
-    path('Calculations/', include('Apps.aCalculations.urls')),
 ]

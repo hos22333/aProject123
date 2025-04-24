@@ -102,1732 +102,6 @@ def interact_with_api(api_url, req_type, input_data):
 ###################################
 
 
-
-def load_ms_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to login page if user is not authenticated
-
-    result = check_user_autho(request.user.username, 'MS')
-    print('#####')
-    print(result)
-    print('######')
-
-
-    form1 = formCalcMS()  # Pass DB values
-
-    return render(request, 'MS.html', {'form1': form1})
-
-def handle_ms_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        form1 = formCalcMS(request.POST)
-        if form1.is_valid():
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
-            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
-            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
-            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
-            oSec01Field09_value = form1.cleaned_data.get('oSec01Field09')
-            oSec01Field10_value = form1.cleaned_data.get('oSec01Field10')
-            oSec01Field11_value = form1.cleaned_data.get('oSec01Field11')
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "MS"  
-            input_data = {
-                "MS_ChannelHeight":     oSec01Field01_value,
-                "MS_ScreenWidth":       oSec01Field02_value,
-                "MS_BeltHeight":        oSec01Field03_value,
-                "MS_WaterLevel":        oSec01Field04_value,
-                "MS_BarSpacing":        oSec01Field05_value,
-                "MS_BarThickness":      oSec01Field06_value,
-                "MS_BarWidth":          oSec01Field07_value,
-                "MS_InclinationDegree": oSec01Field08_value,
-                "MS_SprocketDiameter":  oSec01Field09_value,
-                "MS_Velocity":          oSec01Field10_value,
-                "MS_FOS":               oSec01Field11_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["MS_w"]
-            oSec02Field02_result = response["MS_p"]
-            oSec02Field03_result = response["MS_s"]
-
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1
-            instance.oSec02Field02 = oSec02Field02_result  # Update S2field2
-            instance.oSec02Field03 = oSec02Field03_result  # Update S2field3
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "MS"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcMS(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                'oSec01Field05': oSec01Field05_value,
-                'oSec01Field06': oSec01Field06_value,
-                'oSec01Field07': oSec01Field07_value,
-                'oSec01Field08': oSec01Field08_value,
-                'oSec01Field09': oSec01Field09_value,
-                'oSec01Field10': oSec01Field10_value,
-                'oSec01Field11': oSec01Field11_value,
-                'oSec02Field01': oSec02Field01_result,
-                'oSec02Field02': oSec02Field02_result,
-                'oSec02Field03': oSec02Field03_result,
-            })
-
-            return render(request, 'MS.html', {'form1': form1})
-
-    return redirect('ms_load')  # Redirect to the page if the request is invalid
-
-def generate_ms_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcMS(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Mechanical Screen Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
-                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
-                (form1.fields["oSec01Field07"].label, request.POST.get("oSec01Field07", "N/A")),
-                (form1.fields["oSec01Field08"].label, request.POST.get("oSec01Field08", "N/A")),
-                (form1.fields["oSec01Field09"].label, request.POST.get("oSec01Field09", "N/A")),
-                (form1.fields["oSec01Field10"].label, request.POST.get("oSec01Field10", "N/A")),
-                (form1.fields["oSec01Field11"].label, request.POST.get("oSec01Field11", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Mechanical_Screen_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
-def load_bc_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    result = check_user_autho(request.user.username, 'BC')
-    print('#####')
-    print(result)
-    print('######')
-
-    form1 = formCalcBC()  # Pass DB values
-
-    return render(request, 'BC.html', {'form1': form1})
-
-def handle_bc_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        form1 = formCalcBC(request.POST)
-        if form1.is_valid():
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
-            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
-            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
-
-            # Calculate new values for fields
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "BC"  
-            input_data = {
-                "BC_Length":     oSec01Field01_value,
-                "BC_Width":       oSec01Field02_value,
-                "BC_DrumDia":        oSec01Field03_value,
-                "BC_Friction":        oSec01Field04_value,
-                "BC_Velocity":        oSec01Field05_value,
-                "BC_FOS":      oSec01Field06_value,
-                "BC_Belt_weight_per_meter":      oSec01Field07_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["BC_w"]
-            oSec02Field02_result = response["BC_p"]
-            oSec02Field03_result = response["BC_s"]
-
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1
-            instance.oSec02Field02 = oSec02Field02_result  # Update S2field2
-            instance.oSec02Field03 = oSec02Field03_result  # Update S2field3
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "BC"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcBC(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                'oSec01Field05': oSec01Field05_value,
-                'oSec01Field06': oSec01Field06_value,
-                
-                'oSec02Field01': oSec02Field01_result,
-                'oSec02Field02': oSec02Field02_result,
-                'oSec02Field03': oSec02Field03_result,
-            })
-
-            return render(request, 'BC.html', {'form1': form1})
-    
-    
-    return redirect('bc_load')  # Redirect to the page if the request is invalid
-
-def generate_bc_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcBC(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Belt Conveyor Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
-                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Belt_Conveyor_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
-def load_gr_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    result = check_user_autho(request.user.username, 'GR')
-    print('#####')
-    print(result)
-    print('######')
-
-    form1 = formCalcGR()  # Pass DB values
-
-    return render(request, 'GR.html', {'form1': form1})
-
-def handle_gr_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        form1 = formCalcGR(request.POST)
-        if form1.is_valid():
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
-            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
-            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
-            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
-
-            # Calculate new values for fields
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "GR"  
-            input_data = {
-                "GR_n_channel":     oSec01Field01_value,
-                "GR_channel_width":       oSec01Field02_value,
-                "GR_civil_width":        oSec01Field03_value,
-                "GR_bridge_length":        oSec01Field04_value,
-                "GR_wheel_diameter":        oSec01Field05_value,
-                "GR_Friction":      oSec01Field06_value,
-                "GR_Velocity":      oSec01Field07_value,
-                "GR_FOS":      oSec01Field08_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["GR_out3"]
-            oSec02Field02_result = response["GR_out1"]
-            oSec02Field03_result = response["GR_out2"]
-            oSec02Field04_result = response["GR_out4"]
-            oSec02Field05_result = response["GR_out5"]
-            oSec02Field06_result = response["GR_out6"]
-            
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1
-            instance.oSec02Field02 = oSec02Field02_result  # Update S2field2
-            instance.oSec02Field03 = oSec02Field03_result  # Update S2field3
-            instance.oSec02Field04 = oSec02Field04_result  # Update S2field1
-            instance.oSec02Field05 = oSec02Field05_result  # Update S2field2
-            instance.oSec02Field06 = oSec02Field06_result  # Update S2field3
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "GR"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcGR(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                'oSec01Field05': oSec01Field05_value,
-                'oSec01Field06': oSec01Field06_value,
-                'oSec01Field07': oSec01Field07_value,
-                'oSec01Field08': oSec01Field08_value,
-                
-                'oSec02Field01': oSec02Field01_result,
-                'oSec02Field02': oSec02Field02_result,
-                'oSec02Field03': oSec02Field03_result,
-                'oSec02Field04': oSec02Field04_result,
-                'oSec02Field05': oSec02Field05_result,
-                'oSec02Field06': oSec02Field06_result,
-            })
-
-            return render(request, 'GR.html', {'form1': form1})
-    
-    
-    return redirect('gr_load')  # Redirect to the page if the request is invalid
-
-def generate_gr_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcGR(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Gritremoval Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
-                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
-                (form1.fields["oSec01Field07"].label, request.POST.get("oSec01Field07", "N/A")),
-                (form1.fields["oSec01Field08"].label, request.POST.get("oSec01Field08", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-                (form1.fields["oSec02Field04"].label, request.POST.get("oSec02Field04", "N/A")),
-                (form1.fields["oSec02Field05"].label, request.POST.get("oSec02Field05", "N/A")),
-                (form1.fields["oSec02Field06"].label, request.POST.get("oSec02Field06", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Gritremoval_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
-
-
-def load_ps_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    result = check_user_autho(request.user.username, 'PS')
-    print('#####')
-    print(result)
-    print('######')
-
-    form1 = formCalcPS() 
-    return render(request, 'PS.html', {'form1': form1})
-
-def handle_ps_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        form1 = formCalcPS(request.POST)
-        if form1.is_valid():
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-
-            # Calculate new values for fields
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "PS"  
-            input_data = {
-                "PS_walkway_length":     oSec01Field01_value,
-                "PS_Friction":       oSec01Field02_value,
-                "PS_Velocity":        oSec01Field03_value,
-                "PS_FOS":        oSec01Field04_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["PS_out2"]
-            oSec02Field02_result = response["PS_out1"]
-            oSec02Field03_result = '000'
-            oSec02Field04_result = response["PS_out3"]
-            oSec02Field05_result = response["PS_out4"]
-            
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1
-            instance.oSec02Field02 = oSec02Field02_result  # Update S2field2
-            instance.oSec02Field03 = oSec02Field03_result  # Update S2field3
-            instance.oSec02Field04 = oSec02Field04_result  # Update S2field1
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "PS"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcPS(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                
-                'oSec02Field01': oSec02Field01_result,
-                'oSec02Field02': oSec02Field02_result,
-                'oSec02Field03': oSec02Field03_result,
-                'oSec02Field04': oSec02Field04_result,
-                'oSec02Field05': oSec02Field05_result,
-            })
-
-            return render(request, 'PS.html', {'form1': form1})
-    
-    
-    return redirect('ps_load')  # Redirect to the page if the request is invalid
-
-def generate_ps_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcPS(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('PST Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-                (form1.fields["oSec02Field04"].label, request.POST.get("oSec02Field04", "N/A")),
-                (form1.fields["oSec02Field05"].label, request.POST.get("oSec02Field05", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="PST_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
-def load_th_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    result = check_user_autho(request.user.username, 'TH')
-    print('#####')
-    print(result)
-    print('######')
-
-    form1 = formCalcTH() 
-    
-    return render(request, 'TH.html', {'form1': form1})
-
-def handle_th_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        form1 = formCalcTH(request.POST)
-        if form1.is_valid():
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
-            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
-            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
-            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
-
-            # Calculate new values for fields
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "TH"  
-            input_data = {
-                "TH_diameter":     oSec01Field01_value,
-                "TH_n_arm":       oSec01Field02_value,
-                "TH_Velocity":        oSec01Field03_value,
-                "TH_FOS":        oSec01Field04_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["TH_w"]
-            oSec02Field02_result = response["TH_p"]
-            oSec02Field03_result = response["TH_s"]
-            
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1
-            instance.oSec02Field02 = oSec02Field02_result  # Update S2field1
-            instance.oSec02Field03 = oSec02Field03_result  # Update S2field1
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "TH"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcTH(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                'oSec01Field05': oSec01Field05_value,
-                'oSec01Field06': oSec01Field06_value,
-                'oSec01Field07': oSec01Field07_value,
-                'oSec01Field08': oSec01Field08_value,
-                
-                'oSec02Field01': oSec02Field01_result,
-                'oSec02Field02': oSec02Field02_result,
-                'oSec02Field03': oSec02Field03_result,
-            })
-
-            return render(request, 'TH.html', {'form1': form1})
-    
-    
-    return redirect('th_load')  # Redirect to the page if the request is invalid
-
-def generate_th_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcTH(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Thickener Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-                (form1.fields["oSec02Field04"].label, request.POST.get("oSec02Field04", "N/A")),
-                (form1.fields["oSec02Field05"].label, request.POST.get("oSec02Field05", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Thickener_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
-
-def load_mx_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    result = check_user_autho(request.user.username, 'MX')
-    print('#####')
-    print(result)
-    print('######')
-
-    form1 = formCalcMX()
-    
-    return render(request, 'MX.html', {'form1': form1})
-
-def handle_mx_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        print('qqqqqqqq')
-        form1 = formCalcMX(request.POST)        
-        print('qqqqqqqq')
-        if form1.is_valid():                   
-            print('qqqqqqqq')
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
-            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
-            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
-            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
-                   
-            print('qqqqqqqq')
-
-            # Calculate new values for fields
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "MX"  
-            input_data = {
-                "MX_length":        oSec01Field01_value,
-                "MX_width":         oSec01Field02_value,
-                "MX_water_depth":           oSec01Field03_value,
-                "MX_tank_depth":            oSec01Field04_value,
-                "MX_impeller_coefficient":  oSec01Field05_value,
-                "MX_velocity_gradient":     oSec01Field06_value,
-                "MX_impeller_diameter_factor":  oSec01Field07_value,
-                "MX_safety_factor":             oSec01Field08_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = '000'
-            oSec02Field02_result = response["MX_p"]
-            oSec02Field03_result = response["MX_s"]
-            oSec02Field04_result = response["MX_d"]
-            oSec02Field05_result = response["MX_shaftL"]
-            oSec02Field06_result = response["MX_shaftD"]
-            oSec02Field07_result = response["MX_Type"]
-
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "MX"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcMX(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                'oSec01Field05': oSec01Field05_value,
-                'oSec01Field06': oSec01Field06_value,
-                'oSec01Field07': oSec01Field07_value,
-                'oSec01Field08': oSec01Field08_value,
-                
-                'oSec02Field01': oSec02Field01_result,
-                'oSec02Field02': oSec02Field02_result,
-                'oSec02Field03': oSec02Field03_result,
-                'oSec02Field04': oSec02Field04_result,
-                'oSec02Field05': oSec02Field05_result,
-                'oSec02Field06': oSec02Field06_result,
-                'oSec02Field07': oSec02Field07_result,
-            })
-
-            return render(request, 'MX.html', {'form1': form1})
-    
-    
-    return redirect('mx_load')  # Redirect to the page if the request is invalid
-
-def generate_mx_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcMX(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Mixer Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
-                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
-                (form1.fields["oSec01Field07"].label, request.POST.get("oSec01Field07", "N/A")),
-                (form1.fields["oSec01Field08"].label, request.POST.get("oSec01Field08", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-                (form1.fields["oSec02Field04"].label, request.POST.get("oSec02Field04", "N/A")),
-                (form1.fields["oSec02Field05"].label, request.POST.get("oSec02Field05", "N/A")),
-                (form1.fields["oSec02Field06"].label, request.POST.get("oSec02Field06", "N/A")),
-                (form1.fields["oSec02Field07"].label, request.POST.get("oSec02Field07", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Mixer_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
-
-def load_rt_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    result = check_user_autho(request.user.username, 'RT')
-    print('#####')
-    print(result)
-    print('######')
-
-    form1 = formCalcRT()  
-    
-    return render(request, 'RT.html', {'form1': form1})
-
-def handle_rt_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        form1 = formCalcRT(request.POST)
-        if form1.is_valid():
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
-            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
-            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
-            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
-
-            # Calculate new values for fields
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "RT"  
-            input_data = {
-                "RT_Length":        oSec01Field01_value,
-                "RT_Width":         oSec01Field02_value,
-                "RT_Hight":           oSec01Field03_value,
-                "RT_ShellTH":            oSec01Field04_value,
-                "RT_BaseTH":    oSec01Field05_value,
-                "RT_N_Spliter":     oSec01Field06_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["RT_w10"]
-
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "RT"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcRT(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                'oSec01Field05': oSec01Field05_value,
-                'oSec01Field06': oSec01Field06_value,
-                'oSec01Field07': oSec01Field07_value,
-                'oSec01Field08': oSec01Field08_value,
-                
-                'oSec02Field01': oSec02Field01_result,
-            })
-
-            return render(request, 'RT.html', {'form1': form1})
-    
-    
-    return redirect('rt_load')  # Redirect to the page if the request is invalid
-
-def generate_rt_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcRT(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Rect Tanks Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
-                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Rect_Tank_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
-
-def load_ct_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    result = check_user_autho(request.user.username, 'CT')
-    print('#####')
-    print(result)
-    print('######')
-
-    form1 = formCalcCT()  
-    
-    return render(request, 'PageCT.html', {'form1': form1})
-
-def handle_ct_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        print("111")
-        form1 = formCalcCT(request.POST)
-        if form1.is_valid():
-            print("222")
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-
-            # Calculate new values for fields
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "CT"  
-            input_data = {
-                "CT_Diameter":        oSec01Field01_value,
-                "CT_Height":         oSec01Field02_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["O_Tank_Weight"]
-            oSec02Field02_result = response["O_Tank_Volume"]
-            oSec02Field03_result = response["O_Tank_Shell_Th"]
-            oSec02Field04_result = response["O_Tank_Base_Th"]
-            oSec02Field05_result = response["O_Tank_Shell_Weight"]
-            oSec02Field06_result = response["O_Tank_Base_Weight"]
-            oSec02Field07_result = response["O_Tank_Base_UPN_Weight"]
-            oSec02Field08_result = response["O_Tank_Cover_Weight"]
-
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1
-            instance.oSec02Field02 = oSec02Field02_result  # Update S2field1
-            instance.oSec02Field03 = oSec02Field03_result  # Update S2field1
-            instance.oSec02Field04 = oSec02Field04_result  # Update S2field1
-            instance.oSec02Field05 = oSec02Field05_result  # Update S2field1
-            instance.oSec02Field06 = oSec02Field06_result  # Update S2field1
-            instance.oSec02Field07 = oSec02Field07_result  # Update S2field1
-            instance.oSec02Field08 = oSec02Field08_result  # Update S2field1
-            
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "CT"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcCT(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                
-                'oSec02Field01': oSec02Field01_result,
-                'oSec02Field02': oSec02Field02_result,
-                'oSec02Field03': oSec02Field03_result,
-                'oSec02Field04': oSec02Field04_result,
-                'oSec02Field05': oSec02Field05_result,
-                'oSec02Field06': oSec02Field06_result,
-                'oSec02Field07': oSec02Field07_result,
-                'oSec02Field08': oSec02Field08_result,
-            })
-
-            return render(request, 'PageCT.html', {'form1': form1})
-    
-    
-    return redirect('ct_load')  # Redirect to the page if the request is invalid
-
-def generate_ct_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcCT(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Circular Tanks Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-                (form1.fields["oSec02Field04"].label, request.POST.get("oSec02Field04", "N/A")),
-                (form1.fields["oSec02Field05"].label, request.POST.get("oSec02Field05", "N/A")),
-                (form1.fields["oSec02Field06"].label, request.POST.get("oSec02Field06", "N/A")),
-                (form1.fields["oSec02Field07"].label, request.POST.get("oSec02Field07", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Circular_Tank_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-  
-    
-    
-    
-    
-
-def load_sc_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    result = check_user_autho(request.user.username, 'SC')
-    print('#####')
-    print(result)
-    print('######')
-
-    form1 = formCalcSC()  # Pass DB values
-    
-    return render(request, 'PageSC.html', {'form1': form1})
-
-def handle_sc_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        form1 = formCalcSC(request.POST)
-        if form1.is_valid():
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
-            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
-            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
-            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "SC"  
-            input_data = {
-                "aInput01":     oSec01Field01_value,
-                "aInput02":     oSec01Field02_value,
-                "aInput03":     oSec01Field03_value,
-                "aInput04":     oSec01Field04_value,
-                "aInput05":     oSec01Field05_value,
-                "aInput06":     oSec01Field06_value,
-                "aInput07":     oSec01Field07_value,
-                "aInput08":     oSec01Field08_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["Pitch"]
-            oSec02Field02_result = response["SpeedRPM"]
-            oSec02Field03_result = response["MotorPower"]
-            oSec02Field04_result = response["ScrewWeight"]
-            oSec02Field05_result = response["FrameWeight"]
-            oSec02Field06_result = "1111"
-
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1
-            instance.oSec02Field02 = oSec02Field02_result  # Update S2field1
-            instance.oSec02Field03 = oSec02Field03_result  # Update S2field1
-            instance.oSec02Field04 = oSec02Field04_result  # Update S2field1
-            instance.oSec02Field05 = oSec02Field05_result  # Update S2field1
-            instance.oSec02Field06 = oSec02Field06_result  # Update S2field1
-            
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "SC"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcSC(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                
-                'oSec02Field01': oSec02Field01_result,
-                'oSec02Field02': oSec02Field02_result,
-                'oSec02Field03': oSec02Field03_result,
-                'oSec02Field04': oSec02Field04_result,
-                'oSec02Field05': oSec02Field05_result,
-                'oSec02Field06': oSec02Field06_result,
-            })
-
-            return render(request, 'PageSC.html', {'form1': form1})
-    
-    
-    return redirect('sc_load')  # Redirect to the page if the request is invalid
-
-def generate_sc_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcCT(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Circular Tanks Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-                (form1.fields["oSec02Field04"].label, request.POST.get("oSec02Field04", "N/A")),
-                (form1.fields["oSec02Field05"].label, request.POST.get("oSec02Field05", "N/A")),
-                (form1.fields["oSec02Field06"].label, request.POST.get("oSec02Field06", "N/A")),
-                (form1.fields["oSec02Field07"].label, request.POST.get("oSec02Field07", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Circular_Tank_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
-
-def load_bs_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to login page if user is not authenticated
-
-    result = check_user_autho(request.user.username, 'BS')
-    print('#####')
-    print(result)
-    print('######')
-
-    form1 = formCalcBS()  # Pass DB values
-
-    return render(request, 'PageBS.html', {'form1': form1})
-
-def handle_bs_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        form1 = formCalcBS(request.POST)
-        if form1.is_valid():
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
-            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "BS"  
-            input_data = {
-                "BS_Bar_Dia":     oSec01Field01_value,
-                "BS_Bar_Space":       oSec01Field02_value,
-                "BS_Screen_Height":        oSec01Field03_value,
-                "BS_Screen_Width":        oSec01Field04_value,
-                "BS_Screen_Depth":        oSec01Field05_value,
-                "BS_Plate_Th":      oSec01Field06_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["O_Weight_allBars"]
-            oSec02Field02_result = response["O_Plate_weight"]
-            oSec02Field03_result = response["O_Total_weight"]
-
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1
-            instance.oSec02Field02 = oSec02Field02_result  # Update S2field2
-            instance.oSec02Field03 = oSec02Field03_result  # Update S2field3
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "BS"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcBS(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                'oSec01Field05': oSec01Field05_value,
-                'oSec01Field06': oSec01Field06_value,
-
-                'oSec02Field01': oSec02Field01_result,
-                'oSec02Field02': oSec02Field02_result,
-                'oSec02Field03': oSec02Field03_result,
-            })
-
-            return render(request, 'PageBS.html', {'form1': form1})
-
-    return redirect('ms_load')  # Redirect to the page if the request is invalid
-
-def generate_bs_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcBS(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Basket Screen Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
-                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Basket_Screen_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
-
-
-def load_ns_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to login page if user is not authenticated
-
-    result = check_user_autho(request.user.username, 'BS')
-    print('#####')
-    print(result)
-    print('######')
-
-    form1 = formCalcNS()  # Pass DB values
-
-    return render(request, 'PageNS.html', {'form1': form1})
-
-def handle_ns_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    
-    print("Line 1866")
-
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        
-        print("Line 1871")
-        
-        form1 = formCalcNS(request.POST)
-        
-        print("Line 1875")
-
-        if form1.is_valid():
-            
-            print("Line 1879")
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
-            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
-            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
-            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "NS"  
-            input_data = {
-                "NS_Ch_Height":         oSec01Field01_value,
-                "NS_Ch_Width":          oSec01Field02_value,
-                "NS_WaterLv":           oSec01Field03_value,
-                "NS_WaterLv_Margin":    oSec01Field04_value,
-                "NS_Bar_Spacing":       oSec01Field05_value,
-                "NS_Bar_Th":            oSec01Field06_value,
-                "NS_Bar_Width":         oSec01Field07_value,
-                "NS_Angle":             oSec01Field08_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["O_Weight"]
-
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result  # Update S2field1            
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "NS"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcNS(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                'oSec01Field05': oSec01Field05_value,
-                'oSec01Field06': oSec01Field06_value,
-                'oSec01Field07': oSec01Field07_value,
-                'oSec01Field08': oSec01Field08_value,
-
-                'oSec02Field01': oSec02Field01_result,
-            })
-
-            return render(request, 'PageNS.html', {'form1': form1})
-
-    return redirect('ms_load')  # Redirect to the page if the request is invalid
-
-def generate_ns_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcNS(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Manual Screen Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
-                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
-                (form1.fields["oSec01Field07"].label, request.POST.get("oSec01Field07", "N/A")),
-                (form1.fields["oSec01Field08"].label, request.POST.get("oSec01Field08", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Manual_Screen_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
-
-
-def load_pnch_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to login page if user is not authenticated
-
-    result = check_user_autho(request.user.username, 'PNch')
-    print('#####')
-    print(result)
-    print('######')
-
-    # Fetch initial values from DB
-
-    form1 = formCalcPNch()  # Pass DB values
-
-    return render(request, 'PagePNch.html', {'form1': form1})
-
-def handle_pnch_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    
-    print("aaa")
-
-
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-        
-        print("aaa")
-        
-        form1 = formCalcPNch(request.POST)
-        if form1.is_valid():
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
-            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
-            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
-            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
-            oSec01Field09_value = form1.cleaned_data.get('oSec01Field09')
-            oSec01Field10_value = form1.cleaned_data.get('oSec01Field10')
-            
-            
-            print(oSec01Field08_value)
-            print(oSec01Field09_value)
-            print(oSec01Field10_value)
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "PNch"  
-            input_data = {
-                "PNch_Channel_Height":              oSec01Field01_value,
-                "PNch_Frame_Height_Over_Channel":   oSec01Field02_value,
-                "PNch_Channel_Width":               oSec01Field03_value,
-                "PNch_Gate_Margin_Width":           oSec01Field04_value,
-                "PNch_Water_Lv":                    oSec01Field05_value,
-                "PNch_Gate_Margin_Over_Water_Lv":   oSec01Field06_value,
-                "PNch_Gate_Th":                     oSec01Field07_value,
-                "PNch_Gate_Other_PLs":              oSec01Field08_value,
-                "PNch_HeadStock":                   oSec01Field09_value,
-                "PNch_Frame_Weight_Per_M":          oSec01Field10_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["O_Frame_Perimeter"]
-            oSec02Field02_result = response["O_Frame_Weight"]
-            oSec02Field03_result = response["O_Gate_PL_Weight"]
-            oSec02Field04_result = response["O_Gate_Stiffener_N"]
-            oSec02Field05_result = response["O_Gate_Stiffener_Weight"]
-            oSec02Field06_result = response["O_Gate_Weight"]
-            oSec02Field07_result = response["O_Total_Weight"]
-
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result      
-            instance.oSec02Field02 = oSec02Field02_result        
-            instance.oSec02Field03 = oSec02Field03_result      
-            instance.oSec02Field04 = oSec02Field04_result        
-            instance.oSec02Field05 = oSec02Field05_result       
-            instance.oSec02Field06 = oSec02Field06_result         
-            instance.oSec02Field07 = oSec02Field07_result            
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "PNch"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcPNch(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                'oSec01Field05': oSec01Field05_value,
-                'oSec01Field06': oSec01Field06_value,
-                'oSec01Field07': oSec01Field07_value,
-                'oSec01Field08': oSec01Field08_value,
-                'oSec01Field09': oSec01Field09_value,
-                'oSec01Field10': oSec01Field10_value,
-
-                'oSec02Field01': oSec02Field01_result,
-                'oSec02Field02': oSec02Field02_result,
-                'oSec02Field03': oSec02Field03_result,
-                'oSec02Field04': oSec02Field04_result,
-                'oSec02Field05': oSec02Field05_result,
-                'oSec02Field06': oSec02Field06_result,
-                'oSec02Field07': oSec02Field07_result,
-            })
-            
-            print(oSec01Field08_value)
-            print(oSec01Field09_value)
-            print(oSec01Field10_value)
-
-            return render(request, 'PagePNch.html', {'form1': form1})
-
-    return redirect('ms_load')  # Redirect to the page if the request is invalid
-
-def generate_pnch_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcPNch(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Channel Penstock Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
-                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-                (form1.fields["oSec02Field04"].label, request.POST.get("oSec02Field04", "N/A")),
-                (form1.fields["oSec02Field05"].label, request.POST.get("oSec02Field05", "N/A")),
-                (form1.fields["oSec02Field06"].label, request.POST.get("oSec02Field06", "N/A")),
-                (form1.fields["oSec02Field07"].label, request.POST.get("oSec02Field07", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Channel_Penstock_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
-
-def load_pnwa_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to login page if user is not authenticated
-
-    result = check_user_autho(request.user.username, 'PNch')
-    print('#####')
-    print(result)
-    print('######')
-
-
-    form1 = formCalcPNwa()  
-
-    return render(request, 'PagePNwa.html', {'form1': form1})
-
-def handle_pnwa_form(request):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-
-    print("aaa")
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-                
-        print("aaa")
-        
-        form1 = formCalcPNwa(request.POST)
-        if form1.is_valid():
-            
-            print("form is valid")
-            # Access the cleaned_data dictionary to get individual field values
-            oSec01Field01_value = form1.cleaned_data.get('oSec01Field01')
-            oSec01Field02_value = form1.cleaned_data.get('oSec01Field02')
-            oSec01Field03_value = form1.cleaned_data.get('oSec01Field03')
-            oSec01Field04_value = form1.cleaned_data.get('oSec01Field04')
-            oSec01Field05_value = form1.cleaned_data.get('oSec01Field05')
-            oSec01Field06_value = form1.cleaned_data.get('oSec01Field06')
-            oSec01Field07_value = form1.cleaned_data.get('oSec01Field07')
-            oSec01Field08_value = form1.cleaned_data.get('oSec01Field08')
-            oSec01Field09_value = form1.cleaned_data.get('oSec01Field09')
-            oSec01Field10_value = form1.cleaned_data.get('oSec01Field10')
-            
-
-            # Calculate new values for fields            
-            api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-            req_type = "PNwa"  
-            input_data = {
-                "aInput01":   oSec01Field01_value,
-                "aInput02":   oSec01Field02_value,
-                "aInput03":   oSec01Field03_value,
-                "aInput04":   oSec01Field04_value,
-                "aInput05":   oSec01Field05_value,
-                "aInput06":   oSec01Field06_value,
-                "aInput07":   oSec01Field07_value,
-                "aInput08":   oSec01Field08_value,
-                "aInput09":   oSec01Field09_value,
-                "aInput10":   oSec01Field10_value,
-            }
-
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, req_type, input_data)
-            
-            oSec02Field01_result = response["O_PNwa_Out01"]
-            oSec02Field02_result = response["O_PNwa_Out02"]
-            oSec02Field03_result = response["O_PNwa_Out03"]
-            oSec02Field04_result = response["O_PNwa_Out04"]
-            oSec02Field05_result = response["O_PNwa_Out05"]
-            oSec02Field06_result = response["O_PNwa_Out06"]
-            oSec02Field07_result = response["O_PNwa_Out07"]
-
-            # Save the form with updated values
-            instance = form1.save(commit=False)  # Do not save to the database yet
-            instance.oSec02Field01 = oSec02Field01_result      
-            instance.oSec02Field02 = oSec02Field02_result        
-            instance.oSec02Field03 = oSec02Field03_result      
-            instance.oSec02Field04 = oSec02Field04_result        
-            instance.oSec02Field05 = oSec02Field05_result       
-            instance.oSec02Field06 = oSec02Field06_result         
-            instance.oSec02Field07 = oSec02Field07_result  
-                      
-            instance.oSec00Field01 = request.user.username  # Insert username
-            instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Insert current time
-            instance.oSec00Field03 = "PNwa"  # Insert fixed type
-            instance.save()  # Save to the database
-
-            # Refresh the form with initial values to display results
-            form1 = formCalcPNwa(initial={
-                'oSec01Field01': oSec01Field01_value,
-                'oSec01Field02': oSec01Field02_value,
-                'oSec01Field03': oSec01Field03_value,
-                'oSec01Field04': oSec01Field04_value,
-                'oSec01Field05': oSec01Field05_value,
-                'oSec01Field06': oSec01Field06_value,
-                'oSec01Field07': oSec01Field07_value,
-                'oSec01Field08': oSec01Field08_value,
-                'oSec01Field09': oSec01Field09_value,
-                'oSec01Field10': oSec01Field10_value,
-
-                'oSec02Field01': oSec02Field01_result,
-                'oSec02Field02': oSec02Field02_result,
-                'oSec02Field03': oSec02Field03_result,
-                'oSec02Field04': oSec02Field04_result,
-                'oSec02Field05': oSec02Field05_result,
-                'oSec02Field06': oSec02Field06_result,
-                'oSec02Field07': oSec02Field07_result,
-            })
-                        
-            return render(request, 'PagePNwa.html', {'form1': form1})
-
-    return redirect('ms_load')  # Redirect to the page if the request is invalid
-
-def generate_pnwa_report(request):
-    
-    if request.method == "POST":
-        form1 = formCalcPNwa(request.POST)
-        # Create a new Word document
-        doc = Document()
-        doc.add_heading('Wall Penstock Report', level=1)
-
-        # Extract form data
-        form_data = {
-            "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
-                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
-                (form1.fields["oSec01Field07"].label, request.POST.get("oSec01Field07", "N/A")),
-                (form1.fields["oSec01Field08"].label, request.POST.get("oSec01Field08", "N/A")),
-                (form1.fields["oSec01Field09"].label, request.POST.get("oSec01Field09", "N/A")),
-                (form1.fields["oSec01Field10"].label, request.POST.get("oSec01Field10", "N/A")),
-            ],
-            "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-                (form1.fields["oSec02Field04"].label, request.POST.get("oSec02Field04", "N/A")),
-                (form1.fields["oSec02Field05"].label, request.POST.get("oSec02Field05", "N/A")),
-                (form1.fields["oSec02Field06"].label, request.POST.get("oSec02Field06", "N/A")),
-                (form1.fields["oSec02Field07"].label, request.POST.get("oSec02Field07", "N/A")),
-            ]
-        }
-
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
-            for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
-
-        # Prepare the response to download the document
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename="Wall_Penstock_Report.docx"'
-        doc.save(response)
-        return response
-
-    return HttpResponse("Invalid request", status=400)
-
-
-
 def LoadPageCalculationSheet(request, sheet_key):
     #pdb.set_trace()
     print(sheet_key)
@@ -1851,26 +125,18 @@ def LoadPageCalculationSheet(request, sheet_key):
     )
     
 
+    #Define Retrieve values from AddMachine model
+    try:
+        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        form_type = machine_config.nameFormCalcXX
+        DB_Name = machine_config.nameDB
+        aMachineName = machine_config.nameMachine
+    except AddMachine.DoesNotExist:
+        form_type = "None"
+        DB_Name = "None"
+        aMachineName = "None"
+        
 
-    # Define a dictionary mapping sheet keys to their corresponding values
-    sheet_mapping = {
-        "NS": ("formCalcNS",               "CalculationSheetNS",      "Manual Screen"),
-        "MS": ("formCalcMS",          "CalculationSheetMS",      "Mechanical Screen"),
-        "BC": ("formCalcBC",              "CalculationSheetBC",      "Belt Conveyor"),
-        "GR": ("formCalcGR",         "CalculationSheetGR",      "Gritremoval"),
-        "PS": ("formCalcPS",  "CalculationSheetPS",      "Primary Sedimentation Tank"),
-        "TH": ("formCalcTH",           "CalculationSheetTH",      "Thickener"),
-        "MX": ("formCalcMX",           "CalculationSheetMX",      "Rectangular Mixers"),
-        "RT": ("formCalcRT",           "CalculationSheetRT",      "Rectangular Tanks"),
-        "CT": ("formCalcCT",           "CalculationSheetCT",      "Circular Tanks"),
-        "SC": ("formCalcSC",           "CalculationSheetSC",      "Screw Conveyor"),
-        "BS": ("formCalcBS",           "CalculationSheetBS",      "Basket screens"),
-        "PNch": ("formCalcPNch",           "CalculationSheetPNch",      "Channel Penstocks"),
-        "PNwa": ("formCalcPNwa",           "CalculationSheetPNwa",      "Wall Penstocks"),
-    }
-
-    # Retrieve values using the dictionary
-    form_type, DB_Name, aMachineName = sheet_mapping.get(sheet_key, ("None", "None", "None"))
 
     # Optional: Handle cases where the sheet_key is invalid
     if form_type is None:
@@ -1883,343 +149,519 @@ def LoadPageCalculationSheet(request, sheet_key):
     
     print(f"Initial value for oSec01Field02: {form.fields['oSec01Field02'].initial}")
     
+    # Initialize all section variables
+    aSection01Field01Show = "Yes"
+    aSection01Field02Show = "Yes"
+    aSection01Field03Show = "Yes"
+    aSection01Field04Show = "Yes"
+    aSection01Field05Show = "Yes"
+    aSection01Field06Show = "Yes"
+    aSection01Field07Show = "Yes"
+    aSection01Field08Show = "Yes"
+    aSection01Field09Show = "Yes"
+    aSection01Field10Show = "Yes"
+    aSection01Field11Show = "Yes"
+    aSection01Field12Show = "Yes"
+    aSection01Field13Show = "Yes"
+    aSection01Field14Show = "Yes"
+    aSection01Field15Show = "Yes"
+    aSection01Field16Show = "Yes"
+    aSection01Field17Show = "Yes"
+    aSection01Field18Show = "Yes"
+    aSection01Field19Show = "Yes"
+    aSection01Field20Show = "Yes"
+    aSection02Field01Show = "Yes"
+    aSection02Field02Show = "Yes"
+    aSection02Field03Show = "Yes"
+    aSection02Field04Show = "Yes"
+    aSection02Field05Show = "Yes"
+    aSection02Field06Show = "Yes"
+    aSection02Field07Show = "Yes"
+    aSection02Field08Show = "Yes"
+    aSection02Field09Show = "Yes"
+    aSection02Field10Show = "Yes"
+    aSection02Field11Show = "Yes"
+    aSection02Field12Show = "Yes"
+    aSection02Field13Show = "Yes"
+    aSection02Field14Show = "Yes"
+    aSection02Field15Show = "Yes"
+    aSection02Field16Show = "Yes"
+    aSection02Field17Show = "Yes"
+    aSection02Field18Show = "Yes"
+    aSection02Field19Show = "Yes"
+    aSection02Field20Show = "Yes"
     
+    print(form.fields['oSec01Field01'].initial)
+    print(form.fields['oSec01Field02'].initial)
+    print(form.fields['oSec01Field03'].initial)
+    print(form.fields['oSec01Field04'].initial)
+    print(form.fields['oSec01Field05'].initial)
+    print(form.fields['oSec01Field06'].initial)
+    print(form.fields['oSec01Field07'].initial)
+    print(form.fields['oSec01Field08'].initial)
+    print(form.fields['oSec01Field09'].initial)
+    print(form.fields['oSec01Field10'].initial)
+    print(form.fields['oSec01Field11'].initial)
+    print(form.fields['oSec01Field12'].initial)
+    print(form.fields['oSec01Field13'].initial)
+    print(form.fields['oSec01Field14'].initial)
+    print(form.fields['oSec01Field15'].initial)
+    print(form.fields['oSec01Field16'].initial)
+    print(form.fields['oSec01Field17'].initial)
+    print(form.fields['oSec01Field18'].initial)
+    print(form.fields['oSec01Field19'].initial)
+    print(form.fields['oSec01Field20'].initial)
+    print(form.fields['oSec02Field01'].initial)
+    print(form.fields['oSec02Field02'].initial)
+    print(form.fields['oSec02Field03'].initial)
+    print(form.fields['oSec02Field04'].initial)
+    print(form.fields['oSec02Field05'].initial)
+    print(form.fields['oSec02Field06'].initial)
+    print(form.fields['oSec02Field07'].initial)
+    print(form.fields['oSec02Field08'].initial)
+    print(form.fields['oSec02Field09'].initial)
+    print(form.fields['oSec02Field10'].initial)
+    print(form.fields['oSec02Field11'].initial)
+    print(form.fields['oSec02Field12'].initial)
+    print(form.fields['oSec02Field13'].initial)
+    print(form.fields['oSec02Field14'].initial)
+    print(form.fields['oSec02Field15'].initial)
+    print(form.fields['oSec02Field16'].initial)
+    print(form.fields['oSec02Field17'].initial)
+    print(form.fields['oSec02Field18'].initial)
+    print(form.fields['oSec02Field19'].initial)
+    print(form.fields['oSec02Field20'].initial)
+
+    # Apply conditions to modify the values
+    if form.fields['oSec01Field01'].initial in ["oooo", None , ""]:
+        aSection01Field01Show = "Hide"
+    if form.fields['oSec01Field02'].initial in ["oooo", None , ""]:
+        aSection01Field02Show = "Hide"
+    if form.fields['oSec01Field03'].initial in ["oooo", None , ""]:
+        aSection01Field03Show = "Hide"
+    if form.fields['oSec01Field04'].initial in ["oooo", None , ""]:
+        aSection01Field04Show = "Hide"
+    if form.fields['oSec01Field05'].initial in ["oooo", None , ""]:
+        aSection01Field05Show = "Hide"
+    if form.fields['oSec01Field06'].initial in ["oooo", None , ""]:
+        aSection01Field06Show = "Hide"
+    if form.fields['oSec01Field07'].initial in ["oooo", None , ""]:
+        aSection01Field07Show = "Hide"
+    if form.fields['oSec01Field08'].initial in ["oooo", None , ""]:
+        aSection01Field08Show = "Hide"
+    if form.fields['oSec01Field09'].initial in ["oooo", None , ""]:
+        aSection01Field09Show = "Hide"
+    if form.fields['oSec01Field10'].initial in ["oooo", None , ""]:
+        aSection01Field10Show = "Hide"
+    if form.fields['oSec01Field11'].initial in ["oooo", None , ""]:
+        aSection01Field11Show = "Hide"
+    if form.fields['oSec01Field12'].initial in ["oooo", None , ""]:
+        aSection01Field12Show = "Hide"
+    if form.fields['oSec01Field13'].initial in ["oooo", None , ""]:
+        aSection01Field13Show = "Hide"
+    if form.fields['oSec01Field14'].initial in ["oooo", None , ""]:
+        aSection01Field14Show = "Hide"
+    if form.fields['oSec01Field15'].initial in ["oooo", None , ""]:
+        aSection01Field15Show = "Hide"
+    if form.fields['oSec01Field16'].initial in ["oooo", None , ""]:
+        aSection01Field16Show = "Hide"
+    if form.fields['oSec01Field17'].initial in ["oooo", None , ""]:
+        aSection01Field17Show = "Hide"
+    if form.fields['oSec01Field18'].initial in ["oooo", None , ""]:
+        aSection01Field18Show = "Hide"
+    if form.fields['oSec01Field19'].initial in ["oooo", None , ""]:
+        aSection01Field19Show = "Hide"
+    if form.fields['oSec01Field20'].initial in ["oooo", None , ""]:
+        aSection01Field20Show = "Hide"
+
+    if form.fields['oSec02Field01'].initial in ["oooo", None , ""]:
+        aSection02Field01Show = "Hide"
+    if form.fields['oSec02Field02'].initial in ["oooo", None , ""]:
+        aSection02Field02Show = "Hide"
+    if form.fields['oSec02Field03'].initial in ["oooo", None , ""]:
+        aSection02Field03Show = "Hide"
+    if form.fields['oSec02Field04'].initial in ["oooo", None , ""]:
+        aSection02Field04Show = "Hide"
+    if form.fields['oSec02Field05'].initial in ["oooo", None , ""]:
+        aSection02Field05Show = "Hide"
+    if form.fields['oSec02Field06'].initial in ["oooo", None , ""]:
+        aSection02Field06Show = "Hide"
+    if form.fields['oSec02Field07'].initial in ["oooo", None , ""]:
+        aSection02Field07Show = "Hide"
+    if form.fields['oSec02Field08'].initial in ["oooo", None , ""]:
+        aSection02Field08Show = "Hide"
+    if form.fields['oSec02Field09'].initial in ["oooo", None , ""]:
+        aSection02Field09Show = "Hide"
+    if form.fields['oSec02Field10'].initial in ["oooo", None , ""]:
+        aSection02Field10Show = "Hide"
+    if form.fields['oSec02Field11'].initial in ["oooo", None , ""]:
+        aSection02Field11Show = "Hide"
+    if form.fields['oSec02Field12'].initial in ["oooo", None , ""]:
+        aSection02Field12Show = "Hide"
+    if form.fields['oSec02Field13'].initial in ["oooo", None , ""]:
+        aSection02Field13Show = "Hide"
+    if form.fields['oSec01Field14'].initial in ["oooo", None , ""]:
+        aSection02Field14Show = "Hide"
+    if form.fields['oSec02Field15'].initial in ["oooo", None , ""]:
+        aSection02Field15Show = "Hide"
+    if form.fields['oSec02Field16'].initial in ["oooo", None , ""]:
+        aSection02Field16Show = "Hide"
+    if form.fields['oSec02Field17'].initial in ["oooo", None , ""]:
+        aSection02Field17Show = "Hide"
+    if form.fields['oSec02Field18'].initial in ["oooo", None , ""]:
+        aSection02Field18Show = "Hide"
+    if form.fields['oSec02Field19'].initial in ["oooo", None , ""]:
+        aSection02Field19Show = "Hide"
+    if form.fields['oSec02Field20'].initial in ["oooo", None , ""]:
+        aSection02Field20Show = "Hide"
+    
+    print(aSection01Field01Show)
+    print(aSection01Field02Show)
+    print(aSection01Field03Show)
+    print(aSection01Field04Show)
+    print(aSection01Field05Show)
+    print(aSection01Field06Show)
+    print(aSection01Field07Show)
+    print(aSection01Field08Show)
+    print(aSection01Field09Show)
+    print(aSection01Field10Show)
+    print(aSection01Field11Show)
+    print(aSection01Field12Show)
+    print(aSection01Field13Show)
+    print(aSection01Field14Show)
+    print(aSection01Field15Show)
+    print(aSection01Field16Show)
+    print(aSection01Field17Show)
+    print(aSection01Field18Show)
+    print(aSection01Field19Show)
+    print(aSection01Field20Show)
+    print(aSection02Field01Show)
+    print(aSection02Field02Show)
+    print(aSection02Field03Show)
+    print(aSection02Field04Show)
+    print(aSection02Field05Show)
+    print(aSection02Field06Show)
+    print(aSection02Field07Show)
+    print(aSection02Field08Show)
+    print(aSection02Field09Show)
+    print(aSection02Field10Show)
+    print(aSection02Field11Show)
+    print(aSection02Field12Show)
+    print(aSection02Field13Show)
+    print(aSection02Field14Show)
+    print(aSection02Field15Show)
+    print(aSection02Field16Show)
+    print(aSection02Field17Show)
+    print(aSection02Field18Show)
+    print(aSection02Field19Show)
+    print(aSection02Field20Show)
     
 
     return render(request, "PageCalculationSheet.html", {
     "form": form,
     "aMachineName": aMachineName,  
     "sheet_key": sheet_key,
+    "aSection01Field01Show": aSection01Field01Show,
+    "aSection01Field02Show": aSection01Field02Show,
+    "aSection01Field03Show": aSection01Field03Show,
+    "aSection01Field04Show": aSection01Field04Show,
+    "aSection01Field05Show": aSection01Field05Show,
+    "aSection01Field06Show": aSection01Field06Show,
+    "aSection01Field07Show": aSection01Field07Show,
+    "aSection01Field08Show": aSection01Field08Show,
+    "aSection01Field09Show": aSection01Field09Show,
+    "aSection01Field10Show": aSection01Field10Show,
+    "aSection01Field11Show": aSection01Field11Show,
+    "aSection01Field12Show": aSection01Field12Show,
+    "aSection01Field13Show": aSection01Field13Show,
+    "aSection01Field14Show": aSection01Field14Show,
+    "aSection01Field15Show": aSection01Field15Show,
+    "aSection01Field16Show": aSection01Field16Show,
+    "aSection01Field17Show": aSection01Field17Show,
+    "aSection01Field18Show": aSection01Field18Show,
+    "aSection01Field19Show": aSection01Field19Show,
+    "aSection01Field20Show": aSection01Field20Show,
+    "aSection02Field01Show": aSection02Field01Show,
+    "aSection02Field02Show": aSection02Field02Show,
+    "aSection02Field03Show": aSection02Field03Show,
+    "aSection02Field04Show": aSection02Field04Show,
+    "aSection02Field05Show": aSection02Field05Show,
+    "aSection02Field06Show": aSection02Field06Show,
+    "aSection02Field07Show": aSection02Field07Show,
+    "aSection02Field08Show": aSection02Field08Show,
+    "aSection02Field09Show": aSection02Field09Show,
+    "aSection02Field10Show": aSection02Field10Show,
+    "aSection02Field11Show": aSection02Field11Show,
+    "aSection02Field12Show": aSection02Field12Show,
+    "aSection02Field13Show": aSection02Field13Show,
+    "aSection02Field14Show": aSection02Field14Show,
+    "aSection02Field15Show": aSection02Field15Show,
+    "aSection02Field16Show": aSection02Field16Show,
+    "aSection02Field17Show": aSection02Field17Show,
+    "aSection02Field18Show": aSection02Field18Show,
+    "aSection02Field19Show": aSection02Field19Show,
+    "aSection02Field20Show": aSection02Field20Show,
+    
 })
 
-def handle_form(request, sheet_key):
+def HandleCalculationSheetForm(request, sheet_key):
     if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to the login page if the user is not authenticated
-    
-    sheet_mapping = {
-        'MS': {
-            'form_class': "formCalcMS",
-            'aMachineName': 'Mechanical Screen',
-            'api_type': 'MS',
-            'input_fields': [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03',
-                'oSec01Field04', 'oSec01Field05', 'oSec01Field06', 'oSec01Field07',
-                'oSec01Field08', 'oSec01Field09', 'oSec01Field10', 'oSec01Field11',
-            ],
-            'output_fields': ['oSec02Field01', 'oSec02Field02', 'oSec02Field03'],
-            'api_fields': {
-                "MS_ChannelHeight":     'oSec01Field01',
-                "MS_ScreenWidth":       'oSec01Field02',
-                "MS_BeltHeight":        'oSec01Field03',
-                "MS_WaterLevel":        'oSec01Field04',
-                "MS_BarSpacing":        'oSec01Field05',
-                "MS_BarThickness":      'oSec01Field06',
-                "MS_BarWidth":          'oSec01Field07',
-                "MS_InclinationDegree": 'oSec01Field08',
-                "MS_SprocketDiameter":  'oSec01Field09',
-                "MS_Velocity":          'oSec01Field10',
-                "MS_FOS":               'oSec01Field11',
-            },
-        },
-        'BC': {
-            'form_class': "formCalcBC",
-            'aMachineName': 'Belt Conveyor',
-            'api_type': 'BC',
-            'input_fields': [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03',
-                'oSec01Field04', 'oSec01Field05', 'oSec01Field06', 'oSec01Field07',
-            ],
-            'output_fields': ['oSec02Field01', 'oSec02Field02', 'oSec02Field03'],
-            'api_fields': {
-                'BC_Length': 'oSec01Field01',
-                'BC_Width': 'oSec01Field02',
-                'BC_DrumDia': 'oSec01Field03',
-                'BC_Friction': 'oSec01Field04',
-                'BC_Velocity': 'oSec01Field05',
-                'BC_FOS': 'oSec01Field06',
-                'BC_Belt_weight_per_meter': 'oSec01Field07',
-            },
-        },
-        'GR': {
-            'form_class': "formCalcGR",
-            'aMachineName': 'Grit Removal',
-            'api_type': 'GR',
-            'input_fields': [
+        return redirect('login')
+
+    form_mapping = {
+        "NS": {
+            "form_class": formCalcNS,
+            "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
             ],
-            'output_fields': [
-                'oSec02Field01', 'oSec02Field02', 'oSec02Field03',
-                'oSec02Field04', 'oSec02Field05', 'oSec02Field06',
-            ],
-            'api_fields': {
-                'GR_n_channel': 'oSec01Field01',
-                'GR_channel_width': 'oSec01Field02',
-                'GR_civil_width': 'oSec01Field03',
-                'GR_bridge_length': 'oSec01Field04',
-                'GR_wheel_diameter': 'oSec01Field05',
-                'GR_Friction': 'oSec01Field06',
-                'GR_Velocity': 'oSec01Field07',
-                'GR_FOS': 'oSec01Field08',
+            "output_fields": {
+                "oSec02Field01": "O_Weight",
             },
         },
-        'PS': {
-            'form_class': "formCalcPS",
-            'aMachineName': 'PST',
-            'api_type': 'PS',
-            'input_fields': [
+        "MS": {
+            "form_class": formCalcMS,
+            "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+                'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
+                'oSec01Field09', 'oSec01Field10', 'oSec01Field11',
             ],
-            'output_fields': [
-                'oSec02Field01', 'oSec02Field02', 'oSec02Field03',
-                'oSec02Field04', 'oSec02Field05'
-            ],
-            'api_fields': {
-                    "PS_walkway_length":     'oSec01Field01',
-                    "PS_Friction":       'oSec01Field02',
-                    "PS_Velocity":        'oSec01Field03',
-                    "PS_FOS":        'oSec01Field04',
+            "output_fields": {
+                "oSec02Field01": "MS_w",
+                "oSec02Field02": "MS_p",
+                "oSec02Field03": "MS_s",
             },
         },
-        'TH': {
-            'form_class': "formCalcTH",
-            'aMachineName': 'Thickener',
-            'api_type': 'TH',
-            'input_fields': [
+        "BC": {
+            "form_class": formCalcBC,
+            "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+                'oSec01Field05', 'oSec01Field06', 'oSec01Field07',
             ],
-            'output_fields': [
-                'oSec02Field01', 'oSec02Field02', 'oSec02Field03',
-                'oSec02Field04', 'oSec02Field05',
-            ],
-            'api_fields': {
-                "TH_diameter":     'oSec01Field01',
-                    "TH_n_arm":       'oSec01Field02',
-                    "TH_Velocity":        'oSec01Field03',
-                    "TH_FOS":        'oSec01Field04',
+            "output_fields": {
+                "oSec02Field01": "BC_w",
+                "oSec02Field02": "BC_p",
+                "oSec02Field03": "BC_s",
             },
         },
-        'MX': {
-            'form_class': "formCalcMX",
-            'aMachineName': 'Rectangular Mixers',
-            'api_type': 'MX',
-            'input_fields': [
+        "GR": {
+            "form_class": formCalcGR,
+            "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
             ],
-            'output_fields': [
-                'oSec02Field01', 'oSec02Field02', 'oSec02Field03', 'oSec02Field04', 
-                'oSec02Field05', 'oSec02Field06', 'oSec02Field07',
-            ],
-            'api_fields': {
-                "MX_length":        'oSec01Field01',
-                 "MX_width":         'oSec01Field02',
-                 "MX_water_depth":           'oSec01Field03',
-                 "MX_tank_depth":            'oSec01Field04',
-                 "MX_impeller_coefficient":  'oSec01Field05',
-                 "MX_velocity_gradient":     'oSec01Field06',
-                 "MX_impeller_diameter_factor":  'oSec01Field07',
-                 "MX_safety_factor":             'oSec01Field08',
+            "output_fields": {
+                "oSec02Field01": "GR_out3",
+                "oSec02Field02": "GR_out1",
+                "oSec02Field03": "GR_out2",
+                "oSec02Field04": "GR_out4",
+                "oSec02Field05": "GR_out5",
+                "oSec02Field06": "GR_out6",
             },
         },
-        'RT': {
-            'form_class': "formCalcRT",
-            'aMachineName': 'Rectangular Tanks',
-            'api_type': 'RT',
-            'input_fields': [
+        "PS": {
+            "form_class": formCalcPS,
+            "input_fields": [
+                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+            ],
+            "output_fields": {
+                "oSec02Field01": "PS_out2",
+                "oSec02Field02": "PS_out1",
+                "oSec02Field03": "000",
+                "oSec02Field04": "PS_out3",
+                "oSec02Field05": "PS_out4",
+            },
+        },
+        "TH": {
+            "form_class": formCalcTH,
+            "input_fields": [
+                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+            ],
+            "output_fields": {
+                "oSec02Field01": "TH_w",
+                "oSec02Field02": "TH_p",
+                "oSec02Field03": "TH_s",
+            },
+        },
+        "MX": {
+            "form_class": formCalcMX,
+            "input_fields": [
+                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
+                'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
+            ],
+            "output_fields": {
+                "oSec02Field01": "000",
+                "oSec02Field02": "MX_p",
+                "oSec02Field03": "MX_s",
+                "oSec02Field04": "MX_d",
+                "oSec02Field05": "MX_shaftL",
+                "oSec02Field06": "MX_shaftD",
+                "oSec02Field07": "MX_Type",
+            },
+        },
+        "RT": {
+            "form_class": formCalcRT,
+            "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06',
             ],
-            'output_fields': [
-                'oSec02Field01', 
-            ],
-            'api_fields': {
-                "RT_Length":        'oSec01Field01',
-                "RT_Width":         'oSec01Field02',
-                "RT_Hight":           'oSec01Field03',
-                "RT_ShellTH":            'oSec01Field04',
-                "RT_BaseTH":    'oSec01Field05',
-                "RT_N_Spliter":     'oSec01Field06',
+            "output_fields": {
+                "oSec02Field01": "RT_w10",
             },
         },
-        'CT': {
-            'form_class': "formCalcCT",
-            'aMachineName': 'Circular Tanks',
-            'api_type': 'GR',
-            'input_fields': [
+        "CT": {
+            "form_class": formCalcCT,
+            "input_fields": [
                 'oSec01Field01', 'oSec01Field02',
             ],
-            'output_fields': [
-                'oSec02Field01', 'oSec02Field02', 'oSec02Field03', 'oSec02Field04', 
-                'oSec02Field05', 'oSec02Field06', 'oSec02Field07', 'oSec02Field08',
-            ],
-            'api_fields': {
-                "CT_Diameter":        'oSec01Field01',
-                "CT_Height":         'oSec01Field02',
+            "output_fields": {
+                "oSec02Field01": "O_Tank_Weight",
+                "oSec02Field02": "O_Tank_Volume",
+                "oSec02Field03": "O_Tank_Shell_Th",
+                "oSec02Field04": "O_Tank_Base_Th",
+                "oSec02Field05": "O_Tank_Shell_Weight",
+                "oSec02Field06": "O_Tank_Base_Weight",
+                "oSec02Field07": "O_Tank_Base_UPN_Weight",
+                "oSec02Field08": "O_Tank_Cover_Weight",
             },
         },
-        'SC': {
-            'form_class': "formCalcSC",
-            'aMachineName': 'Screw Conveyor',
-            'api_type': 'SC',
-            'input_fields': [
+        "SC": {
+            "form_class": formCalcSC,
+            "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
             ],
-            'output_fields': [
-                'oSec02Field01', 'oSec02Field02', 'oSec02Field03',
-                'oSec02Field04', 'oSec02Field05', 'oSec02Field06',
-            ],
-            'api_fields': {
-                'aInput01': 'oSec01Field01',
-                'aInput02': 'oSec01Field02',
-                'aInput03': 'oSec01Field03',
-                'aInput04': 'oSec01Field04',
-                'aInput05': 'oSec01Field05',
-                'aInput06': 'oSec01Field06',
-                'aInput07': 'oSec01Field07',
-                'aInput08': 'oSec01Field08',
+            "output_fields": {
+                "oSec02Field01": "Pitch",
+                "oSec02Field02": "SpeedRPM",
+                "oSec02Field03": "MotorPower",
+                "oSec02Field04": "ScrewWeight",
+                "oSec02Field05": "FrameWeight",
+                "oSec02Field06": "1111",
             },
         },
-        'BS': {
-            'form_class': "formCalcBS",
-            'aMachineName': 'Basket Screen',
-            'api_type': 'BS',
-            'input_fields': [
+        "BS": {
+            "form_class": formCalcBS,
+            "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06',
             ],
-            'output_fields': [
-                'oSec02Field01', 'oSec02Field02', 'oSec02Field03',
-            ],
-            'api_fields': {
-                'BS_Bar_Dia': 'oSec01Field01',
-                'BS_Bar_Space': 'oSec01Field02',
-                'BS_Screen_Height': 'oSec01Field03',
-                'BS_Screen_Width': 'oSec01Field04',
-                'BS_Screen_Depth': 'oSec01Field05',
-                'BS_Plate_Th': 'oSec01Field06',
+            "output_fields": {
+                "oSec02Field01": "O_Weight_allBars",
+                "oSec02Field02": "O_Plate_weight",
+                "oSec02Field03": "O_Total_weight",
             },
         },
-        'NS': {
-            'form_class': "formCalcNS",
-            'aMachineName': 'Manual Screen',
-            'api_type': 'NS',
-            'input_fields': [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-                'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
-            ],
-            'output_fields': [
-                'oSec02Field01',
-            ],
-            'api_fields': {
-                'NS_Ch_Height': 'oSec01Field01',
-                'NS_Ch_Width': 'oSec01Field02',
-                'NS_WaterLv': 'oSec01Field03',
-                'NS_WaterLv_Margin': 'oSec01Field04',
-                'NS_Bar_Spacing': 'oSec01Field05',
-                'NS_Bar_Th': 'oSec01Field06',
-                'NS_Bar_Width': 'oSec01Field07',
-                'NS_Angle': 'oSec01Field08',
-            },
-        },
-        'PNch': {
-            'form_class': "formCalcPNch",
-            'aMachineName': 'Channel Penstock',
-            'api_type': 'PNch',
-            'input_fields': [
+        "PNch": {
+            "form_class": formCalcPNch,
+            "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
                 'oSec01Field09', 'oSec01Field10',
             ],
-            'output_fields': [
-                'oSec02Field01', 'oSec02Field02', 'oSec02Field03', 'oSec02Field04', 
-                'oSec02Field05', 'oSec02Field06', 'oSec02Field07', 
-            ],
-            'api_fields': {
-                'PNch_Channel_Height': 'oSec01Field01',
-                'PNch_Frame_Height_Over_Channel': 'oSec01Field02',
-                'PNch_Channel_Width': 'oSec01Field03',
-                'PNch_Gate_Margin_Width': 'oSec01Field04',
-                'PNch_Water_Lv': 'oSec01Field05',
-                'PNch_Gate_Margin_Over_Water_Lv': 'oSec01Field06',
-                'PNch_Gate_Th': 'oSec01Field07',
-                'PNch_Gate_Other_PLs': 'oSec01Field08',
-                'PNch_HeadStock': 'oSec01Field09',
-                'PNch_Frame_Weight_Per_M': 'oSec01Field10',
+            "output_fields": {
+                "oSec02Field01": "O_Frame_Perimeter",
+                "oSec02Field02": "O_Frame_Weight",
+                "oSec02Field03": "O_Gate_PL_Weight",
+                "oSec02Field04": "O_Gate_Stiffener_N",
+                "oSec02Field05": "O_Gate_Stiffener_Weight",
+                "oSec02Field06": "O_Gate_Weight",
+                "oSec02Field07": "O_Total_Weight",
             },
         },
-        'PNwa': {
-            'form_class': "formCalcPNwa",
-            'aMachineName': 'Wall Penstock',
-            'api_type': 'PNwa',
-            'input_fields': [
+        "PNwa": {
+            "form_class": formCalcPNwa,
+            "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
                 'oSec01Field09', 'oSec01Field10',
             ],
-            'output_fields': [
-                'oSec02Field01', 'oSec02Field02', 'oSec02Field03', 'oSec02Field04', 
-                'oSec02Field05', 'oSec02Field06', 'oSec02Field07', 
-            ],
-            'api_fields': {
-                'aInput01': 'oSec01Field01',
-                'aInput02': 'oSec01Field02',
-                'aInput03': 'oSec01Field03',
-                'aInput04': 'oSec01Field04',
-                'aInput05': 'oSec01Field05',
-                'aInput06': 'oSec01Field06',
-                'aInput07': 'oSec01Field07',
-                'aInput08': 'oSec01Field08',
-                'aInput09': 'oSec01Field09',
-                'aInput010': 'oSec01Field10',
+            "output_fields": {
+                "oSec02Field01": "O_PNwa_Out01",
+                "oSec02Field02": "O_PNwa_Out02",
+                "oSec02Field03": "O_PNwa_Out03",
+                "oSec02Field04": "O_PNwa_Out04",
+                "oSec02Field05": "O_PNwa_Out05",
+                "oSec02Field06": "O_PNwa_Out06",
+                "oSec02Field07": "O_PNwa_Out07",
             },
         },
-        
     }
 
-    config = sheet_mapping.get(sheet_key)
-    aMachineName = config['aMachineName']
-    form_type = config['form_class']
-    api_type = config['api_type']
-    api_url = "https://us-central1-h1000project1.cloudfunctions.net/f01"
-
-    
-    print("aaa")
-    if request.method == 'POST' and 'form1_submit' in request.POST:
-                
-        print("aaa")
+    #Define Retrieve values from AddMachine model
+    try:
+        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        form_type = machine_config.nameFormCalcXX
+        aMachineName = machine_config.nameMachine
+    except AddMachine.DoesNotExist:
+        form_type = "None"
+        aMachineName = "None"
         
-        form1 = FormCaculationSheet(form_type=form_type)
-        if form1.is_valid():
-            
-            print("form is valid")
-            cleaned = form1.cleaned_data
+
+
+    config = form_mapping.get(sheet_key)
+    if not config:
+        return redirect('PageCalculationSheet.html')  # Or a 404 page
+
+    form_class = config['form_class']
+    req_type = sheet_key
+    input_fields = config['input_fields']
+    output_fields = config['output_fields']
+
+    if request.method == 'POST' and 'form1_submit' in request.POST:
+        form = form_class(request.POST)
+        if form.is_valid():
             input_data = {
-                api_key: cleaned.get(form_field)
-                for api_key, form_field in config['api_fields'].items()
+                f"{req_type}_{field.split('oSec01Field')[1]}": form.cleaned_data.get(field)
+                for field in input_fields
             }
 
-            # Call the function to interact with the API
-            response = interact_with_api(api_url, api_type, input_data)
-            
-            # Update output fields
+            response = interact_with_api(
+                "https://us-central1-h1000project1.cloudfunctions.net/f01",
+                req_type,
+                input_data
+            )
+
+
             instance = form.save(commit=False)
-            for field in config['output_fields']:
-                if field in response:
-                    setattr(instance, field, response[field])
+            for form_field, api_key in output_fields.items():
+                setattr(instance, form_field, response[api_key])
             instance.oSec00Field01 = request.user.username
             instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             instance.oSec00Field03 = sheet_key
             instance.save()
-            # Re-initialize with new values for display
-            initial_data = {field: cleaned.get(field) for field in config['input_fields']}
-            initial_data.update({field: response.get(field) for field in config['output_fields']})
-            form = FormCaculationSheet(initial=initial_data)
-                        
-            return render(request, 'PagePNwa.html', {'form1': form1})
 
-    return redirect('PageCalculationSheet')  # Redirect to the page if the request is invalid
+            # Refill form for display
+            initial_data = {field: form.cleaned_data.get(field) for field in input_fields}
+            for form_field, api_key in output_fields.items():
+                initial_data[form_field] = response[api_key]
+
+            form = form_class(initial=initial_data)
+            
+
+            # Initialize visibility dictionaries
+            aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Hide" for i in range(1, 21)}
+            aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Hide" for i in range(1, 21)}
+            
+            # Update visibility based on field counts
+            for i in range(1, len(input_fields) + 1):
+                aSection01FieldShow[f"aSection01Field{str(i).zfill(2)}Show"] = "Yes"
+            
+            for i in range(1, len(output_fields) + 1):
+                aSection02FieldShow[f"aSection02Field{str(i).zfill(2)}Show"] = "Yes"
+            
+            
+            
+
+            return render(request, 'PageCalculationSheet.html', {
+                'form': form,
+                'sheet_key': sheet_key,
+                'aMachineName': aMachineName,
+                **aSection01FieldShow,
+                **aSection02FieldShow,
+            })
+
+    return redirect(f"{sheet_key.lower()}_load")
 
 
 def generate_report(request, sheet_key):
@@ -2267,6 +709,16 @@ def generate_report(request, sheet_key):
                 (form1.fields["oSec01Field08"].label, request.POST.get("oSec01Field08", "N/A")),
                 (form1.fields["oSec01Field09"].label, request.POST.get("oSec01Field09", "N/A")),
                 (form1.fields["oSec01Field10"].label, request.POST.get("oSec01Field10", "N/A")),
+                (form1.fields["oSec01Field11"].label, request.POST.get("oSec01Field11", "N/A")),
+                (form1.fields["oSec01Field12"].label, request.POST.get("oSec01Field12", "N/A")),
+                (form1.fields["oSec01Field13"].label, request.POST.get("oSec01Field13", "N/A")),
+                (form1.fields["oSec01Field14"].label, request.POST.get("oSec01Field14", "N/A")),
+                (form1.fields["oSec01Field15"].label, request.POST.get("oSec01Field15", "N/A")),
+                (form1.fields["oSec01Field16"].label, request.POST.get("oSec01Field16", "N/A")),
+                (form1.fields["oSec01Field17"].label, request.POST.get("oSec01Field17", "N/A")),
+                (form1.fields["oSec01Field18"].label, request.POST.get("oSec01Field18", "N/A")),
+                (form1.fields["oSec01Field19"].label, request.POST.get("oSec01Field19", "N/A")),
+                (form1.fields["oSec01Field20"].label, request.POST.get("oSec01Field20", "N/A")),
             ],
             "Output": [
                 (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
@@ -2279,6 +731,16 @@ def generate_report(request, sheet_key):
                 (form1.fields["oSec02Field08"].label, request.POST.get("oSec02Field08", "N/A")),
                 (form1.fields["oSec02Field09"].label, request.POST.get("oSec02Field09", "N/A")),
                 (form1.fields["oSec02Field10"].label, request.POST.get("oSec02Field10", "N/A")),
+                (form1.fields["oSec02Field11"].label, request.POST.get("oSec02Field11", "N/A")),
+                (form1.fields["oSec02Field12"].label, request.POST.get("oSec02Field12", "N/A")),
+                (form1.fields["oSec02Field13"].label, request.POST.get("oSec02Field13", "N/A")),
+                (form1.fields["oSec02Field14"].label, request.POST.get("oSec02Field14", "N/A")),
+                (form1.fields["oSec02Field15"].label, request.POST.get("oSec02Field15", "N/A")),
+                (form1.fields["oSec02Field16"].label, request.POST.get("oSec02Field16", "N/A")),
+                (form1.fields["oSec02Field17"].label, request.POST.get("oSec02Field17", "N/A")),
+                (form1.fields["oSec02Field18"].label, request.POST.get("oSec02Field18", "N/A")),
+                (form1.fields["oSec02Field19"].label, request.POST.get("oSec02Field19", "N/A")),
+                (form1.fields["oSec02Field20"].label, request.POST.get("oSec02Field20", "N/A")),
             ]
         }
 
@@ -2286,7 +748,8 @@ def generate_report(request, sheet_key):
         for section, fields in form_data.items():
             doc.add_heading(section, level=2)
             for field, value in fields:
-                doc.add_paragraph(f"{field}: {value}")
+                if value != "N/A":
+                    doc.add_paragraph(f"{field}: {value}")
 
         # Prepare the response to download the document
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')

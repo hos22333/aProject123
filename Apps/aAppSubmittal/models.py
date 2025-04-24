@@ -6,9 +6,11 @@ from Apps.aAppProject.models import APP_Project
 
 class AddMachine(models.Model):
     keyValue            = models.CharField(max_length=255)
-    nameForm     = models.CharField(max_length=255)
+    nameForm     = models.CharField(max_length=255, null=True, blank=True)
+    nameFormCalcXX = models.CharField(max_length=255, null=True, blank=True)
     nameDB      = models.CharField(max_length=255)
     nameMachine     = models.CharField(max_length=255)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.nameMachine

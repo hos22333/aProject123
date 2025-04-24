@@ -4,10 +4,11 @@
 <div class="container">
     <div class="page-inner">
         <h2>DataSheet : {{ aMachineName }}</h2>
-        <form method="POST" class="form-group">
+        <form method="POST" action="{% url 'submitPageCalculationSheet' sheet_key=sheet_key %}" class="form-group">
             {% csrf_token %}
             <div class="row"> <!-- Row to hold both cards side by side -->
 
+                
                 <!-- Section 1 Card -->
                 <div class="col-md-6">
                     <div class="card shadow mb-4">
@@ -16,51 +17,132 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
+                                {% if aSection01Field01Show == "Yes" %}     
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec01Field01.label }}</label>
                                     {{ form.oSec01Field01 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection01Field02Show == "Yes" %}     
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec01Field02.label }}</label>
                                     {{ form.oSec01Field02 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection01Field03Show == "Yes" %}     
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec01Field03.label }}</label>
                                     {{ form.oSec01Field03 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection01Field04Show == "Yes" %}     
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec01Field04.label }}</label>
                                     {{ form.oSec01Field04 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection01Field05Show == "Yes" %}     
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec01Field05.label }}</label>
                                     {{ form.oSec01Field05 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection01Field06Show == "Yes" %}     
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec01Field06.label }}</label>
                                     {{ form.oSec01Field06 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection01Field07Show == "Yes" %}     
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec01Field07.label }}</label>
                                     {{ form.oSec01Field07 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection01Field08Show == "Yes" %}     
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec01Field08.label }}</label>
                                     {{ form.oSec01Field08 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection01Field09Show == "Yes" %}     
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec01Field09.label }}</label>
                                     {{ form.oSec01Field09 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection01Field10Show == "Yes" %}     
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec01Field10.label }}</label>
                                     {{ form.oSec01Field10 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection01Field11Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field11.label }}</label>
+                                    {{ form.oSec01Field11 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field12Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field12.label }}</label>
+                                    {{ form.oSec01Field12 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field13Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field13.label }}</label>
+                                    {{ form.oSec01Field13 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field14Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field14.label }}</label>
+                                    {{ form.oSec01Field14 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field15Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field15.label }}</label>
+                                    {{ form.oSec01Field15 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field16Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field16.label }}</label>
+                                    {{ form.oSec01Field16 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field17Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field17.label }}</label>
+                                    {{ form.oSec01Field17 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field18Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field18.label }}</label>
+                                    {{ form.oSec01Field18 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field19Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field19.label }}</label>
+                                    {{ form.oSec01Field19 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field20Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field20.label }}</label>
+                                    {{ form.oSec01Field20 }}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
+
                 <!-- Section 2 Card -->
                 <div class="col-md-6">
                     <div class="card shadow mb-4">
@@ -69,46 +151,126 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
+                                {% if aSection02Field01Show == "Yes" %}    
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec02Field01.label }}</label>
                                     {{ form.oSec02Field01 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection02Field02Show == "Yes" %}     
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec02Field02.label }}</label>
                                     {{ form.oSec02Field02 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection02Field03Show == "Yes" %}    
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec02Field03.label }}</label>
                                     {{ form.oSec02Field03 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection02Field04Show == "Yes" %}    
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec02Field04.label }}</label>
                                     {{ form.oSec02Field04 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection02Field05Show == "Yes" %}    
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec02Field05.label }}</label>
                                     {{ form.oSec02Field05 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection02Field06Show == "Yes" %}    
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec02Field06.label }}</label>
                                     {{ form.oSec02Field06 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection02Field07Show == "Yes" %}    
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec02Field07.label }}</label>
                                     {{ form.oSec02Field07 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection02Field08Show == "Yes" %}    
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec02Field08.label }}</label>
                                     {{ form.oSec02Field08 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection02Field09Show == "Yes" %}    
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec02Field09.label }}</label>
                                     {{ form.oSec02Field09 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection02Field10Show == "Yes" %}    
                                 <div class="col-md-6 mb-3">
                                     <label>{{ form.oSec02Field10.label }}</label>
                                     {{ form.oSec02Field10 }}
                                 </div>
+                                {% endif %}
+                                {% if aSection02Field11Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field11.label }}</label>
+                                    {{ form.oSec02Field11 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field12Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field12.label }}</label>
+                                    {{ form.oSec02Field12 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field13Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field13.label }}</label>
+                                    {{ form.oSec02Field13 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field14Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field14.label }}</label>
+                                    {{ form.oSec02Field14 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field15Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field15.label }}</label>
+                                    {{ form.oSec02Field15 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field16Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field16.label }}</label>
+                                    {{ form.oSec02Field16 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field17Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field17.label }}</label>
+                                    {{ form.oSec02Field17 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field18Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field18.label }}</label>
+                                    {{ form.oSec02Field18 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field19Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field19.label }}</label>
+                                    {{ form.oSec02Field19 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field20Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field20.label }}</label>
+                                    {{ form.oSec02Field20 }}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
