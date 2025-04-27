@@ -102,115 +102,8 @@
                     </a>
                     <div class="collapse" id="submenu">
                       <ul class="nav nav-collapse">
+                        <li class="sub-item"><a href="{% url 'PageCalculationSheet' %}"> <i class="fas fa-circle"></i> <p>Calculations </p></a></li>
                         
-                        <li>
-                          <a data-bs-toggle="collapse" href="#subnav1">
-                            <span class="sub-item">Screens</span>
-                            <span class="caret"></span>
-                          </a>
-                          <div class="collapse" id="subnav1">
-                            <ul class="nav nav-collapse subnav">
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='NS' %}"> <span class="sub-item">Manual Screens</span></a></li>
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='BS' %}"> <span class="sub-item">Basket screens</span></a></li> 
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='MS' %}"> <span class="sub-item">Mechanical Screens</span></a></li> 
-                              <li><a href="#"> <span class="sub-item">Screw Conveyor  </span></a></li> 
-                              <li><a href="#"> <span class="sub-item">Screw Conveyor  </span></a></li>                            
-                            </ul>
-                          </div>
-                        </li>
-                        
-                        <li>
-                          <a data-bs-toggle="collapse" href="#subnav2">
-                            <span class="sub-item">Conveyors</span>
-                            <span class="caret"></span>
-                          </a>
-                          <div class="collapse" id="subnav2">
-                            <ul class="nav nav-collapse subnav">
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='BC' %}"> <span class="sub-item">Belt Conveyor   </span></a></li>
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='SC' %}"> <span class="sub-item">Screw Conveyor  </span></a></li>                            
-                            </ul>
-                          </div>
-                        </li>
-                        
-                        <li>
-                          <a data-bs-toggle="collapse" href="#subnav3">
-                            <span class="sub-item">Gritremoval</span>
-                            <span class="caret"></span>
-                          </a>
-                          <div class="collapse" id="subnav3">
-                            <ul class="nav nav-collapse subnav">
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='GR' %}"> <span class="sub-item">Gritremoval (Scrapers) </span></a></li>
-                              <li><a href="#"> <span class="sub-item">Gritremoval (Air Lift Pump) </span></a></li>
-                            </ul>
-                          </div>
-                        </li>
-                        
-                        <li>
-                          <a data-bs-toggle="collapse" href="#subnav4">
-                            <span class="sub-item">PSTs</span>
-                            <span class="caret"></span>
-                          </a>
-                          <div class="collapse" id="subnav4">
-                            <ul class="nav nav-collapse subnav">
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='PS' %}"> <span class="sub-item">PST Half bridge</span></a></li>
-                              <li><a href="#"> <span class="sub-item">PST Full bridge </span></a></li>
-                            </ul>
-                          </div>
-                        </li>
-                        
-                        <li>
-                          <a data-bs-toggle="collapse" href="#subnav5">
-                            <span class="sub-item">Thickeners</span>
-                            <span class="caret"></span>
-                          </a>
-                          <div class="collapse" id="subnav5">
-                            <ul class="nav nav-collapse subnav">
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='TH' %}"> <span class="sub-item">Thickener 3 arm</span></a></li>
-                              <li><a href="#"> <span class="sub-item">Thickener 2 arm </span></a></li>
-                            </ul>
-                          </div>
-                        </li>
-                        
-                        <li>
-                          <a data-bs-toggle="collapse" href="#subnav6">
-                            <span class="sub-item">Mixers</span>
-                            <span class="caret"></span>
-                          </a>
-                          <div class="collapse" id="subnav6">
-                            <ul class="nav nav-collapse subnav">
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='MX' %}"> <span class="sub-item">Rectangular Mixers</span></a></li>
-                              <li><a href="#"> <span class="sub-item">Circular Mixers </span></a></li>
-                            </ul>
-                          </div>
-                        </li>
-                        
-                        <li>
-                          <a data-bs-toggle="collapse" href="#subnav7">
-                            <span class="sub-item">Tanks</span>
-                            <span class="caret"></span>
-                          </a>
-                          <div class="collapse" id="subnav7">
-                            <ul class="nav nav-collapse subnav">
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='RT' %}"> <span class="sub-item">Rectangular Tanks</span></a></li>
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='CT' %}"> <span class="sub-item">Circular Tanks</span></a></li>
-                            </ul>
-                          </div>
-                        </li>
-                        
-                        <li>
-                          <a data-bs-toggle="collapse" href="#subnav8">
-                            <span class="sub-item">Penstocks</span>
-                            <span class="caret"></span>
-                          </a>
-                          <div class="collapse" id="subnav8">
-                            <ul class="nav nav-collapse subnav">
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='PNch' %}"> <span class="sub-item">Channel Penstocks</span></a></li>
-                              <li><a href="{% url 'PageCalculationSheet' sheet_key='PNwa' %}"> <span class="sub-item">Wall Penstocks</span></a></li>
-                              <li><a href="#"> <span class="sub-item">Wier Penstocks</span></a></li>
-                            </ul>
-                          </div>
-                        </li>
-
                       </ul>
                     </div>
                   </li>
@@ -229,16 +122,8 @@
                     </a>
                     <div class="collapse" id="submenu_DS">
                       <ul class="nav nav-collapse">
-                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='NS' %}"> <i class="fas fa-circle"></i> <p>Manual Screen </p></a></li>
-                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='MS' %}"> <i class="fas fa-circle"></i> <p>Mechanical Screen </p></a></li>
-                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='BC' %}"> <i class="fas fa-circle"></i> <p>BeltConveyor </p></a></li>
-                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='CO' %}"> <i class="fas fa-circle"></i> <p>Container </p></a></li>
-                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='GR' %}"> <i class="fas fa-circle"></i> <p>GritGreaseRemoval </p></a></li>
-                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='SS' %}"> <i class="fas fa-circle"></i> <p>SandSilo </p></a></li>
-                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='PS' %}"> <i class="fas fa-circle"></i> <p>PST </p></a></li>
-                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='QV' %}"> <i class="fas fa-circle"></i> <p>QuickValve </p></a></li>
-                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='TV' %}"> <i class="fas fa-circle"></i> <p>TelescopicValve </p></a></li>
-                        <li class="sub-item"><a href="{% url 'PageDataSheet' sheet_key='TH' %}"> <i class="fas fa-circle"></i> <p>SludgeThickener </p></a></li>
+                        <li class="sub-item"><a href="{% url 'PageDataSheet' %}"> <i class="fas fa-circle"></i> <p>Submittal </p></a></li>
+                        
                       </ul>
                     </div>
                   </li>

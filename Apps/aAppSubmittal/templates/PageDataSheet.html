@@ -3,9 +3,40 @@
 
 <div class="container">
     <div class="page-inner">
+
+        <!-- Section Card Machine Selection -->
+        <div class="col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Section Machines</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            <label for="sheet_key">Select Machine:</label>
+                            <select name="sheet_key" id="sheet_key" class="form-control shadow-sm rounded">
+                                <option value="">-- Select a Machine-</option>
+                                {% for machine in sheet_keys %}
+                                    <option value="{{ machine.keyValue }}">{{ machine.nameMachine }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-lg mt-3">Load</button>
+                          </form>
+
+                          
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <h2>DataSheet : {{ aMachineName }}</h2>
-        <form method="POST" action="{% url 'SavePageDataSheet' sheet_key=sheet_key %}" class="form-group">
+        <form method="POST" action="{% url 'SavePageDataSheet' %}" class="form-group">
             {% csrf_token %}
+            <input type="hidden" name="sheet_key" value="{{ sheet_key }}">
             <div class="row"> <!-- Row to hold both cards side by side -->
                 
                 <!-- Section 0 Card Project Selection -->
@@ -32,6 +63,9 @@
                         </div>
                     </div>
                 </div>
+                
+                
+                
 
                 {% if aSection01Show == "Yes" %}                 
                 <!-- Section 1 Card -->
@@ -721,6 +755,7 @@
                 <button type="submit" name="savebuttonname" class="btn btn-primary btn-lg mt-3">Save</button>                                
                 
             </div>
+
         </form>
 
         <!-- Table to Display Saved Data -->
@@ -742,7 +777,7 @@
                     <td>{{ machine.oSec01Field02 }}</td>
                     <td>
                         <button class="btn btn-warning btn-sm edit-btn" data-id="{{ machine.id }}">Edit</button>
-                        <a href="{% url 'DeleteMachine' machine_id=machine.id aType=sheet_key %}" class="btn btn-danger btn-sm">Delete</a>
+                        <a href="{% url 'DeleteMachine' machine_id=machine.id %}" class="btn btn-danger btn-sm">Delete</a>
                         <button class="btn btn-info btn-sm show-data-btn" data-id="{{ machine.id }}" data-toggle="modal" data-target="#dataModal">
                             Show All Data
                         </button>
@@ -754,18 +789,17 @@
                             {% csrf_token %}
                             <button type="submit" class="btn btn-secondary btn-sm">Generate Shop Drawing</button>
                         </form>
-                        
+
                     </td>
                 </tr>
 
-                
+
                 {% endfor %}
-                
+
 
 
             </tbody>
         </table>
-
         
     </div>
 </div>

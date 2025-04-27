@@ -1,7 +1,14 @@
 from django.db import models
+from Apps.aAppMechanical.models import Companies
+from Apps.aAppProject.models import APP_Project
+
 
 # Create your models here.
 class modelcalc(models.Model):
+    project         = models.ForeignKey(APP_Project, on_delete=models.CASCADE, related_name='machinescalc', null=True, blank=True)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
+
+    
     oSec00Field01 = models.CharField(max_length=100, default='') #username
     oSec00Field02 = models.CharField(max_length=100, default='') #created at
     oSec00Field03 = models.CharField(max_length=100, default='') #type 

@@ -4,12 +4,12 @@ from datetime import datetime
 from Apps.aAdmin.models import UserRole, RoleAutho, Autho
 from Apps.aAppMechanical.models import aLogEntry
 from Apps.aAppSubmittal.models import AddMachine
+from Apps.aAppProject.models import APP_Project
+from .models import modelcalc
+from Apps.aAppMechanical.models import UserCompany
 import requests
 
-from .forms import formCalcMS, formCalcBC, formCalcGR, formCalcPS, formCalcTH
-from .forms import formCalcMX, formCalcRT, formCalcCT, formCalcSC, formCalcBS
-from .forms import formCalcNS, formCalcPNch, formCalcPNwa
-from .forms import FormCaculationSheet
+from .forms import FormCalculationSheet
 
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -30,7 +30,6 @@ from docx.oxml import OxmlElement, ns
 from docx.shared import Inches
 from docx.shared import Pt
 # Create your views here.
-
 
 
 def check_user_autho(username, autho_name):
@@ -102,13 +101,27 @@ def interact_with_api(api_url, req_type, input_data):
 ###################################
 
 
-def LoadPageCalculationSheet(request, sheet_key):
+def LoadPageCalculationSheet(request):
+
+    # Redirect unauthenticated users
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None")
+
+
+    sheet_key = None
+
+    
+    
+    
+    # If POST, get the selected sheet_key
+    if request.method == "POST":
+        sheet_key = request.POST.get("sheet_key")
+
     #pdb.set_trace()
     print(sheet_key)
     
-    # Redirect unauthenticated users
-    if not request.user.is_authenticated:
-        return redirect("login")  
 
     result = check_user_autho(request.user.username, sheet_key)
     print('#####')
@@ -124,6 +137,16 @@ def LoadPageCalculationSheet(request, sheet_key):
         message=f"{request.user} >>> {sheet_key}"
     )
     
+
+    # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    print(user_company)
 
     #Define Retrieve values from AddMachine model
     try:
@@ -143,9 +166,17 @@ def LoadPageCalculationSheet(request, sheet_key):
         print(f"Warning: Unknown sheet_key '{sheet_key}'")
 
 
+     # Assign company filter only if the user has a company
+    if user_company:
+        machinescalc = modelcalc.objects.filter(oSec00Field03=DB_Name, company=user_company)
+        projects = APP_Project.objects.filter(company=user_company)
+    else:
+        machinescalc = modelcalc.objects.none()  # Return an empty queryset if no company
+        projects = APP_Project.objects.none()  # Return an empty queryset if no company
 
 
-    form = FormCaculationSheet(form_type=form_type)
+
+    form = FormCalculationSheet(form_type=form_type)
     
     print(f"Initial value for oSec01Field02: {form.fields['oSec01Field02'].initial}")
     
@@ -359,8 +390,12 @@ def LoadPageCalculationSheet(request, sheet_key):
 
     return render(request, "PageCalculationSheet.html", {
     "form": form,
-    "aMachineName": aMachineName,  
+    "machinescalc": machinescalc,
+    "projects": projects,  
+    "aMachineName": aMachineName, 
+    "user_company": user_company, 
     "sheet_key": sheet_key,
+    "sheet_keys": sheet_keys,
     "aSection01Field01Show": aSection01Field01Show,
     "aSection01Field02Show": aSection01Field02Show,
     "aSection01Field03Show": aSection01Field03Show,
@@ -404,13 +439,18 @@ def LoadPageCalculationSheet(request, sheet_key):
     
 })
 
-def HandleCalculationSheetForm(request, sheet_key):
+def HandleCalculationSheetForm(request):
+    sheet_key = request.POST.get("sheet_key")
+    print(sheet_key)
+
+
     if not request.user.is_authenticated:
         return redirect('login')
+    
+    
 
     form_mapping = {
         "NS": {
-            "form_class": formCalcNS,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
@@ -420,7 +460,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "MS": {
-            "form_class": formCalcMS,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
@@ -433,7 +472,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "BC": {
-            "form_class": formCalcBC,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07',
@@ -445,7 +483,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "GR": {
-            "form_class": formCalcGR,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
@@ -460,7 +497,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "PS": {
-            "form_class": formCalcPS,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
             ],
@@ -473,7 +509,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "TH": {
-            "form_class": formCalcTH,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
             ],
@@ -484,7 +519,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "MX": {
-            "form_class": formCalcMX,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
@@ -500,7 +534,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "RT": {
-            "form_class": formCalcRT,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06',
@@ -510,7 +543,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "CT": {
-            "form_class": formCalcCT,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02',
             ],
@@ -526,7 +558,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "SC": {
-            "form_class": formCalcSC,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
@@ -541,7 +572,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "BS": {
-            "form_class": formCalcBS,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06',
@@ -553,7 +583,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "PNch": {
-            "form_class": formCalcPNch,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
@@ -570,7 +599,6 @@ def HandleCalculationSheetForm(request, sheet_key):
             },
         },
         "PNwa": {
-            "form_class": formCalcPNwa,
             "input_fields": [
                 'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
                 'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
@@ -603,17 +631,17 @@ def HandleCalculationSheetForm(request, sheet_key):
     if not config:
         return redirect('PageCalculationSheet.html')  # Or a 404 page
 
-    form_class = config['form_class']
+    
     req_type = sheet_key
     input_fields = config['input_fields']
     output_fields = config['output_fields']
 
     if request.method == 'POST' and 'form1_submit' in request.POST:
-        form = form_class(request.POST)
+        form = FormCalculationSheet(form_type=form_type, data=request.POST)
         if form.is_valid():
             input_data = {
                 f"{req_type}_{field.split('oSec01Field')[1]}": form.cleaned_data.get(field)
-                for field in input_fields
+                for field in input_fields if form.cleaned_data.get(field) is not None
             }
 
             response = interact_with_api(
@@ -625,7 +653,8 @@ def HandleCalculationSheetForm(request, sheet_key):
 
             instance = form.save(commit=False)
             for form_field, api_key in output_fields.items():
-                setattr(instance, form_field, response[api_key])
+                if api_key not in ["000", "1111"]:
+                    setattr(instance, form_field, response[api_key])
             instance.oSec00Field01 = request.user.username
             instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             instance.oSec00Field03 = sheet_key
@@ -634,9 +663,10 @@ def HandleCalculationSheetForm(request, sheet_key):
             # Refill form for display
             initial_data = {field: form.cleaned_data.get(field) for field in input_fields}
             for form_field, api_key in output_fields.items():
-                initial_data[form_field] = response[api_key]
+                if api_key not in ["000", "1111"]:
+                    initial_data[form_field] = response[api_key]
 
-            form = form_class(initial=initial_data)
+            form = FormCalculationSheet(form_type=form_type, initial=initial_data)
             
 
             # Initialize visibility dictionaries
@@ -664,8 +694,10 @@ def HandleCalculationSheetForm(request, sheet_key):
     return redirect(f"{sheet_key.lower()}_load")
 
 
-def generate_report(request, sheet_key):
-    
+def generate_report(request):
+    sheet_key = request.POST.get("sheet_key")
+    print(sheet_key)
+
     #Define Retrieve values from AddMachine model
     try:
         machine_config = AddMachine.objects.get(keyValue=sheet_key)
@@ -682,7 +714,7 @@ def generate_report(request, sheet_key):
         print(f"Warning: Unknown sheet_key '{sheet_key}'")
 
     if request.method == "POST":
-        form1 = FormCaculationSheet(form_type=form_type)
+        form1 = FormCalculationSheet(form_type=form_type)
         # Create a new Word document
         doc = Document()
         doc.add_heading(aMachineName, level=1)

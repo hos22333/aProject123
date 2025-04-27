@@ -74,14 +74,31 @@ def edit_amachine(request, machine_id):
 
 
 
-# Create your views here.
-def LoadPageDataSheet(request, sheet_key):
+def LoadPageDataSheet(request):
+
+    # Redirect unauthenticated users
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None")
+
+
+    sheet_key = None
+
+    
+    
+    
+    # If POST, get the selected sheet_key
+    if request.method == "POST":
+        sheet_key = request.POST.get("sheet_key")
+    
+    
+
+
     #pdb.set_trace()
     print(sheet_key)
     
-    # Redirect unauthenticated users
-    if not request.user.is_authenticated:
-        return redirect("login")  
+    
     
     print(request.user)
     print(f"{request.user} accessed Load {sheet_key}")
@@ -213,6 +230,7 @@ def LoadPageDataSheet(request, sheet_key):
     "aMachineName": aMachineName,  
     "user_company": user_company,
     "sheet_key": sheet_key,
+    "sheet_keys": sheet_keys,
     "aSection01Show": aSection01Show,
     "aSection02Show": aSection02Show,
     "aSection03Show": aSection03Show,
@@ -228,7 +246,8 @@ def LoadPageDataSheet(request, sheet_key):
 
 
 
-def SavePageDataSheet(request, sheet_key):    
+def SavePageDataSheet(request):    
+    sheet_key = request.POST.get("sheet_key")
     print(sheet_key)
     
     # Redirect unauthenticated users
@@ -418,12 +437,14 @@ def SavePageDataSheet(request, sheet_key):
 
 
 
-def DeleteMachine(request, machine_id, aType):  
+def DeleteMachine(request, machine_id):  
+    sheet_key = request.POST.get("sheet_key")
+    print(sheet_key)
     machine = get_object_or_404(Machine, id=machine_id)
     machine.delete()
 
     # Redirect after deletion (if needed)
-    return redirect(reverse('PageDataSheet', kwargs={'sheet_key': aType}))
+    return redirect(reverse('PageDataSheet'))
 
 
 
