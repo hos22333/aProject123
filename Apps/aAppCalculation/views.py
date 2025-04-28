@@ -834,9 +834,15 @@ def generate_report(request):
 
     if request.method == "POST":
         form1 = FormCalculationSheet(form_type=form_type)
+
+        project_id = request.POST.get("project")
+        theprojects = APP_Project.objects.get(id=project_id)
+        project_name = theprojects.name
+        
         # Create a new Word document
         doc = Document()
         doc.add_heading(aMachineName, level=1)
+        doc.add_heading(f"Project Name : {project_name}", level=2)
 
         # Extract form data
         form_data = {
@@ -888,7 +894,7 @@ def generate_report(request):
 
         # Add form data to the Word document
         for section, fields in form_data.items():
-            doc.add_heading(section, level=2)
+            doc.add_heading(section, level=3)
             for field, value in fields:
                 if value != "N/A":
                     doc.add_paragraph(f"{field}: {value}")
