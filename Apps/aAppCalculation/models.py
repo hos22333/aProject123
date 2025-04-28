@@ -5,7 +5,7 @@ from Apps.aAppProject.models import APP_Project
 
 # Create your models here.
 class modelcalc(models.Model):
-    project         = models.ForeignKey(APP_Project, on_delete=models.CASCADE, related_name='machinescalc', null=True, blank=True)
+    project         = models.ForeignKey(APP_Project, on_delete=models.CASCADE)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
 
     

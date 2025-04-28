@@ -14,7 +14,7 @@
                     <div class="row">
                         
                         
-                        <form method="post">
+                        <form method="post" action="{% url 'PageCalculationSheet' %}" >
                             {% csrf_token %}
                             <label for="sheet_key">Select Machine:</label>
                             <select name="sheet_key" id="sheet_key" class="form-control shadow-sm rounded">
@@ -335,17 +335,156 @@
                 <button type="submit" name="form1_submit" class="btn btn-primary btn-lg mt-3">Calculate</button>                                
                 <button type="submit" name="generate_report" formaction="{% url 'generate_report' %}" class="btn btn-success btn-lg mt-3">Report</button>
             </div>
+
         </form>
 
+        <!-- Table to Display Saved Data -->
+        <h3 class="mt-5">Saved Data</h3>
+        <table id="sortable-table" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Project Name</th>
+                    <th>oSec01Field01</th>
+                    <th>oSec01Field02</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for machine in machines %}
+                <tr>
+                    <td>{{ machine.project.name }}</td>
+                    <td>{{ machine.oSec01Field01 }}</td>
+                    <td>{{ machine.oSec01Field02 }}</td>
+                    <td>
+                    
+                        <a href="{% url 'DeleteCalcMachine' machine_id=machine.id %}" class="btn btn-danger btn-sm">Delete</a>
+                        <button class="btn btn-info btn-sm show-data-btn" data-id="{{ machine.id }}" data-toggle="modal" data-target="#dataModal">
+                            Show All Data
+                        </button>
+                        <form action="{% url 'generate_saved_report' machine_id=machine.id %}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" name="generate_saved_report" class="btn btn-success btn-lg btn-sm">Report</button>
+                        </form>
+                    
+                    </td>
+                </tr>
+            
+            
+                {% endfor %}
+            
+            
+            
+            </tbody>
+        </table>
         
 
     </div>
 </div>
 
-
+<!-- Modal for Showing All Data -->
+<div class="modal fade" id="dataModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Full Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Data will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Add this to <head> in base.html -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+
+<!-- Add jQuery & DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+        $('#sortable-table').DataTable();
+    });
+</script>
+
+<!-- Add this before </body> -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".show-data-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let machineId = this.dataset.id;
+
+                fetch(`/Calculation/CalculationSheet_get_data/${machineId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let modalContent = `
+                            <p><strong>Project:</strong> ${data.project}</p>
+                            
+                            ${data.oSec01Field01 != "oooo" && data.oSec01Field01 !== null && data.oSec01Field01 !== undefined && data.oSec01Field01 !== "" ? `<p><strong>${data.oSec01Field01label}:</strong> ${data.oSec01Field01}</p>` : ""}
+                            ${data.oSec01Field02 != "oooo" && data.oSec01Field02 !== null && data.oSec01Field02 !== undefined && data.oSec01Field02 !== "" ? `<p><strong>${data.oSec01Field02label}:</strong> ${data.oSec01Field02}</p>` : ""}
+                            ${data.oSec01Field03 != "oooo" && data.oSec01Field03 !== null && data.oSec01Field03 !== undefined && data.oSec01Field03 !== "" ? `<p><strong>${data.oSec01Field03label}:</strong> ${data.oSec01Field03}</p>` : ""}
+                            ${data.oSec01Field04 != "oooo" && data.oSec01Field04 !== null && data.oSec01Field04 !== undefined && data.oSec01Field04 !== "" ? `<p><strong>${data.oSec01Field04label}:</strong> ${data.oSec01Field04}</p>` : ""}
+                            ${data.oSec01Field05 != "oooo" && data.oSec01Field05 !== null && data.oSec01Field05 !== undefined && data.oSec01Field05 !== "" ? `<p><strong>${data.oSec01Field05label}:</strong> ${data.oSec01Field05}</p>` : ""}
+                            ${data.oSec01Field06 != "oooo" && data.oSec01Field06 !== null && data.oSec01Field06 !== undefined && data.oSec01Field06 !== "" ? `<p><strong>${data.oSec01Field06label}:</strong> ${data.oSec01Field06}</p>` : ""}
+                            ${data.oSec01Field07 != "oooo" && data.oSec01Field07 !== null && data.oSec01Field07 !== undefined && data.oSec01Field07 !== "" ? `<p><strong>${data.oSec01Field07label}:</strong> ${data.oSec01Field07}</p>` : ""}
+                            ${data.oSec01Field08 != "oooo" && data.oSec01Field08 !== null && data.oSec01Field08 !== undefined && data.oSec01Field08 !== "" ? `<p><strong>${data.oSec01Field08label}:</strong> ${data.oSec01Field08}</p>` : ""}
+                            ${data.oSec01Field09 != "oooo" && data.oSec01Field09 !== null && data.oSec01Field09 !== undefined && data.oSec01Field09 !== "" ? `<p><strong>${data.oSec01Field09label}:</strong> ${data.oSec01Field09}</p>` : ""}
+                            ${data.oSec01Field10 != "oooo" && data.oSec01Field10 !== null && data.oSec01Field10 !== undefined && data.oSec01Field10 !== "" ? `<p><strong>${data.oSec01Field10label}:</strong> ${data.oSec01Field10}</p>` : ""}
+                            ${data.oSec01Field11 != "oooo" && data.oSec01Field11 !== null && data.oSec01Field11 !== undefined && data.oSec01Field11 !== "" ? `<p><strong>${data.oSec01Field11label}:</strong> ${data.oSec01Field11}</p>` : ""}
+                            ${data.oSec01Field12 != "oooo" && data.oSec01Field12 !== null && data.oSec01Field12 !== undefined && data.oSec01Field12 !== "" ? `<p><strong>${data.oSec01Field12label}:</strong> ${data.oSec01Field12}</p>` : ""}
+                            ${data.oSec01Field13 != "oooo" && data.oSec01Field13 !== null && data.oSec01Field13 !== undefined && data.oSec01Field13 !== "" ? `<p><strong>${data.oSec01Field13label}:</strong> ${data.oSec01Field13}</p>` : ""}
+                            ${data.oSec01Field14 != "oooo" && data.oSec01Field14 !== null && data.oSec01Field14 !== undefined && data.oSec01Field14 !== "" ? `<p><strong>${data.oSec01Field14label}:</strong> ${data.oSec01Field14}</p>` : ""}
+                            ${data.oSec01Field15 != "oooo" && data.oSec01Field15 !== null && data.oSec01Field15 !== undefined && data.oSec01Field15 !== "" ? `<p><strong>${data.oSec01Field15label}:</strong> ${data.oSec01Field15}</p>` : ""}
+                            ${data.oSec01Field16 != "oooo" && data.oSec01Field16 !== null && data.oSec01Field16 !== undefined && data.oSec01Field16 !== "" ? `<p><strong>${data.oSec01Field16label}:</strong> ${data.oSec01Field16}</p>` : ""}
+                            ${data.oSec01Field17 != "oooo" && data.oSec01Field17 !== null && data.oSec01Field17 !== undefined && data.oSec01Field17 !== "" ? `<p><strong>${data.oSec01Field17label}:</strong> ${data.oSec01Field17}</p>` : ""}
+                            ${data.oSec01Field18 != "oooo" && data.oSec01Field18 !== null && data.oSec01Field18 !== undefined && data.oSec01Field18 !== "" ? `<p><strong>${data.oSec01Field18label}:</strong> ${data.oSec01Field18}</p>` : ""}
+                            ${data.oSec01Field19 != "oooo" && data.oSec01Field19 !== null && data.oSec01Field19 !== undefined && data.oSec01Field19 !== "" ? `<p><strong>${data.oSec01Field19label}:</strong> ${data.oSec01Field19}</p>` : ""}
+                            ${data.oSec01Field20 != "oooo" && data.oSec01Field20 !== null && data.oSec01Field20 !== undefined && data.oSec01Field20 !== "" ? `<p><strong>${data.oSec01Field20label}:</strong> ${data.oSec01Field20}</p>` : ""}
+                            <br/>
+
+                            ${data.oSec02Field01 != "oooo" && data.oSec02Field01 !== null && data.oSec02Field01 !== undefined && data.oSec02Field01 !== "" ? `<p><strong>${data.oSec02Field01label}:</strong> ${data.oSec02Field01}</p>` : ""}
+                            ${data.oSec02Field02 != "oooo" && data.oSec02Field02 !== null && data.oSec02Field02 !== undefined && data.oSec02Field02 !== "" ? `<p><strong>${data.oSec02Field02label}:</strong> ${data.oSec02Field02}</p>` : ""}
+                            ${data.oSec02Field03 != "oooo" && data.oSec02Field03 !== null && data.oSec02Field03 !== undefined && data.oSec02Field03 !== "" ? `<p><strong>${data.oSec02Field03label}:</strong> ${data.oSec02Field03}</p>` : ""}
+                            ${data.oSec02Field04 != "oooo" && data.oSec02Field04 !== null && data.oSec02Field04 !== undefined && data.oSec02Field04 !== "" ? `<p><strong>${data.oSec02Field04label}:</strong> ${data.oSec02Field04}</p>` : ""}
+                            ${data.oSec02Field05 != "oooo" && data.oSec02Field05 !== null && data.oSec02Field05 !== undefined && data.oSec02Field05 !== "" ? `<p><strong>${data.oSec02Field05label}:</strong> ${data.oSec02Field05}</p>` : ""}
+                            ${data.oSec02Field06 != "oooo" && data.oSec02Field06 !== null && data.oSec02Field06 !== undefined && data.oSec02Field06 !== "" ? `<p><strong>${data.oSec02Field06label}:</strong> ${data.oSec02Field06}</p>` : ""}
+                            ${data.oSec02Field07 != "oooo" && data.oSec02Field07 !== null && data.oSec02Field07 !== undefined && data.oSec02Field07 !== "" ? `<p><strong>${data.oSec02Field07label}:</strong> ${data.oSec02Field07}</p>` : ""}
+                            ${data.oSec02Field08 != "oooo" && data.oSec02Field08 !== null && data.oSec02Field08 !== undefined && data.oSec02Field08 !== "" ? `<p><strong>${data.oSec02Field08label}:</strong> ${data.oSec02Field08}</p>` : ""}
+                            ${data.oSec02Field09 != "oooo" && data.oSec02Field09 !== null && data.oSec02Field09 !== undefined && data.oSec02Field09 !== "" ? `<p><strong>${data.oSec02Field09label}:</strong> ${data.oSec02Field09}</p>` : ""}
+                            ${data.oSec02Field10 != "oooo" && data.oSec02Field10 !== null && data.oSec02Field10 !== undefined && data.oSec02Field10 !== "" ? `<p><strong>${data.oSec02Field10label}:</strong> ${data.oSec02Field10}</p>` : ""}
+                            ${data.oSec02Field11 != "oooo" && data.oSec02Field11 !== null && data.oSec02Field11 !== undefined && data.oSec02Field11 !== "" ? `<p><strong>${data.oSec02Field11label}:</strong> ${data.oSec02Field11}</p>` : ""}
+                            ${data.oSec02Field12 != "oooo" && data.oSec02Field12 !== null && data.oSec02Field12 !== undefined && data.oSec02Field12 !== "" ? `<p><strong>${data.oSec02Field12label}:</strong> ${data.oSec02Field12}</p>` : ""}
+                            ${data.oSec02Field13 != "oooo" && data.oSec02Field13 !== null && data.oSec02Field13 !== undefined && data.oSec02Field13 !== "" ? `<p><strong>${data.oSec02Field13label}:</strong> ${data.oSec02Field13}</p>` : ""}
+                            ${data.oSec02Field14 != "oooo" && data.oSec02Field14 !== null && data.oSec02Field14 !== undefined && data.oSec02Field14 !== "" ? `<p><strong>${data.oSec02Field14label}:</strong> ${data.oSec02Field14}</p>` : ""}
+                            ${data.oSec02Field15 != "oooo" && data.oSec02Field15 !== null && data.oSec02Field15 !== undefined && data.oSec02Field15 !== "" ? `<p><strong>${data.oSec02Field15label}:</strong> ${data.oSec02Field15}</p>` : ""}
+                            ${data.oSec02Field16 != "oooo" && data.oSec02Field16 !== null && data.oSec02Field16 !== undefined && data.oSec02Field16 !== "" ? `<p><strong>${data.oSec02Field16label}:</strong> ${data.oSec02Field16}</p>` : ""}
+                            ${data.oSec02Field17 != "oooo" && data.oSec02Field17 !== null && data.oSec02Field17 !== undefined && data.oSec02Field17 !== "" ? `<p><strong>${data.oSec02Field17label}:</strong> ${data.oSec02Field17}</p>` : ""}
+                            ${data.oSec02Field18 != "oooo" && data.oSec02Field18 !== null && data.oSec02Field18 !== undefined && data.oSec02Field18 !== "" ? `<p><strong>${data.oSec02Field18label}:</strong> ${data.oSec02Field18}</p>` : ""}
+                            ${data.oSec02Field19 != "oooo" && data.oSec02Field19 !== null && data.oSec02Field19 !== undefined && data.oSec02Field19 !== "" ? `<p><strong>${data.oSec02Field19label}:</strong> ${data.oSec02Field19}</p>` : ""}
+                            ${data.oSec02Field20 != "oooo" && data.oSec02Field20 !== null && data.oSec02Field20 !== undefined && data.oSec02Field20 !== "" ? `<p><strong>${data.oSec02Field20label}:</strong> ${data.oSec02Field20}</p>` : ""}
+                            
+                            
+                        `;
+
+                        document.getElementById("modalBody").innerHTML = modalContent;
+                        
+                        let modal = new bootstrap.Modal(document.getElementById("dataModal"));
+                        modal.show();
+                    })
+                    .catch(error => console.error("Error fetching data:", error));
+            });
+        });
+    });
+</script>
 
 
 

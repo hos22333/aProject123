@@ -167,6 +167,18 @@ def LoadPageDataSheet(request):
     aSection08Show = "Yes"
     aSection09Show = "Yes"
     aSection10Show = "Yes"
+
+    # Initialize visibility dictionaries
+    aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+    aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+    aSection03FieldShow = {f"aSection03Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+    aSection04FieldShow = {f"aSection04Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+    aSection05FieldShow = {f"aSection05Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+    aSection06FieldShow = {f"aSection06Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+    aSection07FieldShow = {f"aSection07Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+    aSection08FieldShow = {f"aSection08Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+    aSection09FieldShow = {f"aSection09Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+    aSection10FieldShow = {f"aSection10Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
     
     print(form.fields['oSec01Field01'].initial)
     print(form.fields['oSec02Field01'].initial)
@@ -221,6 +233,58 @@ def LoadPageDataSheet(request):
     print(aSection09Show)
     print(aSection10Show)
     
+   
+    # Update visibility based on field counts
+    for i in range(0, 10):
+        if form.fields[f'oSec01Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
+            aSection01FieldShow[f"aSection01Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+            aSection01FieldShow[f"aSection01Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+    
+    for i in range(0, 10):
+        if form.fields[f'oSec02Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
+            aSection02FieldShow[f"aSection02Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+            aSection02FieldShow[f"aSection02Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+    
+    for i in range(0, 10):
+        if form.fields[f'oSec03Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
+            aSection03FieldShow[f"aSection03Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+            aSection03FieldShow[f"aSection03Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+    
+    for i in range(0, 10):
+        if form.fields[f'oSec04Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
+            aSection04FieldShow[f"aSection04Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+            aSection04FieldShow[f"aSection04Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+    
+    for i in range(0, 10):
+        if form.fields[f'oSec05Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
+            aSection05FieldShow[f"aSection05Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+            aSection05FieldShow[f"aSection05Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+    
+    for i in range(0, 10):
+        if form.fields[f'oSec06Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
+            aSection06FieldShow[f"aSection06Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+            aSection06FieldShow[f"aSection06Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+    
+    for i in range(0, 10):
+        if form.fields[f'oSec07Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
+            aSection07FieldShow[f"aSection07Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+            aSection07FieldShow[f"aSection07Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+    
+    for i in range(0, 10):
+        if form.fields[f'oSec08Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
+            aSection08FieldShow[f"aSection08Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+            aSection08FieldShow[f"aSection08Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+    
+    for i in range(0, 10):
+        if form.fields[f'oSec09Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
+            aSection09FieldShow[f"aSection09Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+            aSection09FieldShow[f"aSection09Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+    
+    for i in range(0, 10):
+        if form.fields[f'oSec10Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
+            aSection10FieldShow[f"aSection10Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+            aSection10FieldShow[f"aSection10Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+    
     # print(projects)
 
     return render(request, "PageDataSheet.html", {
@@ -241,12 +305,23 @@ def LoadPageDataSheet(request):
     "aSection08Show": aSection08Show,
     "aSection09Show": aSection09Show,
     "aSection10Show": aSection10Show,
+    **aSection01FieldShow,
+    **aSection02FieldShow,
+    **aSection03FieldShow,
+    **aSection04FieldShow,
+    **aSection05FieldShow,
+    **aSection06FieldShow,
+    **aSection07FieldShow,
+    **aSection08FieldShow,
+    **aSection09FieldShow,
+    **aSection10FieldShow,
 })
 
 
 
 
-def SavePageDataSheet(request):    
+def SavePageDataSheet(request):
+    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None")
     sheet_key = request.POST.get("sheet_key")
     print(sheet_key)
     
@@ -313,9 +388,9 @@ def SavePageDataSheet(request):
                 try:
                     instance.project = APP_Project.objects.get(id=project_id)
                 except APP_Project.DoesNotExist:
-                    return render(request, "PageDataSheet.html", {"form": form, "error": "Invalid Project ID"})
+                    return render(request, "PageDataSheet.html", {"form": form, "sheet_keys": sheet_keys, "error": "Invalid Project ID"})
             else:
-                return render(request, "PageDataSheet.html", {"form": form, "error": "Project is required"})
+                return render(request, "PageDataSheet.html", {"form": form, "sheet_keys": sheet_keys, "error": "Project is required"})
 
             # Get the company associated with the user
             try:
@@ -353,6 +428,18 @@ def SavePageDataSheet(request):
             aSection08Show = "Yes"
             aSection09Show = "Yes"
             aSection10Show = "Yes"
+
+            # Initialize visibility dictionaries
+            aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+            aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+            aSection03FieldShow = {f"aSection03Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+            aSection04FieldShow = {f"aSection04Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+            aSection05FieldShow = {f"aSection05Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+            aSection06FieldShow = {f"aSection06Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+            aSection07FieldShow = {f"aSection07Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+            aSection08FieldShow = {f"aSection08Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+            aSection09FieldShow = {f"aSection09Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+            aSection10FieldShow = {f"aSection10Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
             
             print(form.fields['oSec01Field01'].initial)
             print(form.fields['oSec02Field01'].initial)
@@ -407,7 +494,59 @@ def SavePageDataSheet(request):
             print(aSection09Show)
             print(aSection10Show)
             
-            
+
+            # Update visibility based on field counts
+            for i in range(0, 10):
+                if form.fields[f'oSec01Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                    aSection01FieldShow[f"aSection01Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                    aSection01FieldShow[f"aSection01Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+            for i in range(0, 10):
+                if form.fields[f'oSec02Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                    aSection02FieldShow[f"aSection02Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                    aSection02FieldShow[f"aSection02Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+            for i in range(0, 10):
+                if form.fields[f'oSec03Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                    aSection03FieldShow[f"aSection03Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                    aSection03FieldShow[f"aSection03Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+            for i in range(0, 10):
+                if form.fields[f'oSec04Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                    aSection04FieldShow[f"aSection04Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                    aSection04FieldShow[f"aSection04Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+            for i in range(0, 10):
+                if form.fields[f'oSec05Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                    aSection05FieldShow[f"aSection05Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                    aSection05FieldShow[f"aSection05Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+            for i in range(0, 10):
+                if form.fields[f'oSec06Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                    aSection06FieldShow[f"aSection06Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                    aSection06FieldShow[f"aSection06Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+            for i in range(0, 10):
+                if form.fields[f'oSec07Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                    aSection07FieldShow[f"aSection07Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                    aSection07FieldShow[f"aSection07Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+            for i in range(0, 10):
+                if form.fields[f'oSec08Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                    aSection08FieldShow[f"aSection08Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                    aSection08FieldShow[f"aSection08Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+            for i in range(0, 10):
+                if form.fields[f'oSec09Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                    aSection09FieldShow[f"aSection09Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                    aSection09FieldShow[f"aSection09Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+            for i in range(0, 10):
+                if form.fields[f'oSec10Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                    aSection10FieldShow[f"aSection10Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                    aSection10FieldShow[f"aSection10Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+                    
+
 
             return render(request, "PageDataSheet.html", {
                 "form": form,
@@ -416,6 +555,7 @@ def SavePageDataSheet(request):
                 "aMachineName": aMachineName,  
                 "user_company": user_company,
                 "sheet_key": sheet_key,
+                "sheet_keys": sheet_keys,
                 "aSection01Show": aSection01Show,
                 "aSection02Show": aSection02Show,
                 "aSection03Show": aSection03Show,
@@ -426,10 +566,20 @@ def SavePageDataSheet(request):
                 "aSection08Show": aSection08Show,
                 "aSection09Show": aSection09Show,
                 "aSection10Show": aSection10Show,
+                **aSection01FieldShow,
+                **aSection02FieldShow,
+                **aSection03FieldShow,
+                **aSection04FieldShow,
+                **aSection05FieldShow,
+                **aSection06FieldShow,
+                **aSection07FieldShow,
+                **aSection08FieldShow,
+                **aSection09FieldShow,
+                **aSection10FieldShow,
             })
 
         else:
-            # If the form has errors, return all machines for this DB_Name (no company filtering)
+
             machines = Machine.objects.filter(oSec00Field03=DB_Name)
             return render(request, "PageDataSheet.html", {"form": form, "error": "Form contains errors", "machines": machines})
 

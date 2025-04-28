@@ -7,6 +7,7 @@ from Apps.aAppSubmittal.models import AddMachine
 from Apps.aAppProject.models import APP_Project
 from .models import modelcalc
 from Apps.aAppMechanical.models import UserCompany
+from Apps.aAppMechanical.models import FormFieldConfig
 import requests
 
 from .forms import FormCalculationSheet
@@ -168,12 +169,13 @@ def LoadPageCalculationSheet(request):
 
      # Assign company filter only if the user has a company
     if user_company:
-        machinescalc = modelcalc.objects.filter(oSec00Field03=DB_Name, company=user_company)
+        machines = modelcalc.objects.filter(oSec00Field03=sheet_key)
         projects = APP_Project.objects.filter(company=user_company)
     else:
-        machinescalc = modelcalc.objects.none()  # Return an empty queryset if no company
+        machines = modelcalc.objects.none()  # Return an empty queryset if no company
         projects = APP_Project.objects.none()  # Return an empty queryset if no company
 
+    print(form_type)
 
 
     form = FormCalculationSheet(form_type=form_type)
@@ -390,7 +392,7 @@ def LoadPageCalculationSheet(request):
 
     return render(request, "PageCalculationSheet.html", {
     "form": form,
-    "machinescalc": machinescalc,
+    "machines": machines,
     "projects": projects,  
     "aMachineName": aMachineName, 
     "user_company": user_company, 
@@ -440,6 +442,7 @@ def LoadPageCalculationSheet(request):
 })
 
 def HandleCalculationSheetForm(request):
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None")
     sheet_key = request.POST.get("sheet_key")
     print(sheet_key)
 
@@ -451,20 +454,34 @@ def HandleCalculationSheetForm(request):
 
     form_mapping = {
         "NS": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-                'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
-            ],
+            "input_fields": {
+                "NS_Ch_Height":       'oSec01Field01', 
+                "NS_Ch_Width":        'oSec01Field02', 
+                "NS_WaterLv":         'oSec01Field03', 
+                "NS_WaterLv_Margin":  'oSec01Field04',
+                "NS_Bar_Spacing":     'oSec01Field05', 
+                "NS_Bar_Th":          'oSec01Field06', 
+                "NS_Bar_Width":       'oSec01Field07', 
+                "NS_Angle":           'oSec01Field08',
+            },
             "output_fields": {
                 "oSec02Field01": "O_Weight",
             },
         },
         "MS": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-                'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
-                'oSec01Field09', 'oSec01Field10', 'oSec01Field11',
-            ],
+            "input_fields": {
+                "MS_ChannelHeight":     'oSec01Field01',
+                "MS_ScreenWidth":       'oSec01Field02',
+                "MS_BeltHeight":        'oSec01Field03',
+                "MS_WaterLevel":        'oSec01Field04',
+                "MS_BarSpacing":        'oSec01Field05',
+                "MS_BarThickness":      'oSec01Field06',
+                "MS_BarWidth":          'oSec01Field07',
+                "MS_InclinationDegree": 'oSec01Field08',
+                "MS_SprocketDiameter":  'oSec01Field09',
+                "MS_Velocity":          'oSec01Field10',
+                "MS_FOS":               'oSec01Field11',
+            },
             "output_fields": {
                 "oSec02Field01": "MS_w",
                 "oSec02Field02": "MS_p",
@@ -472,10 +489,15 @@ def HandleCalculationSheetForm(request):
             },
         },
         "BC": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-                'oSec01Field05', 'oSec01Field06', 'oSec01Field07',
-            ],
+            "input_fields": {
+                "BC_Length": 'oSec01Field01',
+                "BC_Width": 'oSec01Field02',
+                "BC_DrumDia": 'oSec01Field03',
+                "BC_Friction": 'oSec01Field04',
+                "BC_Velocity": 'oSec01Field05',
+                "BC_FOS": 'oSec01Field06',
+                "BC_Belt_weight_per_meter": 'oSec01Field07',
+            },
             "output_fields": {
                 "oSec02Field01": "BC_w",
                 "oSec02Field02": "BC_p",
@@ -483,10 +505,16 @@ def HandleCalculationSheetForm(request):
             },
         },
         "GR": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-                'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
-            ],
+            "input_fields": {
+                "GR_n_channel":       'oSec01Field01',
+                "GR_channel_width":   'oSec01Field02',
+                "GR_civil_width":     'oSec01Field03',
+                "GR_bridge_length":   'oSec01Field04',
+                "GR_wheel_diameter":  'oSec01Field05',
+                "GR_Friction":        'oSec01Field06',
+                "GR_Velocity":        'oSec01Field07',
+                "GR_FOS":        'oSec01Field08',
+            },
             "output_fields": {
                 "oSec02Field01": "GR_out3",
                 "oSec02Field02": "GR_out1",
@@ -497,9 +525,12 @@ def HandleCalculationSheetForm(request):
             },
         },
         "PS": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-            ],
+            "input_fields": {
+                "PS_walkway_length": 'oSec01Field01',
+                "PS_Friction":       'oSec01Field02',
+                "PS_Velocity":       'oSec01Field03',
+                "PS_FOS":        'oSec01Field04',
+            },
             "output_fields": {
                 "oSec02Field01": "PS_out2",
                 "oSec02Field02": "PS_out1",
@@ -509,9 +540,12 @@ def HandleCalculationSheetForm(request):
             },
         },
         "TH": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-            ],
+            "input_fields": {
+                "TH_diameter":  'oSec01Field01', 
+                "TH_n_arm":     'oSec01Field02', 
+                "TH_Velocity":  'oSec01Field03', 
+                "TH_FOS":       'oSec01Field04',
+            },
             "output_fields": {
                 "oSec02Field01": "TH_w",
                 "oSec02Field02": "TH_p",
@@ -519,10 +553,16 @@ def HandleCalculationSheetForm(request):
             },
         },
         "MX": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-                'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
-            ],
+            "input_fields": {
+                "MX_length":        'oSec01Field01', 
+                "MX_width":         'oSec01Field02', 
+                "MX_water_depth":           'oSec01Field03', 
+                "MX_tank_depth":            'oSec01Field04',
+                "MX_impeller_coefficient":  'oSec01Field05', 
+                "MX_velocity_gradient":     'oSec01Field06', 
+                "MX_impeller_diameter_factor":  'oSec01Field07', 
+                "MX_safety_factor":             'oSec01Field08',
+            },
             "output_fields": {
                 "oSec02Field01": "000",
                 "oSec02Field02": "MX_p",
@@ -534,18 +574,23 @@ def HandleCalculationSheetForm(request):
             },
         },
         "RT": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-                'oSec01Field05', 'oSec01Field06',
-            ],
+            "input_fields": {
+                "RT_Length":    'oSec01Field01', 
+                "RT_Width":     'oSec01Field02', 
+                "RT_Hight":     'oSec01Field03', 
+                "RT_ShellTH":   'oSec01Field04',
+                "RT_BaseTH":    'oSec01Field05', 
+                "RT_N_Spliter": 'oSec01Field06',
+            },
             "output_fields": {
                 "oSec02Field01": "RT_w10",
             },
         },
         "CT": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02',
-            ],
+            "input_fields": {
+                "CT_Diameter": 'oSec01Field01', 
+                "CT_Height": 'oSec01Field02',
+            },
             "output_fields": {
                 "oSec02Field01": "O_Tank_Weight",
                 "oSec02Field02": "O_Tank_Volume",
@@ -558,10 +603,16 @@ def HandleCalculationSheetForm(request):
             },
         },
         "SC": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-                'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
-            ],
+            "input_fields": {
+                "aInput01": 'oSec01Field01', 
+                "aInput02": 'oSec01Field02', 
+                "aInput03": 'oSec01Field03', 
+                "aInput04": 'oSec01Field04',
+                "aInput05": 'oSec01Field05', 
+                "aInput06": 'oSec01Field06', 
+                "aInput07": 'oSec01Field07', 
+                "aInput08": 'oSec01Field08',
+            },
             "output_fields": {
                 "oSec02Field01": "Pitch",
                 "oSec02Field02": "SpeedRPM",
@@ -572,10 +623,14 @@ def HandleCalculationSheetForm(request):
             },
         },
         "BS": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-                'oSec01Field05', 'oSec01Field06',
-            ],
+            "input_fields": {
+                "BS_Bar_Dia":     'oSec01Field01', 
+                "BS_Bar_Space":     'oSec01Field02', 
+                "BS_Screen_Height": 'oSec01Field03', 
+                "BS_Screen_Width":  'oSec01Field04',
+                "BS_Screen_Depth":  'oSec01Field05', 
+                "BS_Plate_Th":      'oSec01Field06',
+            },
             "output_fields": {
                 "oSec02Field01": "O_Weight_allBars",
                 "oSec02Field02": "O_Plate_weight",
@@ -583,11 +638,18 @@ def HandleCalculationSheetForm(request):
             },
         },
         "PNch": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-                'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
-                'oSec01Field09', 'oSec01Field10',
-            ],
+            "input_fields": {
+                "PNch_Channel_Height":             'oSec01Field01', 
+                "PNch_Frame_Height_Over_Channel":  'oSec01Field02', 
+                "PNch_Channel_Width":              'oSec01Field03', 
+                "PNch_Gate_Margin_Width":          'oSec01Field04',
+                "PNch_Water_Lv":                   'oSec01Field05', 
+                "PNch_Gate_Margin_Over_Water_Lv":  'oSec01Field06', 
+                "PNch_Gate_Th":                    'oSec01Field07', 
+                "PNch_Gate_Other_PLs":             'oSec01Field08',
+                "PNch_HeadStock":                  'oSec01Field09', 
+                "PNch_Frame_Weight_Per_M":         'oSec01Field10',
+            },
             "output_fields": {
                 "oSec02Field01": "O_Frame_Perimeter",
                 "oSec02Field02": "O_Frame_Weight",
@@ -599,11 +661,18 @@ def HandleCalculationSheetForm(request):
             },
         },
         "PNwa": {
-            "input_fields": [
-                'oSec01Field01', 'oSec01Field02', 'oSec01Field03', 'oSec01Field04',
-                'oSec01Field05', 'oSec01Field06', 'oSec01Field07', 'oSec01Field08',
-                'oSec01Field09', 'oSec01Field10',
-            ],
+            "input_fields": {
+                "aInput01":   'oSec01Field01', 
+                "aInput02":   'oSec01Field02', 
+                "aInput03":   'oSec01Field03', 
+                "aInput04":   'oSec01Field04',
+                "aInput05":   'oSec01Field05', 
+                "aInput06":   'oSec01Field06', 
+                "aInput07":   'oSec01Field07', 
+                "aInput08":   'oSec01Field08',
+                "aInput09":   'oSec01Field09', 
+                "aInput10":   'oSec01Field10',
+            },
             "output_fields": {
                 "oSec02Field01": "O_PNwa_Out01",
                 "oSec02Field02": "O_PNwa_Out02",
@@ -615,6 +684,16 @@ def HandleCalculationSheetForm(request):
             },
         },
     }
+
+    # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    print(user_company)
 
     #Define Retrieve values from AddMachine model
     try:
@@ -636,19 +715,34 @@ def HandleCalculationSheetForm(request):
     input_fields = config['input_fields']
     output_fields = config['output_fields']
 
+    # Assign company filter only if the user has a company
+    if user_company:
+        machines = modelcalc.objects.filter(oSec00Field03=sheet_key)
+        projects = APP_Project.objects.filter(company=user_company)
+    else:
+        machines = modelcalc.objects.none()  # Return an empty queryset if no company
+        projects = APP_Project.objects.none()  # Return an empty queryset if no company
+    
+    print(user_company)
+
     if request.method == 'POST' and 'form1_submit' in request.POST:
         form = FormCalculationSheet(form_type=form_type, data=request.POST)
         if form.is_valid():
+            
+
             input_data = {
-                f"{req_type}_{field.split('oSec01Field')[1]}": form.cleaned_data.get(field)
-                for field in input_fields if form.cleaned_data.get(field) is not None
+                f"{api_key}": form.cleaned_data.get(field)
+                for api_key, field in input_fields.items() if form.cleaned_data.get(field) is not None
             }
+            print ("input_data : ", input_data)
 
             response = interact_with_api(
                 "https://us-central1-h1000project1.cloudfunctions.net/f01",
                 req_type,
                 input_data
             )
+
+            print("response : ", response)
 
 
             instance = form.save(commit=False)
@@ -658,10 +752,33 @@ def HandleCalculationSheetForm(request):
             instance.oSec00Field01 = request.user.username
             instance.oSec00Field02 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             instance.oSec00Field03 = sheet_key
+
+            # Handle project assignment
+            project_id = request.POST.get("project")
+            if project_id:
+                try:
+                    instance.project = APP_Project.objects.get(id=project_id)
+                except APP_Project.DoesNotExist:
+                    return render(request, "PageCalculationSheet.html", {"form": form, "sheet_keys": sheet_keys, "error": "Invalid Project ID"})
+            else:
+                return render(request, "PageCalculationSheet.html", {"form": form, "sheet_keys": sheet_keys, "error": "Project is required"})
+            
+            # Get the company associated with the user
+            try:
+                user_company = UserCompany.objects.get(user=request.user).company
+                instance.company = user_company  # Assign company to the instance
+            except UserCompany.DoesNotExist:
+                return render(request, "PageCalculationSheet.html", 
+                              {"form": form, 
+                               "error": "User is not associated with a company",
+                               "aMachineName": aMachineName,
+                               "sheet_key" : sheet_key,
+                               "sheet_keys": sheet_keys,})
+
             instance.save()
 
             # Refill form for display
-            initial_data = {field: form.cleaned_data.get(field) for field in input_fields}
+            initial_data = {form_field: form.cleaned_data.get(form_field) for form_field in input_fields.values()}
             for form_field, api_key in output_fields.items():
                 if api_key not in ["000", "1111"]:
                     initial_data[form_field] = response[api_key]
@@ -685,13 +802,17 @@ def HandleCalculationSheetForm(request):
 
             return render(request, 'PageCalculationSheet.html', {
                 'form': form,
+                'sheet_keys': sheet_keys,
                 'sheet_key': sheet_key,
-                'aMachineName': aMachineName,
+                'machines': machines,
+                'projects': projects,  
+                'aMachineName': aMachineName, 
+                'user_company': user_company, 
                 **aSection01FieldShow,
                 **aSection02FieldShow,
             })
 
-    return redirect(f"{sheet_key.lower()}_load")
+    return redirect("PageCalculationSheet")
 
 
 def generate_report(request):
@@ -702,11 +823,9 @@ def generate_report(request):
     try:
         machine_config = AddMachine.objects.get(keyValue=sheet_key)
         form_type = machine_config.nameFormCalcXX
-        DB_Name = machine_config.nameDB
         aMachineName = machine_config.nameMachine
     except AddMachine.DoesNotExist:
         form_type = "None"
-        DB_Name = "None"
         aMachineName = "None"
 
     # Optional: Handle cases where the sheet_key is invalid
@@ -773,6 +892,220 @@ def generate_report(request):
             for field, value in fields:
                 if value != "N/A":
                     doc.add_paragraph(f"{field}: {value}")
+
+        # Prepare the response to download the document
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = f'attachment; filename="{sheet_key}_report.docx"'
+        doc.save(response)
+        return response
+
+    return HttpResponse("Invalid request", status=400)
+
+def DeleteCalcMachine(request, machine_id):  
+    sheet_key = request.POST.get("sheet_key")
+    print(sheet_key)
+    machine = get_object_or_404(modelcalc, id=machine_id)
+    machine.delete()
+
+    # Redirect after deletion (if needed)
+    return redirect(reverse('PageCalculationSheet'))
+
+
+def CalculationSheet_get_data(request, machine_id):
+    machine = get_object_or_404(modelcalc, id=machine_id)
+    sheet_key = machine.oSec00Field03
+    print(sheet_key)
+    
+    #Define Retrieve values from AddMachine model
+    try:
+        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        form_type = machine_config.nameFormCalcXX
+    except AddMachine.DoesNotExist:
+        form_type = "None"
+
+    print("form_type: ", form_type)
+
+    # Helper function to get the label from FormFieldConfig
+    def get_field_label(form_type, field_name):
+        field_config = FormFieldConfig.objects.filter(form_name=form_type, field_name=field_name).first()
+        return field_config.label if field_config else None
+    
+    
+    data = {
+        "project": machine.project.name if machine.project else "No Project",
+        "oSec01Field01": machine.oSec01Field01,
+        "oSec01Field02": machine.oSec01Field02,
+        "oSec01Field03": machine.oSec01Field03,
+        "oSec01Field04": machine.oSec01Field04,
+        "oSec01Field05": machine.oSec01Field05,
+        "oSec01Field06": machine.oSec01Field06,
+        "oSec01Field07": machine.oSec01Field07,
+        "oSec01Field08": machine.oSec01Field08,
+        "oSec01Field09": machine.oSec01Field09,
+        "oSec01Field10": machine.oSec01Field10,        
+        "oSec01Field11": machine.oSec01Field11,
+        "oSec01Field12": machine.oSec01Field12,
+        "oSec01Field13": machine.oSec01Field13,
+        "oSec01Field14": machine.oSec01Field14,
+        "oSec01Field15": machine.oSec01Field15,
+        "oSec01Field16": machine.oSec01Field16,
+        "oSec01Field17": machine.oSec01Field17,
+        "oSec01Field18": machine.oSec01Field18,
+        "oSec01Field19": machine.oSec01Field19,
+        "oSec01Field20": machine.oSec01Field20,
+        
+        "oSec02Field01": machine.oSec02Field01,
+        "oSec02Field02": machine.oSec02Field02,
+        "oSec02Field03": machine.oSec02Field03,
+        "oSec02Field04": machine.oSec02Field04,
+        "oSec02Field05": machine.oSec02Field05,
+        "oSec02Field06": machine.oSec02Field06,
+        "oSec02Field07": machine.oSec02Field07,
+        "oSec02Field08": machine.oSec02Field08,
+        "oSec02Field09": machine.oSec02Field09,
+        "oSec02Field10": machine.oSec02Field10,        
+        "oSec02Field11": machine.oSec02Field11,
+        "oSec02Field12": machine.oSec02Field12,
+        "oSec02Field13": machine.oSec02Field13,
+        "oSec02Field14": machine.oSec02Field14,
+        "oSec02Field15": machine.oSec02Field15,
+        "oSec02Field16": machine.oSec02Field16,
+        "oSec02Field17": machine.oSec02Field17,
+        "oSec02Field18": machine.oSec02Field18,
+        "oSec02Field19": machine.oSec02Field19,
+        "oSec02Field20": machine.oSec02Field20,
+        
+        "oSec01Field01label": get_field_label(form_type, "oSec01Field01"),
+        "oSec01Field02label": get_field_label(form_type, "oSec01Field02"),
+        "oSec01Field03label": get_field_label(form_type, "oSec01Field03"),
+        "oSec01Field04label": get_field_label(form_type, "oSec01Field04"),
+        "oSec01Field05label": get_field_label(form_type, "oSec01Field05"),
+        "oSec01Field06label": get_field_label(form_type, "oSec01Field06"),
+        "oSec01Field07label": get_field_label(form_type, "oSec01Field07"),
+        "oSec01Field08label": get_field_label(form_type, "oSec01Field08"),
+        "oSec01Field09label": get_field_label(form_type, "oSec01Field09"),
+        "oSec01Field10label": get_field_label(form_type, "oSec01Field10"),
+        "oSec01Field11label": get_field_label(form_type, "oSec01Field11"),
+        "oSec01Field12label": get_field_label(form_type, "oSec01Field12"),
+        "oSec01Field13label": get_field_label(form_type, "oSec01Field13"),
+        "oSec01Field14label": get_field_label(form_type, "oSec01Field14"),
+        "oSec01Field15label": get_field_label(form_type, "oSec01Field15"),
+        "oSec01Field16label": get_field_label(form_type, "oSec01Field16"),
+        "oSec01Field17label": get_field_label(form_type, "oSec01Field17"),
+        "oSec01Field18label": get_field_label(form_type, "oSec01Field18"),
+        "oSec01Field19label": get_field_label(form_type, "oSec01Field19"),
+        "oSec01Field20label": get_field_label(form_type, "oSec01Field20"),
+        
+        "oSec02Field01label": get_field_label(form_type, "oSec02Field01"),
+        "oSec02Field02label": get_field_label(form_type, "oSec02Field02"),
+        "oSec02Field03label": get_field_label(form_type, "oSec02Field03"),
+        "oSec02Field04label": get_field_label(form_type, "oSec02Field04"),
+        "oSec02Field05label": get_field_label(form_type, "oSec02Field05"),
+        "oSec02Field06label": get_field_label(form_type, "oSec02Field06"),
+        "oSec02Field07label": get_field_label(form_type, "oSec02Field07"),
+        "oSec02Field08label": get_field_label(form_type, "oSec02Field08"),
+        "oSec02Field09label": get_field_label(form_type, "oSec02Field09"),
+        "oSec02Field10label": get_field_label(form_type, "oSec02Field10"),
+        "oSec02Field11label": get_field_label(form_type, "oSec02Field11"),
+        "oSec02Field12label": get_field_label(form_type, "oSec02Field12"),
+        "oSec02Field13label": get_field_label(form_type, "oSec02Field13"),
+        "oSec02Field14label": get_field_label(form_type, "oSec02Field14"),
+        "oSec02Field15label": get_field_label(form_type, "oSec02Field15"),
+        "oSec02Field16label": get_field_label(form_type, "oSec02Field16"),
+        "oSec02Field17label": get_field_label(form_type, "oSec02Field17"),
+        "oSec02Field18label": get_field_label(form_type, "oSec02Field18"),
+        "oSec02Field19label": get_field_label(form_type, "oSec02Field19"),
+        "oSec02Field20label": get_field_label(form_type, "oSec02Field20"),
+        
+    }
+
+    return JsonResponse(data)
+
+
+def generate_saved_report(request, machine_id):
+    machine = get_object_or_404(modelcalc, id=machine_id)
+    sheet_key = machine.oSec00Field03
+    print(sheet_key)
+
+    #Define Retrieve values from AddMachine model
+    try:
+        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        form_type = machine_config.nameFormCalcXX
+        aMachineName = machine_config.nameMachine
+    except AddMachine.DoesNotExist:
+        form_type = "None"
+        aMachineName = "None"
+
+    # Optional: Handle cases where the sheet_key is invalid
+    if form_type is None:
+        print(f"Warning: Unknown sheet_key '{sheet_key}'")
+
+    # Helper function to get the label from FormFieldConfig
+    def get_field_label(form_type, field_name):
+        field_config = FormFieldConfig.objects.filter(form_name=form_type, field_name=field_name).first()
+        return field_config.label if field_config else "N/A"
+
+    if request.method == "POST":
+        # Create a new Word document
+        doc = Document()
+        doc.add_heading(aMachineName, level=1)
+        doc.add_heading(f"Project Name : {machine.project.name}", level=2)
+
+        # Extract form data
+        form_data = {
+            "Input": [
+                (get_field_label(form_type, "oSec01Field01"), machine.oSec01Field01),
+                (get_field_label(form_type, "oSec01Field02"), machine.oSec01Field02),
+                (get_field_label(form_type, "oSec01Field03"), machine.oSec01Field03),
+                (get_field_label(form_type, "oSec01Field04"), machine.oSec01Field04),
+                (get_field_label(form_type, "oSec01Field05"), machine.oSec01Field05),
+                (get_field_label(form_type, "oSec01Field06"), machine.oSec01Field06),
+                (get_field_label(form_type, "oSec01Field07"), machine.oSec01Field07),
+                (get_field_label(form_type, "oSec01Field08"), machine.oSec01Field08),
+                (get_field_label(form_type, "oSec01Field09"), machine.oSec01Field09),
+                (get_field_label(form_type, "oSec01Field10"), machine.oSec01Field10),
+                (get_field_label(form_type, "oSec01Field11"), machine.oSec01Field11),
+                (get_field_label(form_type, "oSec01Field12"), machine.oSec01Field12),
+                (get_field_label(form_type, "oSec01Field13"), machine.oSec01Field13),
+                (get_field_label(form_type, "oSec01Field14"), machine.oSec01Field14),
+                (get_field_label(form_type, "oSec01Field15"), machine.oSec01Field15),
+                (get_field_label(form_type, "oSec01Field16"), machine.oSec01Field16),
+                (get_field_label(form_type, "oSec01Field17"), machine.oSec01Field17),
+                (get_field_label(form_type, "oSec01Field18"), machine.oSec01Field18),
+                (get_field_label(form_type, "oSec01Field19"), machine.oSec01Field19),
+                (get_field_label(form_type, "oSec01Field20"), machine.oSec01Field20),
+            ],
+            "Output": [
+                (get_field_label(form_type, "oSec02Field01"), machine.oSec02Field01),
+                (get_field_label(form_type, "oSec02Field02"), machine.oSec02Field02),
+                (get_field_label(form_type, "oSec02Field03"), machine.oSec02Field03),
+                (get_field_label(form_type, "oSec02Field04"), machine.oSec02Field04),
+                (get_field_label(form_type, "oSec02Field05"), machine.oSec02Field05),
+                (get_field_label(form_type, "oSec02Field06"), machine.oSec02Field06),
+                (get_field_label(form_type, "oSec02Field07"), machine.oSec02Field07),
+                (get_field_label(form_type, "oSec02Field08"), machine.oSec02Field08),
+                (get_field_label(form_type, "oSec02Field09"), machine.oSec02Field09),
+                (get_field_label(form_type, "oSec02Field10"), machine.oSec02Field10),
+                (get_field_label(form_type, "oSec02Field11"), machine.oSec02Field11),
+                (get_field_label(form_type, "oSec02Field12"), machine.oSec02Field12),
+                (get_field_label(form_type, "oSec02Field13"), machine.oSec02Field13),
+                (get_field_label(form_type, "oSec02Field14"), machine.oSec02Field14),
+                (get_field_label(form_type, "oSec02Field15"), machine.oSec02Field15),
+                (get_field_label(form_type, "oSec02Field16"), machine.oSec02Field16),
+                (get_field_label(form_type, "oSec02Field17"), machine.oSec02Field17),
+                (get_field_label(form_type, "oSec02Field18"), machine.oSec02Field18),
+                (get_field_label(form_type, "oSec02Field19"), machine.oSec02Field19),
+                (get_field_label(form_type, "oSec02Field20"), machine.oSec02Field20),
+            ]
+        }
+
+        # Add form data to the Word document
+        for section, fields in form_data.items():
+            doc.add_heading(section, level=3)
+            for field, value in fields:
+                if value != "N/A":
+                    if field != "N/A":
+                        doc.add_paragraph(f"{field}: {value}")
 
         # Prepare the response to download the document
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
