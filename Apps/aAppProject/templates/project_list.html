@@ -36,7 +36,8 @@
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>                    
                         <button class="btn btn-info btn-sm" onclick="showDetails('{{ project.name }}', '{{ project.client_name }}', '{{ project.capacity }}')">Show All</button>
-                        <button class="btn btn-success btn-sm" onclick="reviewMachines('{{ project.id }}')">Review Machines</button>
+                        <button class="btn btn-success btn-sm" onclick="reviewSubmittalMachines('{{ project.id }}')">Review Submittal Machines</button>
+                        <button class="btn btn-success btn-sm" onclick="reviewCalculationMachines('{{ project.id }}')">Review Calculation Machines</button>
                         <a href="{% url 'generate_report' project.id %}" class="btn btn-secondary btn-sm">Generate Submittal (Word file)</a>
                         <a href="#" class="btn btn-secondary btn-sm disabled" aria-disabled="true">Generate Submittal (PDF)</a>
 
@@ -91,7 +92,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="reviewMachinesModalLabel">Machines for <span id="modalProjectName"></span></h5>
+                <h5 class="modal-title" id="reviewMachinesModalLabel">Submittal Machines for <span id="modalProjectName"></span></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -127,7 +128,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="machineDetailsModalLabel">Machine Details</h5>
+                <h5 class="modal-title" id="machineDetailsModalLabel">Submittal Machine Details</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -243,6 +244,94 @@
 </div>
 
 
+
+<!-- Modal -->
+<div class="modal fade" id="reviewCalcMachinesModal" tabindex="-1" aria-labelledby="reviewCalcMachinesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewCalcMachinesModalLabel">Calculation Machines for <span id="modalProjectName"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Created At</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calcmachinesTableBody">
+                        <!-- Machines will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Change modal background color */
+    #calcmachineDetailsModal .modal-content {
+        background-color:#d0ebff; /* Light gray */
+        color: #000; /* Black text */
+    }
+</style>
+
+<!-- Machine Details Modal -->
+<div class="modal fade" id="calcmachineDetailsModal" tabindex="-1" aria-labelledby="calcmachineDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calcmachineDetailsModalLabel">Calculation Machine Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Username:</strong> <span id="calcdetailUsername"></span></p>
+                <p><strong>Created At:</strong> <span id="calcdetailCreatedAt"></span></p>
+                <p><strong>Type:</strong> <span id="calcdetailType"></span></p>
+                <hr>
+                <p><strong><span id="calclabelField1"></span> <span id="calcpoints1"></span> </strong> <span id="calcdetailField1"></span></p>
+                <p><strong><span id="calclabelField2"></span> <span id="calcpoints2"></span></strong> <span id="calcdetailField2"></span></p>
+                <p><strong><span id="calclabelField3"></span> <span id="calcpoints3"></span></strong> <span id="calcdetailField3"></span></p>
+                <p><strong><span id="calclabelField4"></span> <span id="calcpoints4"></span></strong> <span id="calcdetailField4"></span></p>
+                <p><strong><span id="calclabelField5"></span> <span id="calcpoints5"></span></strong> <span id="calcdetailField5"></span></p>
+                <p><strong><span id="calclabelField6"></span> <span id="calcpoints6"></span></strong> <span id="calcdetailField6"></span></p>
+                <p><strong><span id="calclabelField7"></span> <span id="calcpoints7"></span></strong> <span id="calcdetailField7"></span></p>
+                <p><strong><span id="calclabelField8"></span> <span id="calcpoints8"></span></strong> <span id="calcdetailField8"></span></p>
+                <p><strong><span id="calclabelField9"></span> <span id="calcpoints9"></span></strong> <span id="calcdetailField9"></span></p>
+                <p><strong><span id="calclabelField10"></span> <span id="calcpoints10"></span></strong> <span id="calcdetailField10"></span></p>
+                <p><strong><span id="calclabelField11"></span> <span id="calcpoints11"></span> </strong> <span id="calcdetailField11"></span></p>
+                <p><strong><span id="calclabelField12"></span> <span id="calcpoints12"></span></strong> <span id="calcdetailField12"></span></p>
+                <p><strong><span id="calclabelField13"></span> <span id="calcpoints13"></span></strong> <span id="calcdetailField13"></span></p>
+                <p><strong><span id="calclabelField14"></span> <span id="calcpoints14"></span></strong> <span id="calcdetailField14"></span></p>
+                <p><strong><span id="calclabelField15"></span> <span id="calcpoints15"></span></strong> <span id="calcdetailField15"></span></p>
+                <p><strong><span id="calclabelField16"></span> <span id="calcpoints16"></span></strong> <span id="calcdetailField16"></span></p>
+                <p><strong><span id="calclabelField17"></span> <span id="calcpoints17"></span></strong> <span id="calcdetailField17"></span></p>
+                <p><strong><span id="calclabelField18"></span> <span id="calcpoints18"></span></strong> <span id="calcdetailField18"></span></p>
+                <p><strong><span id="calclabelField19"></span> <span id="calcpoints19"></span></strong> <span id="calcdetailField19"></span></p>
+                <p><strong><span id="calclabelField20"></span> <span id="calcpoints20"></span></strong> <span id="calcdetailField20"></span></p>
+                <p><strong><span id="calclabelField21"></span> <span id="calcpoints21"></span> </strong> <span id="calcdetailField21"></span></p>
+                <p><strong><span id="calclabelField22"></span> <span id="calcpoints22"></span></strong> <span id="calcdetailField22"></span></p>
+                <p><strong><span id="calclabelField23"></span> <span id="calcpoints23"></span></strong> <span id="calcdetailField23"></span></p>
+                <p><strong><span id="calclabelField24"></span> <span id="calcpoints24"></span></strong> <span id="calcdetailField24"></span></p>
+                <p><strong><span id="calclabelField25"></span> <span id="calcpoints25"></span></strong> <span id="calcdetailField25"></span></p>
+                <p><strong><span id="calclabelField26"></span> <span id="calcpoints26"></span></strong> <span id="calcdetailField26"></span></p>
+                <p><strong><span id="calclabelField27"></span> <span id="calcpoints27"></span></strong> <span id="calcdetailField27"></span></p>
+                <p><strong><span id="calclabelField28"></span> <span id="calcpoints28"></span></strong> <span id="calcdetailField28"></span></p>
+                <p><strong><span id="calclabelField29"></span> <span id="calcpoints29"></span></strong> <span id="calcdetailField29"></span></p>
+                <p><strong><span id="calclabelField30"></span> <span id="calcpoints30"></span></strong> <span id="calcdetailField30"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
     let currentEditUrl = null; // Track the URL of the project being edited
     // When the edit button is clicked
@@ -318,7 +407,7 @@ function showDetails(name, client, capacity) {
 
 
 <script>
-    function reviewMachines(projectId) {
+    function reviewSubmittalMachines(projectId) {
         document.getElementById('modalProjectName').textContent = "Loading...";
         
         fetch(`/Project/get_machines/${projectId}/`)
@@ -1721,5 +1810,473 @@ function showDetails(name, client, capacity) {
     
 </script>
 
+
+
+
+
+<script>
+    function reviewCalculationMachines(projectId) {
+        document.getElementById('modalProjectName').textContent = "Loading...";
+        
+        fetch(`/Project/get_calc_machines/${projectId}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('modalProjectName').textContent = data.project_name;
     
+                let calcmachinesTableBody = document.getElementById('calcmachinesTableBody');
+                calcmachinesTableBody.innerHTML = "";  
+    
+                if (data.machines.length > 0) {
+                    data.machines.forEach(machine => {
+                        let row = `<tr>
+                            <td>${machine.oSec00Field01}</td>
+                            <td>${machine.oSec00Field02}</td>
+                            <td>${machine.oSec00Field03}</td>
+                            <td>
+                                <button class="btn btn-info btn-sm" onclick="showCalcMachineDetails(
+                                    '${machine.oSec00Field01}', 
+                                    '${machine.oSec00Field02}', 
+                                    '${machine.oSec00Field03}', 
+                                    '${machine.oSec01Field01}', 
+                                    '${machine.oSec01Field02}', 
+                                    '${machine.oSec01Field03}', 
+                                    '${machine.oSec01Field04}', 
+                                    '${machine.oSec01Field05}', 
+                                    '${machine.oSec01Field06}', 
+                                    '${machine.oSec01Field07}', 
+                                    '${machine.oSec01Field08}', 
+                                    '${machine.oSec01Field09}', 
+                                    '${machine.oSec01Field10}', 
+                                    '${machine.oSec01Field11}', 
+                                    '${machine.oSec01Field12}', 
+                                    '${machine.oSec01Field13}', 
+                                    '${machine.oSec01Field14}', 
+                                    '${machine.oSec01Field15}', 
+                                    '${machine.oSec01Field16}', 
+                                    '${machine.oSec01Field17}', 
+                                    '${machine.oSec01Field18}', 
+                                    '${machine.oSec01Field19}', 
+                                    '${machine.oSec01Field20}',
+                                    '${machine.oSec01Field21}', 
+                                    '${machine.oSec01Field22}', 
+                                    '${machine.oSec01Field23}', 
+                                    '${machine.oSec01Field24}', 
+                                    '${machine.oSec01Field25}', 
+                                    '${machine.oSec01Field26}', 
+                                    '${machine.oSec01Field27}', 
+                                    '${machine.oSec01Field28}', 
+                                    '${machine.oSec01Field29}', 
+                                    '${machine.oSec01Field30}',
+                                    '${machine.oSec02Field01}', 
+                                    '${machine.oSec02Field02}', 
+                                    '${machine.oSec02Field03}', 
+                                    '${machine.oSec02Field04}', 
+                                    '${machine.oSec02Field05}', 
+                                    '${machine.oSec02Field06}', 
+                                    '${machine.oSec02Field07}', 
+                                    '${machine.oSec02Field08}', 
+                                    '${machine.oSec02Field09}', 
+                                    '${machine.oSec02Field10}', 
+                                    '${machine.oSec02Field11}', 
+                                    '${machine.oSec02Field12}', 
+                                    '${machine.oSec02Field13}', 
+                                    '${machine.oSec02Field14}', 
+                                    '${machine.oSec02Field15}', 
+                                    '${machine.oSec02Field16}', 
+                                    '${machine.oSec02Field17}', 
+                                    '${machine.oSec02Field18}', 
+                                    '${machine.oSec02Field19}', 
+                                    '${machine.oSec02Field20}',
+                                    '${machine.oSec02Field21}', 
+                                    '${machine.oSec02Field22}', 
+                                    '${machine.oSec02Field23}', 
+                                    '${machine.oSec02Field24}', 
+                                    '${machine.oSec02Field25}', 
+                                    '${machine.oSec02Field26}', 
+                                    '${machine.oSec02Field27}', 
+                                    '${machine.oSec02Field28}', 
+                                    '${machine.oSec02Field29}', 
+                                    '${machine.oSec02Field30}'
+                                )">View Details</button>
+                            </td>
+                        </tr>`;
+                        calcmachinesTableBody.innerHTML += row;
+                    });
+                } else {
+                    calcmachinesTableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No machines found.</td></tr>";
+                }
+    
+                $('#reviewCalcMachinesModal').modal('show');
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function resetCalcMachineDetailsModal() {
+    const fieldsToReset = [
+        'detailUsername', 'detailCreatedAt', 'detailType',
+        'labelField1', 'points1', 'detailField1',
+        'labelField2', 'points2', 'detailField2',
+        'labelField3', 'points3', 'detailField3',
+        'labelField4', 'points4', 'detailField4',
+        'labelField5', 'points5', 'detailField5',
+        'labelField6', 'points6', 'detailField6',
+        'labelField7', 'points7', 'detailField7',
+        'labelField8', 'points8', 'detailField8',
+        'labelField9', 'points9', 'detailField9',
+        'labelField10', 'points10', 'detailField10',
+        'labelField11', 'points11', 'detailField11',
+        'labelField12', 'points12', 'detailField12',
+        'labelField13', 'points13', 'detailField13',
+        'labelField14', 'points14', 'detailField14',
+        'labelField15', 'points15', 'detailField15',
+        'labelField16', 'points16', 'detailField16',
+        'labelField17', 'points17', 'detailField17',
+        'labelField18', 'points18', 'detailField18',
+        'labelField19', 'points19', 'detailField19',
+        'labelField20', 'points20', 'detailField20',
+        'labelField21', 'points21', 'detailField21',
+        'labelField22', 'points22', 'detailField22',
+        'labelField23', 'points23', 'detailField23',
+        'labelField24', 'points24', 'detailField24',
+        'labelField25', 'points25', 'detailField25',
+        'labelField26', 'points26', 'detailField26',
+        'labelField27', 'points27', 'detailField27',
+        'labelField28', 'points28', 'detailField28',
+        'labelField29', 'points29', 'detailField29',
+        'labelField30', 'points30', 'detailField30'
+    ];
+    
+    fieldsToReset.forEach(id => {
+        let element = document.getElementById(id);
+        if (element) {
+            element.textContent = '';
+        }
+    });
+}
+
+    function showCalcMachineDetails(username, createdAt, type, field1, field2,
+    field3, field4, field5, field6, field7,
+    field8, field9, field10, field11, field12,
+    field13, field14, field15, field16, field17,
+    field18, field19, field20, field21, field22,
+    field23, field24, field25, field26, field27,
+    field28, field29, field30, field31, field32,
+    field33, field34, field35, field36, field37,
+    field38, field39, field40, field41, field42,
+    field43, field44, field45, field46, field47,
+    field48, field49, field50, field51, field52,
+    field53, field54, field55, field56, field57,
+    field58, field59, field60 ) {
+        resetCalcMachineDetailsModal();
+
+        document.getElementById('calcdetailUsername').textContent = username || "N/A";
+        document.getElementById('calcdetailCreatedAt').textContent = createdAt || "N/A";
+        document.getElementById('calcdetailType').textContent = type || "N/A";
+    
+        if ((field1)&&(field1 !="undefined")&&(field1 !="oooo")) {
+            document.getElementById('calclabelField1').textContent = field1 || "N/A";
+        }
+        if (((field1)&&(field1 !="undefined")&&(field1 !="oooo")) || ((field2)&&(field2 !="undefined")&&(field2 !="oooo"))) {
+            document.getElementById('calcpoints1').textContent = ":";
+        }
+        if ((field2)&&(field2 !="undefined")&&(field2 !="oooo")) {
+            document.getElementById('calcdetailField1').textContent = field2 || "N/A";
+        }
+    
+        if ((field3)&&(field3 !="undefined")&&(field3 !="oooo")) {
+            document.getElementById('calclabelField2').textContent = field3 || "N/A";
+        }
+        if (((field3)&&(field3 !="undefined")&&(field3 !="oooo")) || ((field4)&&(field4 !="undefined")&&(field4 !="oooo"))) {
+            document.getElementById('calcpoints2').textContent = ":";
+        }
+        if ((field4)&&(field4 !="undefined")&&(field4 !="oooo")) {
+            document.getElementById('calcdetailField2').textContent = field4 || "N/A";
+        }
+    
+        if ((field5)&&(field5 !="undefined")&&(field5 !="oooo")) {
+            document.getElementById('calclabelField3').textContent = field5 || "N/A";
+        }
+        if (((field5)&&(field5 !="undefined")&&(field5 !="oooo")) || ((field6)&&(field6 !="undefined")&&(field6 !="oooo"))) {
+            document.getElementById('calcpoints3').textContent = ":";
+        }
+        if ((field6)&&(field6 !="undefined")&&(field6 !="oooo")) {
+            document.getElementById('calcdetailField3').textContent = field6 || "N/A";
+        }
+    
+        if ((field7)&&(field7 !="undefined")&&(field7 !="oooo")) {
+            document.getElementById('calclabelField4').textContent = field7 || "N/A";
+        }
+        if (((field7)&&(field7 !="undefined")&&(field7 !="oooo")) || ((field8)&&(field8 !="undefined")&&(field8 !="oooo"))) {
+            document.getElementById('calcpoints4').textContent = ":";
+        }
+        if ((field8)&&(field8 !="undefined")&&(field8 !="oooo")) {
+            document.getElementById('calcdetailField4').textContent = field8 || "N/A";
+        }
+    
+        if ((field9)&&(field9 !="undefined")&&(field9 !="oooo")) {
+            document.getElementById('calclabelField5').textContent = field9 || "N/A";
+        }
+        if (((field9)&&(field9 !="undefined")&&(field9 !="oooo")) || ((field10)&&(field10 !="undefined")&&(field10 !="oooo"))) {
+            document.getElementById('calcpoints5').textContent = ":";
+        }
+        if ((field10)&&(field10 !="undefined")&&(field10 !="oooo")) {
+            document.getElementById('calcdetailField5').textContent = field10 || "N/A";
+        }
+    
+        if ((field11)&&(field11 !="undefined")&&(field11 !="oooo")) {
+            document.getElementById('calclabelField6').textContent = field11 || "N/A";
+        }
+        if (((field11)&&(field11!="undefined")&&(field11 !="oooo")) || ((field12)&&(field12 !="undefined")&&(field12 !="oooo"))) {
+            document.getElementById('calcpoints6').textContent = ":";
+        }
+        if  ((field12)&&(field12 !="undefined")&&(field12 !="oooo")) {
+            document.getElementById('calcdetailField6').textContent = field12 || "N/A";
+        }
+    
+        if ((field13)&&(field13 !="undefined")&&(field13 !="oooo")) {
+            document.getElementById('calclabelField7').textContent = field13 || "N/A";
+        }
+        if (((field13)&&(field13 !="undefined")&&(field13 !="oooo")) || ((field14)&&(field14 !="undefined")&&(field14 !="oooo"))) {
+            document.getElementById('calcpoints7').textContent = ":";
+        }
+        if ((field14)&&(field14 !="undefined")&&(field14 !="oooo")) {
+            document.getElementById('calcdetailField7').textContent = field14 || "N/A";
+        }
+    
+        if ((field15)&&(field15 !="undefined")&&(field15 !="oooo")) {
+            document.getElementById('calclabelField8').textContent = field15 || "N/A";
+        }
+        if (((field15)&&(field15 !="undefined")&&(field15 !="oooo")) || ((field16)&&(field16 !="undefined")&&(field16 !="oooo"))) {
+            document.getElementById('calcpoints8').textContent = ":";
+        }
+        if ((field16)&&(field16 !="undefined")&&(field16 !="oooo")) {
+            document.getElementById('calcdetailField8').textContent = field16 || "N/A";
+        }
+    
+        if ((field17)&&(field17 !="undefined")&&(field17 !="oooo")) {
+            document.getElementById('calclabelField9').textContent = field17 || "N/A";
+        }
+        if (((field17)&&(field17 !="undefined")&&(field17 !="oooo")) || ((field18)&&(field18 !="undefined")&&(field18 !="oooo"))) {
+            document.getElementById('calcpoints9').textContent = ":";
+        }
+        if ((field18)&&(field18 !="undefined")&&(field18 !="oooo")) {
+            document.getElementById('calcdetailField9').textContent = field18 || "N/A";
+        }
+    
+        if ((field19)&&(field19 !="undefined")&&(field19 !="oooo")) {
+            document.getElementById('calclabelField10').textContent = field19 || "N/A";
+        }
+        if (((field19)&&(field19 !="undefined")&&(field19 !="oooo")) || ((field20)&&(field20 !="undefined")&&(field20 !="oooo"))) {
+            document.getElementById('calcpoints10').textContent = ":";
+        }
+        if ((field20)&&(field20 !="undefined")&&(field20 !="oooo")) {
+            document.getElementById('calcdetailField10').textContent = field20 || "N/A";
+        }
+    
+        if ((field21)&&(field21 !="undefined")&&(field21 !="oooo")) {
+            document.getElementById('calclabelField11').textContent = field21 || "N/A";
+        }
+        if (((field21)&&(field21 !="undefined")&&(field21 !="oooo")) || ((field22)&&(field22 !="undefined")&&(field22 !="oooo"))) {
+            document.getElementById('calcpoints11').textContent = ":";
+        }
+        if ((field22)&&(field22 !="undefined")&&(field22 !="oooo")) {
+            document.getElementById('calcdetailField11').textContent = field22 || "N/A";
+        }
+    
+        if ((field23)&&(field23 !="undefined")&&(field23 !="oooo")) {
+            document.getElementById('calclabelField12').textContent = field23 || "N/A";
+        }
+        if (((field23)&&(field23 !="undefined")&&(field23 !="oooo")) || ((field24)&&(field24 !="undefined")&&(field24 !="oooo"))) {
+            document.getElementById('calcpoints12').textContent = ":";
+        }
+        if ((field24)&&(field24 !="undefined")&&(field24 !="oooo")) {
+            document.getElementById('calcdetailField12').textContent = field24 || "N/A";
+        }
+    
+        if ((field25)&&(field25 !="undefined")&&(field25 !="oooo")) {
+            document.getElementById('calclabelField13').textContent = field25 || "N/A";
+        }
+        if (((field25)&&(field25 !="undefined")&&(field25 !="oooo")) || ((field26)&&(field26 !="undefined")&&(field26 !="oooo"))) {
+            document.getElementById('calcpoints13').textContent = ":";
+        }
+        if ((field26)&&(field26 !="undefined")&&(field26 !="oooo")) {
+            document.getElementById('calcdetailField13').textContent = field26 || "N/A";
+        }
+    
+        if ((field27)&&(field27 !="undefined")&&(field27 !="oooo")) {
+            document.getElementById('calclabelField14').textContent = field27 || "N/A";
+        }
+        if (((field27)&&(field27 !="undefined")&&(field27 !="oooo")) || ((field28)&&(field28 !="undefined")&&(field28 !="oooo"))) {
+            document.getElementById('calcpoints14').textContent = ":";
+        }
+        if ((field28)&&(field28 !="undefined")&&(field28 !="oooo")) {
+            document.getElementById('calcdetailField14').textContent = field28 || "N/A";
+        }
+    
+        if ((field29)&&(field29 !="undefined")&&(field29 !="oooo")) {
+            document.getElementById('calclabelField15').textContent = field29 || "N/A";
+        }
+        if (((field29)&&(field29 !="undefined")&&(field29 !="oooo")) || ((field30)&&(field30 !="undefined")&&(field30 !="oooo"))) {
+            document.getElementById('calcpoints15').textContent = ":";
+        }
+        if ((field30)&&(field30 !="undefined")&&(field30 !="oooo")) {
+            document.getElementById('calcdetailField15').textContent = field30 || "N/A";
+        }
+    
+        if ((field31)&&(field31 !="undefined")&&(field31 !="oooo")) {
+            document.getElementById('calclabelField16').textContent = field31 || "N/A";
+        }
+        if (((field31)&&(field31!="undefined")&&(field31 !="oooo")) || ((field32)&&(field32 !="undefined")&&(field32 !="oooo"))) {
+            document.getElementById('calcpoints16').textContent = ":";
+        }
+        if  ((field32)&&(field32 !="undefined")&&(field32 !="oooo")) {
+            document.getElementById('calcdetailField16').textContent = field32 || "N/A";
+        }
+    
+        if ((field33)&&(field33 !="undefined")&&(field33 !="oooo")) {
+            document.getElementById('calclabelField17').textContent = field33 || "N/A";
+        }
+        if (((field33)&&(field33 !="undefined")&&(field33 !="oooo")) || ((field34)&&(field34 !="undefined")&&(field34 !="oooo"))) {
+            document.getElementById('calcpoints17').textContent = ":";
+        }
+        if ((field34)&&(field34 !="undefined")&&(field34 !="oooo")) {
+            document.getElementById('calcdetailField17').textContent = field34 || "N/A";
+        }
+    
+        if ((field35)&&(field35 !="undefined")&&(field35 !="oooo")) {
+            document.getElementById('calclabelField18').textContent = field35 || "N/A";
+        }
+        if (((field35)&&(field35 !="undefined")&&(field35 !="oooo")) || ((field36)&&(field36 !="undefined")&&(field36 !="oooo"))) {
+            document.getElementById('calcpoints18').textContent = ":";
+        }
+        if ((field36)&&(field36 !="undefined")&&(field36 !="oooo")) {
+            document.getElementById('calcdetailField18').textContent = field36 || "N/A";
+        }
+    
+        if ((field37)&&(field37 !="undefined")&&(field37 !="oooo")) {
+            document.getElementById('calclabelField19').textContent = field37 || "N/A";
+        }
+        if (((field37)&&(field37 !="undefined")&&(field37 !="oooo")) || ((field38)&&(field38 !="undefined")&&(field38 !="oooo"))) {
+            document.getElementById('calcpoints19').textContent = ":";
+        }
+        if ((field38)&&(field38 !="undefined")&&(field38 !="oooo")) {
+            document.getElementById('calcdetailField19').textContent = field38 || "N/A";
+        }
+    
+        if ((field39)&&(field39 !="undefined")&&(field39 !="oooo")) {
+            document.getElementById('calclabelField20').textContent = field39 || "N/A";
+        }
+        if (((field39)&&(field39 !="undefined")&&(field39 !="oooo")) || ((field40)&&(field40 !="undefined")&&(field40 !="oooo"))) {
+            document.getElementById('calcpoints20').textContent = ":";
+        }
+        if ((field40)&&(field40 !="undefined")&&(field40 !="oooo")) {
+            document.getElementById('calcdetailField20').textContent = field40 || "N/A";
+        }
+    
+        if ((field41)&&(field41 !="undefined")&&(field41 !="oooo")) {
+            document.getElementById('calclabelField21').textContent = field41 || "N/A";
+        }
+        if (((field41)&&(field41 !="undefined")&&(field41 !="oooo")) || ((field42)&&(field42 !="undefined")&&(field42 !="oooo"))) {
+            document.getElementById('calcpoints21').textContent = ":";
+        }
+        if ((field42)&&(field42 !="undefined")&&(field42 !="oooo")) {
+            document.getElementById('calcdetailField21').textContent = field42 || "N/A";
+        }
+    
+        if ((field43)&&(field43 !="undefined")&&(field43 !="oooo")) {
+            document.getElementById('calclabelField22').textContent = field43 || "N/A";
+        }
+        if (((field43)&&(field43 !="undefined")&&(field43 !="oooo")) || ((field44)&&(field44 !="undefined")&&(field44 !="oooo"))) {
+            document.getElementById('calcpoints22').textContent = ":";
+        }
+        if ((field44)&&(field44 !="undefined")&&(field44 !="oooo")) {
+            document.getElementById('calcdetailField22').textContent = field44 || "N/A";
+        }
+    
+        if ((field45)&&(field45 !="undefined")&&(field45 !="oooo")) {
+            document.getElementById('calclabelField23').textContent = field45 || "N/A";
+        }
+        if (((field45)&&(field45 !="undefined")&&(field45 !="oooo")) || ((field46)&&(field46 !="undefined")&&(field46 !="oooo"))) {
+            document.getElementById('calcpoints23').textContent = ":";
+        }
+        if ((field46)&&(field46 !="undefined")&&(field46 !="oooo")) {
+            document.getElementById('calcdetailField23').textContent = field46 || "N/A";
+        }
+    
+        if ((field47)&&(field47 !="undefined")&&(field47 !="oooo")) {
+            document.getElementById('calclabelField24').textContent = field47 || "N/A";
+        }
+        if (((field47)&&(field47 !="undefined")&&(field47 !="oooo")) || ((field48)&&(field48 !="undefined")&&(field48 !="oooo"))) {
+            document.getElementById('calcpoints24').textContent = ":";
+        }
+        if ((field48)&&(field48 !="undefined")&&(field48 !="oooo")) {
+            document.getElementById('calcdetailField24').textContent = field48 || "N/A";
+        }
+    
+        if ((field49)&&(field49 !="undefined")&&(field49 !="oooo")) {
+            document.getElementById('calclabelField25').textContent = field49 || "N/A";
+        }
+        if (((field49)&&(field49 !="undefined")&&(field49 !="oooo")) || ((field50)&&(field50 !="undefined")&&(field50 !="oooo"))) {
+            document.getElementById('calcpoints25').textContent = ":";
+        }
+        if ((field50)&&(field50 !="undefined")&&(field50 !="oooo")) {
+            document.getElementById('calcdetailField25').textContent = field50 || "N/A";
+        }
+    
+        if ((field51)&&(field51 !="undefined")&&(field51 !="oooo")) {
+            document.getElementById('calclabelField26').textContent = field51 || "N/A";
+        }
+        if (((field51)&&(field51!="undefined")&&(field51 !="oooo")) || ((field52)&&(field52 !="undefined")&&(field52 !="oooo"))) {
+            document.getElementById('calcpoints26').textContent = ":";
+        }
+        if  ((field52)&&(field52 !="undefined")&&(field52 !="oooo")) {
+            document.getElementById('calcdetailField26').textContent = field52 || "N/A";
+        }
+    
+        if ((field53)&&(field53 !="undefined")&&(field53 !="oooo")) {
+            document.getElementById('calclabelField27').textContent = field53 || "N/A";
+        }
+        if (((field53)&&(field53 !="undefined")&&(field53 !="oooo")) || ((field54)&&(field54 !="undefined")&&(field54 !="oooo"))) {
+            document.getElementById('calcpoints27').textContent = ":";
+        }
+        if ((field54)&&(field54 !="undefined")&&(field54 !="oooo")) {
+            document.getElementById('calcdetailField27').textContent = field54 || "N/A";
+        }
+    
+        if ((field55)&&(field55 !="undefined")&&(field55 !="oooo")) {
+            document.getElementById('calclabelField28').textContent = field55 || "N/A";
+        }
+        if (((field55)&&(field55 !="undefined")&&(field55 !="oooo")) || ((field56)&&(field56 !="undefined")&&(field56 !="oooo"))) {
+            document.getElementById('calcpoints28').textContent = ":";
+        }
+        if ((field56)&&(field56 !="undefined")&&(field56 !="oooo")) {
+            document.getElementById('calcdetailField28').textContent = field56 || "N/A";
+        }
+    
+        if ((field57)&&(field57 !="undefined")&&(field57 !="oooo")) {
+            document.getElementById('calclabelField29').textContent = field57 || "N/A";
+        }
+        if (((field57)&&(field57 !="undefined")&&(field57 !="oooo")) || ((field58)&&(field58 !="undefined")&&(field58 !="oooo"))) {
+            document.getElementById('calcpoints29').textContent = ":";
+        }
+        if ((field58)&&(field58 !="undefined")&&(field58 !="oooo")) {
+            document.getElementById('calcdetailField29').textContent = field58 || "N/A";
+        }
+    
+        if ((field59)&&(field59 !="undefined")&&(field59 !="oooo")) {
+            document.getElementById('calclabelField30').textContent = field59 || "N/A";
+        }
+        if (((field59)&&(field59 !="undefined")&&(field59 !="oooo")) || ((field60)&&(field60 !="undefined")&&(field60 !="oooo"))) {
+            document.getElementById('calcpoints30').textContent = ":";
+        }
+        if ((field60)&&(field60 !="undefined")&&(field60 !="oooo")) {
+            document.getElementById('calcdetailField30').textContent = field60 || "N/A";
+        }
+    
+        $('#calcmachineDetailsModal').modal('show');
+    }
+    
+
+    
+</script>
 {% endblock %}

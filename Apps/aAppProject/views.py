@@ -4,6 +4,7 @@ from .models import APP_Project
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppSubmittal.models import Machine
 from Apps.aAppMechanical.models import aLogEntry
+from Apps.aAppCalculation.models import modelcalc
 
 import requests
 
@@ -181,6 +182,40 @@ def get_machines(request, project_id):
                                              "oSec10Field13", "oSec10Field14", "oSec10Field15",
                                              "oSec10Field16", "oSec10Field17", "oSec10Field18",
                                              "oSec10Field19", "oSec10Field20"))
+        }
+        return JsonResponse(data)
+    except APP_Project.DoesNotExist:
+        return JsonResponse({"error": "Project not found"}, status=404)
+    
+
+def get_calc_machines(request, project_id):
+    try:
+        project = APP_Project.objects.get(id=project_id)
+        machines = modelcalc.objects.filter(project=project)
+        
+        data = {
+            "project_name": project.name,
+            "machines": list(machines.values("oSec00Field01", "oSec00Field02", "oSec00Field03",
+                                             "oSec01Field01", "oSec01Field02", "oSec01Field03",
+                                             "oSec01Field04", "oSec01Field05", "oSec01Field06",
+                                             "oSec01Field07", "oSec01Field08", "oSec01Field09",
+                                             "oSec01Field10", "oSec01Field11", "oSec01Field12",
+                                             "oSec01Field13", "oSec01Field14", "oSec01Field15",
+                                             "oSec01Field16", "oSec01Field17", "oSec01Field18",
+                                             "oSec01Field19", "oSec01Field20", "oSec01Field21",
+                                             "oSec01Field22", "oSec01Field23", "oSec01Field24", 
+                                             "oSec01Field25", "oSec01Field26", "oSec01Field27", 
+                                             "oSec01Field28", "oSec01Field29", "oSec01Field30",
+                                             "oSec02Field01", "oSec02Field02", "oSec02Field03",
+                                             "oSec02Field04", "oSec02Field05", "oSec02Field06",
+                                             "oSec02Field07", "oSec02Field08", "oSec02Field09",
+                                             "oSec02Field10", "oSec02Field11", "oSec02Field12",
+                                             "oSec02Field13", "oSec02Field14", "oSec02Field15",
+                                             "oSec02Field16", "oSec02Field17", "oSec02Field18",
+                                             "oSec02Field19", "oSec02Field20", "oSec02Field21",
+                                             "oSec02Field22", "oSec02Field23", "oSec02Field24", 
+                                             "oSec02Field25", "oSec02Field26", "oSec02Field27", 
+                                             "oSec02Field28", "oSec02Field29", "oSec02Field30",))
         }
         return JsonResponse(data)
     except APP_Project.DoesNotExist:

@@ -237,7 +237,7 @@ class Machine(models.Model):
     
 
     def __str__(self):
-        return f"{self.name} ({self.get_machine_type_display()})"
+        return f"{self.project.name} ({self.oSec00Field03})"
 
     class Meta:
         db_table = 'aAppMechanical_machine'
@@ -466,4 +466,5 @@ class Machine_log(models.Model):
     
 
     def __str__(self):
-        return f"{self.name} ({self.get_machine_type_display()})"
+        return f"{self.project.name} ({self.oSec00Field03})"
+

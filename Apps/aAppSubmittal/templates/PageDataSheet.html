@@ -1139,7 +1139,11 @@
                     <td>{{ machine.oSec01Field02 }}</td>
                     <td>
                         <button class="btn btn-warning btn-sm edit-btn" data-id="{{ machine.id }}">Edit</button>
-                        <a href="{% url 'DeleteMachine' machine_id=machine.id %}" class="btn btn-danger btn-sm">Delete</a>
+                        <form action="{% url 'DeleteMachine' machine_id=machine.id %}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="sheet_key" value="{{ sheet_key }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
                         <button class="btn btn-info btn-sm show-data-btn" data-id="{{ machine.id }}" data-toggle="modal" data-target="#dataModal">
                             Show All Data
                         </button>
