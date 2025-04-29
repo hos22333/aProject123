@@ -14,7 +14,7 @@
                     <div class="row">
                         
                         
-                        <form method="post" action="{% url 'PageDataSheet' %}" >
+                        <form method="post" action="{% url 'PageDataSheet' %}" id="machineForm">
                             {% csrf_token %}
                             <label for="sheet_key">Select Machine:</label>
                             <select name="sheet_key" id="sheet_key" class="form-control shadow-sm rounded">
@@ -23,6 +23,7 @@
                                     <option value="{{ machine.keyValue }}">{{ machine.nameMachine }}</option>
                                 {% endfor %}
                             </select>
+                            <small id="sheet_key_error" class="text-danger" style="display:none;">Please select a machine.</small>
                             <button type="submit" class="btn btn-primary btn-lg mt-3">Load</button>
                           </form>
 
@@ -32,9 +33,9 @@
             </div>
         </div>
 
-
+        {% if machineShow == "Yes" %}        
         <h2>DataSheet : {{ aMachineName }}</h2>
-        <form method="POST" action="{% url 'SavePageDataSheet' %}" class="form-group">
+        <form method="POST" action="{% url 'SavePageDataSheet' %}" class="form-group" id="projectForm">
             {% csrf_token %}
             <input type="hidden" name="sheet_key" value="{{ sheet_key }}">
             <div class="row"> <!-- Row to hold both cards side by side -->
@@ -56,6 +57,7 @@
                                             <option value="{{ project.id }}">{{ project.name }}</option>
                                         {% endfor %}
                                     </select>
+                                    <small id="project_error" class="text-danger" style="display:none;">Please select a project.</small>
                                 </div>
 
 
@@ -1160,6 +1162,8 @@
 
             </tbody>
         </table>
+        
+        {% endif %}
         
     </div>
 </div>
@@ -2502,6 +2506,52 @@
 </script>
 
 
+<!-- JS validation for choosing a machine -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById('machineForm');
+        const select = document.getElementById('sheet_key');
+        const errorText = document.getElementById('sheet_key_error');
+
+        form.addEventListener("submit", function (event) {
+            if (select.value === "") {
+                event.preventDefault();
+                // Highlight the select with red color
+                select.classList.add("is-invalid");
+                // Show error message
+                errorText.style.display = "block";
+            } else {
+                // If the user selects something correctly, remove the alert.
+                select.classList.remove("is-invalid");
+                errorText.style.display = "none";
+            }
+        });
+    });
+</script>
+
+
+<!-- JS validation  for choosing a project-->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById('projectForm');
+        const select = document.getElementById('project');
+        const errorText = document.getElementById('project_error');
+
+        form.addEventListener("submit", function (event) {
+            if (select.value === "") {
+                event.preventDefault();
+                // Highlight the select with red color
+                select.classList.add("is-invalid");
+                // Show error message
+                errorText.style.display = "block";
+            } else {
+                // If the user selects something correctly, remove the alert.
+                select.classList.remove("is-invalid");
+                errorText.style.display = "none";
+            }
+        });
+    });
+</script>
 
 
 {% endblock %}

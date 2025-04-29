@@ -14,7 +14,7 @@
                     <div class="row">
                         
                         
-                        <form method="post" action="{% url 'PageCalculationSheet' %}" >
+                        <form method="post" action="{% url 'PageCalculationSheet' %}" id="machineForm">
                             {% csrf_token %}
                             <label for="sheet_key">Select Machine:</label>
                             <select name="sheet_key" id="sheet_key" class="form-control shadow-sm rounded">
@@ -23,15 +23,17 @@
                                     <option value="{{ machine.keyValue }}">{{ machine.nameMachine }}</option>
                                 {% endfor %}
                             </select>
+                            <small id="sheet_key_error" class="text-danger" style="display:none;">Please select a machine.</small>
                             <button type="submit" class="btn btn-primary btn-lg mt-3">Load</button>
                           </form>
                     </div>
                 </div>
             </div>
         </div>
-
+        
+        {% if machineShow == "Yes" %}      
         <h2> {{ aMachineName }}</h2>
-        <form method="POST" action="{% url 'submitPageCalculationSheet' %}" class="form-group">
+        <form method="POST" action="{% url 'submitPageCalculationSheet' %}" class="form-group" id="projectForm">
             {% csrf_token %}
             <input type="hidden" name="sheet_key" value="{{ sheet_key }}">
             <div class="row"> <!-- Row to hold both cards side by side -->
@@ -53,6 +55,7 @@
                                             <option value="{{ project.id }}">{{ project.name }}</option>
                                         {% endfor %}
                                     </select>
+                                    <small id="project_error" class="text-danger" style="display:none;">Please select a project.</small>
                                 </div>
 
 
@@ -189,6 +192,66 @@
                                     {{ form.oSec01Field20 }}
                                 </div>
                                 {% endif %}
+                                {% if aSection01Field21Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field21.label }}</label>
+                                    {{ form.oSec01Field21 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field22Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field22.label }}</label>
+                                    {{ form.oSec01Field22 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field23Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field13.label }}</label>
+                                    {{ form.oSec01Field23 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field24Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field14.label }}</label>
+                                    {{ form.oSec01Field24 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field25Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field15.label }}</label>
+                                    {{ form.oSec01Field25 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field26Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field16.label }}</label>
+                                    {{ form.oSec01Field26 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field27Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field17.label }}</label>
+                                    {{ form.oSec01Field27 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field28Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field18.label }}</label>
+                                    {{ form.oSec01Field28 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field29Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field19.label }}</label>
+                                    {{ form.oSec01Field29 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection01Field30Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec01Field20.label }}</label>
+                                    {{ form.oSec01Field30 }}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -323,6 +386,66 @@
                                     {{ form.oSec02Field20 }}
                                 </div>
                                 {% endif %}
+                                {% if aSection02Field21Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field11.label }}</label>
+                                    {{ form.oSec02Field21 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field22Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field12.label }}</label>
+                                    {{ form.oSec02Field22 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field23Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field13.label }}</label>
+                                    {{ form.oSec02Field23 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field24Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field14.label }}</label>
+                                    {{ form.oSec02Field24 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field25Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field15.label }}</label>
+                                    {{ form.oSec02Field25 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field26Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field16.label }}</label>
+                                    {{ form.oSec02Field26 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field27Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field17.label }}</label>
+                                    {{ form.oSec02Field27 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field28Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field18.label }}</label>
+                                    {{ form.oSec02Field28 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field29Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field19.label }}</label>
+                                    {{ form.oSec02Field29 }}
+                                </div>
+                                {% endif %}
+                                {% if aSection02Field30Show == "Yes" %}     
+                                <div class="col-md-6 mb-3">
+                                    <label>{{ form.oSec02Field20.label }}</label>
+                                    {{ form.oSec02Field30 }}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -377,6 +500,7 @@
             </tbody>
         </table>
         
+        {% endif %}
 
     </div>
 </div>
@@ -486,7 +610,52 @@
     });
 </script>
 
+<!-- JS validation for choosing a machine -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById('machineForm');
+        const select = document.getElementById('sheet_key');
+        const errorText = document.getElementById('sheet_key_error');
 
+        form.addEventListener("submit", function (event) {
+            if (select.value === "") {
+                event.preventDefault();
+                // Highlight the select with red color
+                select.classList.add("is-invalid");
+                // Show error message
+                errorText.style.display = "block";
+            } else {
+                // If the user selects something correctly, remove the alert.
+                select.classList.remove("is-invalid");
+                errorText.style.display = "none";
+            }
+        });
+    });
+</script>
+
+
+<!-- JS validation  for choosing a project-->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById('projectForm');
+        const select = document.getElementById('project');
+        const errorText = document.getElementById('project_error');
+
+        form.addEventListener("submit", function (event) {
+            if (select.value === "") {
+                event.preventDefault();
+                // Highlight the select with red color
+                select.classList.add("is-invalid");
+                // Show error message
+                errorText.style.display = "block";
+            } else {
+                // If the user selects something correctly, remove the alert.
+                select.classList.remove("is-invalid");
+                errorText.style.display = "none";
+            }
+        });
+    });
+</script>
 
 
 {% endblock %}

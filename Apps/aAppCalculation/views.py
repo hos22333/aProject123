@@ -103,22 +103,30 @@ def interact_with_api(api_url, req_type, input_data):
 
 
 def LoadPageCalculationSheet(request):
-
+    machineShow = "Hide"
     # Redirect unauthenticated users
     if not request.user.is_authenticated:
         return redirect("login")
+    
+    # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
 
-    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None")
+    print(user_company)
 
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").filter(company=user_company)
 
     sheet_key = None
 
-    
-    
-    
     # If POST, get the selected sheet_key
     if request.method == "POST":
         sheet_key = request.POST.get("sheet_key")
+        if sheet_key :
+            machineShow = "Yes"
 
     #pdb.set_trace()
     print(sheet_key)
@@ -138,16 +146,6 @@ def LoadPageCalculationSheet(request):
         message=f"{request.user} >>> {sheet_key}"
     )
     
-
-    # Get the company of the logged-in user    
-    user_company = None
-    if request.user.is_authenticated:
-        try:
-            user_company = UserCompany.objects.get(user=request.user).company
-        except UserCompany.DoesNotExist:
-            user_company = None
-
-    print(user_company)
 
     #Define Retrieve values from AddMachine model
     try:
@@ -203,6 +201,16 @@ def LoadPageCalculationSheet(request):
     aSection01Field18Show = "Yes"
     aSection01Field19Show = "Yes"
     aSection01Field20Show = "Yes"
+    aSection01Field21Show = "Yes"
+    aSection01Field22Show = "Yes"
+    aSection01Field23Show = "Yes"
+    aSection01Field24Show = "Yes"
+    aSection01Field25Show = "Yes"
+    aSection01Field26Show = "Yes"
+    aSection01Field27Show = "Yes"
+    aSection01Field28Show = "Yes"
+    aSection01Field29Show = "Yes"
+    aSection01Field30Show = "Yes"
     aSection02Field01Show = "Yes"
     aSection02Field02Show = "Yes"
     aSection02Field03Show = "Yes"
@@ -223,6 +231,16 @@ def LoadPageCalculationSheet(request):
     aSection02Field18Show = "Yes"
     aSection02Field19Show = "Yes"
     aSection02Field20Show = "Yes"
+    aSection02Field21Show = "Yes"
+    aSection02Field22Show = "Yes"
+    aSection02Field23Show = "Yes"
+    aSection02Field24Show = "Yes"
+    aSection02Field25Show = "Yes"
+    aSection02Field26Show = "Yes"
+    aSection02Field27Show = "Yes"
+    aSection02Field28Show = "Yes"
+    aSection02Field29Show = "Yes"
+    aSection02Field30Show = "Yes"
     
     print(form.fields['oSec01Field01'].initial)
     print(form.fields['oSec01Field02'].initial)
@@ -244,6 +262,16 @@ def LoadPageCalculationSheet(request):
     print(form.fields['oSec01Field18'].initial)
     print(form.fields['oSec01Field19'].initial)
     print(form.fields['oSec01Field20'].initial)
+    print(form.fields['oSec01Field21'].initial)
+    print(form.fields['oSec01Field22'].initial)
+    print(form.fields['oSec01Field23'].initial)
+    print(form.fields['oSec01Field24'].initial)
+    print(form.fields['oSec01Field25'].initial)
+    print(form.fields['oSec01Field26'].initial)
+    print(form.fields['oSec01Field27'].initial)
+    print(form.fields['oSec01Field28'].initial)
+    print(form.fields['oSec01Field29'].initial)
+    print(form.fields['oSec01Field30'].initial)
     print(form.fields['oSec02Field01'].initial)
     print(form.fields['oSec02Field02'].initial)
     print(form.fields['oSec02Field03'].initial)
@@ -264,6 +292,16 @@ def LoadPageCalculationSheet(request):
     print(form.fields['oSec02Field18'].initial)
     print(form.fields['oSec02Field19'].initial)
     print(form.fields['oSec02Field20'].initial)
+    print(form.fields['oSec02Field21'].initial)
+    print(form.fields['oSec02Field22'].initial)
+    print(form.fields['oSec02Field23'].initial)
+    print(form.fields['oSec02Field24'].initial)
+    print(form.fields['oSec02Field25'].initial)
+    print(form.fields['oSec02Field26'].initial)
+    print(form.fields['oSec02Field27'].initial)
+    print(form.fields['oSec02Field28'].initial)
+    print(form.fields['oSec02Field29'].initial)
+    print(form.fields['oSec02Field30'].initial)
 
     # Apply conditions to modify the values
     if form.fields['oSec01Field01'].initial in ["oooo", None , ""]:
@@ -306,6 +344,26 @@ def LoadPageCalculationSheet(request):
         aSection01Field19Show = "Hide"
     if form.fields['oSec01Field20'].initial in ["oooo", None , ""]:
         aSection01Field20Show = "Hide"
+    if form.fields['oSec01Field21'].initial in ["oooo", None , ""]:
+        aSection01Field21Show = "Hide"
+    if form.fields['oSec01Field22'].initial in ["oooo", None , ""]:
+        aSection01Field22Show = "Hide"
+    if form.fields['oSec01Field23'].initial in ["oooo", None , ""]:
+        aSection01Field23Show = "Hide"
+    if form.fields['oSec01Field24'].initial in ["oooo", None , ""]:
+        aSection01Field24Show = "Hide"
+    if form.fields['oSec01Field25'].initial in ["oooo", None , ""]:
+        aSection01Field25Show = "Hide"
+    if form.fields['oSec01Field26'].initial in ["oooo", None , ""]:
+        aSection01Field26Show = "Hide"
+    if form.fields['oSec01Field27'].initial in ["oooo", None , ""]:
+        aSection01Field27Show = "Hide"
+    if form.fields['oSec01Field28'].initial in ["oooo", None , ""]:
+        aSection01Field28Show = "Hide"
+    if form.fields['oSec01Field29'].initial in ["oooo", None , ""]:
+        aSection01Field29Show = "Hide"
+    if form.fields['oSec01Field30'].initial in ["oooo", None , ""]:
+        aSection01Field30Show = "Hide"
 
     if form.fields['oSec02Field01'].initial in ["oooo", None , ""]:
         aSection02Field01Show = "Hide"
@@ -347,6 +405,26 @@ def LoadPageCalculationSheet(request):
         aSection02Field19Show = "Hide"
     if form.fields['oSec02Field20'].initial in ["oooo", None , ""]:
         aSection02Field20Show = "Hide"
+    if form.fields['oSec02Field21'].initial in ["oooo", None , ""]:
+        aSection02Field21Show = "Hide"
+    if form.fields['oSec02Field22'].initial in ["oooo", None , ""]:
+        aSection02Field22Show = "Hide"
+    if form.fields['oSec02Field23'].initial in ["oooo", None , ""]:
+        aSection02Field23Show = "Hide"
+    if form.fields['oSec01Field24'].initial in ["oooo", None , ""]:
+        aSection02Field24Show = "Hide"
+    if form.fields['oSec02Field25'].initial in ["oooo", None , ""]:
+        aSection02Field25Show = "Hide"
+    if form.fields['oSec02Field26'].initial in ["oooo", None , ""]:
+        aSection02Field26Show = "Hide"
+    if form.fields['oSec02Field27'].initial in ["oooo", None , ""]:
+        aSection02Field27Show = "Hide"
+    if form.fields['oSec02Field28'].initial in ["oooo", None , ""]:
+        aSection02Field28Show = "Hide"
+    if form.fields['oSec02Field29'].initial in ["oooo", None , ""]:
+        aSection02Field29Show = "Hide"
+    if form.fields['oSec02Field30'].initial in ["oooo", None , ""]:
+        aSection02Field30Show = "Hide"
     
     print(aSection01Field01Show)
     print(aSection01Field02Show)
@@ -368,6 +446,16 @@ def LoadPageCalculationSheet(request):
     print(aSection01Field18Show)
     print(aSection01Field19Show)
     print(aSection01Field20Show)
+    print(aSection01Field21Show)
+    print(aSection01Field22Show)
+    print(aSection01Field23Show)
+    print(aSection01Field24Show)
+    print(aSection01Field25Show)
+    print(aSection01Field26Show)
+    print(aSection01Field27Show)
+    print(aSection01Field28Show)
+    print(aSection01Field29Show)
+    print(aSection01Field30Show)
     print(aSection02Field01Show)
     print(aSection02Field02Show)
     print(aSection02Field03Show)
@@ -388,6 +476,16 @@ def LoadPageCalculationSheet(request):
     print(aSection02Field18Show)
     print(aSection02Field19Show)
     print(aSection02Field20Show)
+    print(aSection02Field21Show)
+    print(aSection02Field22Show)
+    print(aSection02Field23Show)
+    print(aSection02Field24Show)
+    print(aSection02Field25Show)
+    print(aSection02Field26Show)
+    print(aSection02Field27Show)
+    print(aSection02Field28Show)
+    print(aSection02Field29Show)
+    print(aSection02Field30Show)
     
 
     return render(request, "PageCalculationSheet.html", {
@@ -398,6 +496,7 @@ def LoadPageCalculationSheet(request):
     "user_company": user_company, 
     "sheet_key": sheet_key,
     "sheet_keys": sheet_keys,
+    "machineShow": machineShow,
     "aSection01Field01Show": aSection01Field01Show,
     "aSection01Field02Show": aSection01Field02Show,
     "aSection01Field03Show": aSection01Field03Show,
@@ -418,6 +517,16 @@ def LoadPageCalculationSheet(request):
     "aSection01Field18Show": aSection01Field18Show,
     "aSection01Field19Show": aSection01Field19Show,
     "aSection01Field20Show": aSection01Field20Show,
+    "aSection01Field21Show": aSection01Field21Show,
+    "aSection01Field22Show": aSection01Field22Show,
+    "aSection01Field23Show": aSection01Field23Show,
+    "aSection01Field24Show": aSection01Field24Show,
+    "aSection01Field25Show": aSection01Field25Show,
+    "aSection01Field26Show": aSection01Field26Show,
+    "aSection01Field27Show": aSection01Field27Show,
+    "aSection01Field28Show": aSection01Field28Show,
+    "aSection01Field29Show": aSection01Field29Show,
+    "aSection01Field30Show": aSection01Field30Show,
     "aSection02Field01Show": aSection02Field01Show,
     "aSection02Field02Show": aSection02Field02Show,
     "aSection02Field03Show": aSection02Field03Show,
@@ -438,15 +547,20 @@ def LoadPageCalculationSheet(request):
     "aSection02Field18Show": aSection02Field18Show,
     "aSection02Field19Show": aSection02Field19Show,
     "aSection02Field20Show": aSection02Field20Show,
+    "aSection02Field21Show": aSection02Field21Show,
+    "aSection02Field22Show": aSection02Field22Show,
+    "aSection02Field23Show": aSection02Field23Show,
+    "aSection02Field24Show": aSection02Field24Show,
+    "aSection02Field25Show": aSection02Field25Show,
+    "aSection02Field26Show": aSection02Field26Show,
+    "aSection02Field27Show": aSection02Field27Show,
+    "aSection02Field28Show": aSection02Field28Show,
+    "aSection02Field29Show": aSection02Field29Show,
+    "aSection02Field30Show": aSection02Field30Show,
     
 })
 
 def HandleCalculationSheetForm(request):
-    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None")
-    sheet_key = request.POST.get("sheet_key")
-    print(sheet_key)
-
-
     if not request.user.is_authenticated:
         return redirect('login')
     
@@ -695,6 +809,10 @@ def HandleCalculationSheetForm(request):
 
     print(user_company)
 
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").filter(company=user_company)
+    sheet_key = request.POST.get("sheet_key")
+    print(sheet_key)
+    
     #Define Retrieve values from AddMachine model
     try:
         machine_config = AddMachine.objects.get(keyValue=sheet_key)

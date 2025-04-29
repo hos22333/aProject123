@@ -75,25 +75,30 @@ def edit_amachine(request, machine_id):
 
 
 def LoadPageDataSheet(request):
-
+    machineShow = "Hide"
     # Redirect unauthenticated users
     if not request.user.is_authenticated:
         return redirect("login")
 
-    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None")
+     # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
 
+    print(user_company)
+
+    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None").filter(company=user_company)
 
     sheet_key = None
-
-    
-    
     
     # If POST, get the selected sheet_key
     if request.method == "POST":
         sheet_key = request.POST.get("sheet_key")
-    
-    
-
+        if sheet_key :
+            machineShow = "Yes"
 
     #pdb.set_trace()
     print(sheet_key)
@@ -108,18 +113,6 @@ def LoadPageDataSheet(request):
         user=request.user,
         message=f"{request.user} >>> {sheet_key}"
     )
-    
-    
-    
-    # Get the company of the logged-in user    
-    user_company = None
-    if request.user.is_authenticated:
-        try:
-            user_company = UserCompany.objects.get(user=request.user).company
-        except UserCompany.DoesNotExist:
-            user_company = None
-
-    print(user_company)
 
 
     #Define Retrieve values from AddMachine model
@@ -295,6 +288,7 @@ def LoadPageDataSheet(request):
     "user_company": user_company,
     "sheet_key": sheet_key,
     "sheet_keys": sheet_keys,
+    "machineShow": machineShow,
     "aSection01Show": aSection01Show,
     "aSection02Show": aSection02Show,
     "aSection03Show": aSection03Show,
@@ -321,10 +315,6 @@ def LoadPageDataSheet(request):
 
 
 def SavePageDataSheet(request):
-    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None")
-    sheet_key = request.POST.get("sheet_key")
-    print(sheet_key)
-    
     # Redirect unauthenticated users
     if not request.user.is_authenticated:
         return redirect("login")  
@@ -345,7 +335,9 @@ def SavePageDataSheet(request):
         except UserCompany.DoesNotExist:
             user_company = None
 
-
+    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None")
+    sheet_key = request.POST.get("sheet_key")
+    print(sheet_key)
     #Define Retrieve values from AddMachine model
     try:
         machine_config = AddMachine.objects.get(keyValue=sheet_key)
@@ -583,7 +575,7 @@ def SavePageDataSheet(request):
             machines = Machine.objects.filter(oSec00Field03=DB_Name)
             return render(request, "PageDataSheet.html", {"form": form, "error": "Form contains errors", "machines": machines})
 
-    return redirect("ms_load")  # Redirect for invalid requests
+    return redirect("PageDataSheet")  # Redirect for invalid requests
 
 
 
