@@ -281,35 +281,35 @@ def LoadPageDataSheet(request):
     # print(projects)
 
     return render(request, "PageDataSheet.html", {
-    "form": form,
-    "machines": machines,
-    "projects": projects,  
-    "aMachineName": aMachineName,  
-    "user_company": user_company,
-    "sheet_key": sheet_key,
-    "sheet_keys": sheet_keys,
-    "machineShow": machineShow,
-    "aSection01Show": aSection01Show,
-    "aSection02Show": aSection02Show,
-    "aSection03Show": aSection03Show,
-    "aSection04Show": aSection04Show,
-    "aSection05Show": aSection05Show,
-    "aSection06Show": aSection06Show,
-    "aSection07Show": aSection07Show,
-    "aSection08Show": aSection08Show,
-    "aSection09Show": aSection09Show,
-    "aSection10Show": aSection10Show,
-    **aSection01FieldShow,
-    **aSection02FieldShow,
-    **aSection03FieldShow,
-    **aSection04FieldShow,
-    **aSection05FieldShow,
-    **aSection06FieldShow,
-    **aSection07FieldShow,
-    **aSection08FieldShow,
-    **aSection09FieldShow,
-    **aSection10FieldShow,
-})
+        "form": form,
+        "machines": machines,
+        "projects": projects,  
+        "aMachineName": aMachineName,  
+        "user_company": user_company,
+        "sheet_key": sheet_key,
+        "sheet_keys": sheet_keys,
+        "machineShow": machineShow,
+        "aSection01Show": aSection01Show,
+        "aSection02Show": aSection02Show,
+        "aSection03Show": aSection03Show,
+        "aSection04Show": aSection04Show,
+        "aSection05Show": aSection05Show,
+        "aSection06Show": aSection06Show,
+        "aSection07Show": aSection07Show,
+        "aSection08Show": aSection08Show,
+        "aSection09Show": aSection09Show,
+        "aSection10Show": aSection10Show,
+        **aSection01FieldShow,
+        **aSection02FieldShow,
+        **aSection03FieldShow,
+        **aSection04FieldShow,
+        **aSection05FieldShow,
+        **aSection06FieldShow,
+        **aSection07FieldShow,
+        **aSection08FieldShow,
+        **aSection09FieldShow,
+        **aSection10FieldShow,
+    })
 
 
 
@@ -319,14 +319,6 @@ def SavePageDataSheet(request):
     if not request.user.is_authenticated:
         return redirect("login")  
     
-    
-    ###LOG
-    aLogEntry.objects.create(
-            user=request.user,
-            message=f"at {now()} {request.user} accessed Load {sheet_key} "
-        )
-    
-    
     # Get the company of the logged-in user    
     user_company = None
     if request.user.is_authenticated:
@@ -335,9 +327,18 @@ def SavePageDataSheet(request):
         except UserCompany.DoesNotExist:
             user_company = None
 
-    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None")
+    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None").filter(company=user_company)
     sheet_key = request.POST.get("sheet_key")
     print(sheet_key)
+    
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} accessed Load {sheet_key} "
+        )
+    
+    
+    
     #Define Retrieve values from AddMachine model
     try:
         machine_config = AddMachine.objects.get(keyValue=sheet_key)
