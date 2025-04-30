@@ -46,6 +46,7 @@ urlpatterns = [
     
     path('user_roles_autho/', views.user_roles_with_authos, name='user_roles_autho'),
 
+    path('Log_history/', views.Log_history, name='Log_history'),
     path('modelcalc/', views.modelcalc_list, name='modelcalc_list'),
     path('modelmachine/', views.modelmachine_list, name='modelmachine_list'),
     

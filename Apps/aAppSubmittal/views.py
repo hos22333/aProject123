@@ -41,6 +41,10 @@ def add_machine(request):
         form = MachineForm(request.POST)
         if form.is_valid():
             form.save()
+            aLogEntry.objects.create(
+                user=request.user,
+                message=f"{request.user} Added >>> {form.nameMachine} "
+            )
     else:
         form = MachineForm()
 
@@ -52,6 +56,10 @@ def add_machine(request):
 # Delete Company
 def delete_machine(request, machine_id):
     machine = get_object_or_404(AddMachine, id=machine_id)
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Added >>> {machine.nameMachine} "
+    )
     machine.delete()
     return redirect('add_machine')  # Redirect back to the list
 
@@ -60,6 +68,11 @@ def delete_machine(request, machine_id):
 # Edit Company
 def edit_amachine(request, machine_id):
     machine = get_object_or_404(AddMachine, id=machine_id)
+
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Edited >>> {machine.nameMachine} "
+    )
 
     if request.method == 'POST':
         form = MachineForm(request.POST, instance=machine)
@@ -327,7 +340,7 @@ def SavePageDataSheet(request):
     ###LOG
     aLogEntry.objects.create(
             user=request.user,
-            message=f"at {now()} {request.user} accessed Load {sheet_key} "
+            message=f"at {now()} {request.user} saved accessed Load {sheet_key} "
         )
     
     
@@ -624,6 +637,10 @@ def DeleteMachine(request, machine_id):
     if sheet_key :
         machineShow = "Yes"
     machine = get_object_or_404(Machine, id=machine_id)
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Deleted >>> {machine.nameMachine} form the log "
+    )
     machine.delete()
 
      # Get the company of the logged-in user    
@@ -842,6 +859,10 @@ def DeleteMachine(request, machine_id):
 
 def edit_machine(request, machine_id):
     machine = get_object_or_404(Machine, id=machine_id)  # Fetch the existing machine
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Edited >>> {machine.nameMachine} "
+    )
 
     if request.method == "POST":
         #form = FDS_CO(request.POST)  # Bind the form with posted data
@@ -883,6 +904,10 @@ def edit_machine(request, machine_id):
 
 def DataSheetNS_get_datasheet_data(request, machine_id):
     machine = get_object_or_404(Machine, id=machine_id)
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Get Data for >>> {machine.nameMachine} "
+    )
     
     data = {
         "project": machine.project.name if machine.project else "No Project",

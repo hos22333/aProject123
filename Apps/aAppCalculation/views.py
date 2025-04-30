@@ -566,6 +566,9 @@ def HandleCalculationSheetForm(request):
     if not request.user.is_authenticated:
         return redirect('login')
     
+    print(request.user)
+    print(f"{request.user} accessed Load {sheet_key}")
+    
     
 
     form_mapping = {
@@ -843,6 +846,13 @@ def HandleCalculationSheetForm(request):
     
     print(user_company)
 
+    ###LOG
+    
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Calculated >>> {sheet_key} >>> {projects}"
+    )
+
     if request.method == 'POST' and 'form1_submit' in request.POST:
         form = FormCalculationSheet(form_type=form_type, data=request.POST)
         if form.is_valid():
@@ -1001,6 +1011,11 @@ def generate_report(request):
     sheet_key = request.POST.get("sheet_key")
     print(sheet_key)
 
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Generated Report of >>> {sheet_key}"
+    )
+
     #Define Retrieve values from AddMachine model
     try:
         machine_config = AddMachine.objects.get(keyValue=sheet_key)
@@ -1029,48 +1044,38 @@ def generate_report(request):
         # Extract form data
         form_data = {
             "Input": [
-                (form1.fields["oSec01Field01"].label, request.POST.get("oSec01Field01", "N/A")),
-                (form1.fields["oSec01Field02"].label, request.POST.get("oSec01Field02", "N/A")),
-                (form1.fields["oSec01Field03"].label, request.POST.get("oSec01Field03", "N/A")),
-                (form1.fields["oSec01Field04"].label, request.POST.get("oSec01Field04", "N/A")),
-                (form1.fields["oSec01Field05"].label, request.POST.get("oSec01Field05", "N/A")),
-                (form1.fields["oSec01Field06"].label, request.POST.get("oSec01Field06", "N/A")),
-                (form1.fields["oSec01Field07"].label, request.POST.get("oSec01Field07", "N/A")),
-                (form1.fields["oSec01Field08"].label, request.POST.get("oSec01Field08", "N/A")),
-                (form1.fields["oSec01Field09"].label, request.POST.get("oSec01Field09", "N/A")),
-                (form1.fields["oSec01Field10"].label, request.POST.get("oSec01Field10", "N/A")),
-                (form1.fields["oSec01Field11"].label, request.POST.get("oSec01Field11", "N/A")),
-                (form1.fields["oSec01Field12"].label, request.POST.get("oSec01Field12", "N/A")),
-                (form1.fields["oSec01Field13"].label, request.POST.get("oSec01Field13", "N/A")),
-                (form1.fields["oSec01Field14"].label, request.POST.get("oSec01Field14", "N/A")),
-                (form1.fields["oSec01Field15"].label, request.POST.get("oSec01Field15", "N/A")),
-                (form1.fields["oSec01Field16"].label, request.POST.get("oSec01Field16", "N/A")),
-                (form1.fields["oSec01Field17"].label, request.POST.get("oSec01Field17", "N/A")),
-                (form1.fields["oSec01Field18"].label, request.POST.get("oSec01Field18", "N/A")),
-                (form1.fields["oSec01Field19"].label, request.POST.get("oSec01Field19", "N/A")),
-                (form1.fields["oSec01Field20"].label, request.POST.get("oSec01Field20", "N/A")),
+                (request.POST.get("oSec01Field01", "N/A"), request.POST.get("oSec01Field02", "N/A")),
+                (request.POST.get("oSec01Field03", "N/A"), request.POST.get("oSec01Field04", "N/A")),
+                (request.POST.get("oSec01Field05", "N/A"), request.POST.get("oSec01Field06", "N/A")),
+                (request.POST.get("oSec01Field07", "N/A"), request.POST.get("oSec01Field08", "N/A")),
+                (request.POST.get("oSec01Field09", "N/A"), request.POST.get("oSec01Field10", "N/A")),
+                (request.POST.get("oSec01Field11", "N/A"), request.POST.get("oSec01Field12", "N/A")),
+                (request.POST.get("oSec01Field13", "N/A"), request.POST.get("oSec01Field14", "N/A")),
+                (request.POST.get("oSec01Field15", "N/A"), request.POST.get("oSec01Field16", "N/A")),
+                (request.POST.get("oSec01Field17", "N/A"), request.POST.get("oSec01Field18", "N/A")),
+                (request.POST.get("oSec01Field19", "N/A"), request.POST.get("oSec01Field20", "N/A")),
+                (request.POST.get("oSec01Field21", "N/A"), request.POST.get("oSec01Field22", "N/A")),
+                (request.POST.get("oSec01Field23", "N/A"), request.POST.get("oSec01Field24", "N/A")),
+                (request.POST.get("oSec01Field25", "N/A"), request.POST.get("oSec01Field26", "N/A")),
+                (request.POST.get("oSec01Field27", "N/A"), request.POST.get("oSec01Field28", "N/A")),
+                (request.POST.get("oSec01Field29", "N/A"), request.POST.get("oSec01Field30", "N/A")),
             ],
             "Output": [
-                (form1.fields["oSec02Field01"].label, request.POST.get("oSec02Field01", "N/A")),
-                (form1.fields["oSec02Field02"].label, request.POST.get("oSec02Field02", "N/A")),
-                (form1.fields["oSec02Field03"].label, request.POST.get("oSec02Field03", "N/A")),
-                (form1.fields["oSec02Field04"].label, request.POST.get("oSec02Field04", "N/A")),
-                (form1.fields["oSec02Field05"].label, request.POST.get("oSec02Field05", "N/A")),
-                (form1.fields["oSec02Field06"].label, request.POST.get("oSec02Field06", "N/A")),
-                (form1.fields["oSec02Field07"].label, request.POST.get("oSec02Field07", "N/A")),
-                (form1.fields["oSec02Field08"].label, request.POST.get("oSec02Field08", "N/A")),
-                (form1.fields["oSec02Field09"].label, request.POST.get("oSec02Field09", "N/A")),
-                (form1.fields["oSec02Field10"].label, request.POST.get("oSec02Field10", "N/A")),
-                (form1.fields["oSec02Field11"].label, request.POST.get("oSec02Field11", "N/A")),
-                (form1.fields["oSec02Field12"].label, request.POST.get("oSec02Field12", "N/A")),
-                (form1.fields["oSec02Field13"].label, request.POST.get("oSec02Field13", "N/A")),
-                (form1.fields["oSec02Field14"].label, request.POST.get("oSec02Field14", "N/A")),
-                (form1.fields["oSec02Field15"].label, request.POST.get("oSec02Field15", "N/A")),
-                (form1.fields["oSec02Field16"].label, request.POST.get("oSec02Field16", "N/A")),
-                (form1.fields["oSec02Field17"].label, request.POST.get("oSec02Field17", "N/A")),
-                (form1.fields["oSec02Field18"].label, request.POST.get("oSec02Field18", "N/A")),
-                (form1.fields["oSec02Field19"].label, request.POST.get("oSec02Field19", "N/A")),
-                (form1.fields["oSec02Field20"].label, request.POST.get("oSec02Field20", "N/A")),
+                (request.POST.get("oSec02Field01", "N/A"), request.POST.get("oSec02Field02", "N/A")),
+                (request.POST.get("oSec02Field03", "N/A"), request.POST.get("oSec02Field04", "N/A")),
+                (request.POST.get("oSec02Field05", "N/A"), request.POST.get("oSec02Field06", "N/A")),
+                (request.POST.get("oSec02Field07", "N/A"), request.POST.get("oSec02Field08", "N/A")),
+                (request.POST.get("oSec02Field09", "N/A"), request.POST.get("oSec02Field10", "N/A")),
+                (request.POST.get("oSec02Field11", "N/A"), request.POST.get("oSec02Field12", "N/A")),
+                (request.POST.get("oSec02Field13", "N/A"), request.POST.get("oSec02Field14", "N/A")),
+                (request.POST.get("oSec02Field15", "N/A"), request.POST.get("oSec02Field16", "N/A")),
+                (request.POST.get("oSec02Field17", "N/A"), request.POST.get("oSec02Field18", "N/A")),
+                (request.POST.get("oSec02Field19", "N/A"), request.POST.get("oSec02Field20", "N/A")),
+                (request.POST.get("oSec02Field21", "N/A"), request.POST.get("oSec02Field22", "N/A")),
+                (request.POST.get("oSec02Field23", "N/A"), request.POST.get("oSec02Field24", "N/A")),
+                (request.POST.get("oSec02Field25", "N/A"), request.POST.get("oSec02Field26", "N/A")),
+                (request.POST.get("oSec02Field27", "N/A"), request.POST.get("oSec02Field28", "N/A")),
+                (request.POST.get("oSec02Field29", "N/A"), request.POST.get("oSec02Field30", "N/A")),
             ]
         }
 
@@ -1089,14 +1094,22 @@ def generate_report(request):
 
     return HttpResponse("Invalid request", status=400)
 
+
 def DeleteCalcMachine(request, machine_id):  
     sheet_key = request.POST.get("sheet_key")
     print(sheet_key)
     if sheet_key :
             machineShow = "Yes"
+
+    
+
     machine = get_object_or_404(modelcalc, id=machine_id)
     machine.delete()
 
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} deleted >>> {sheet_key} >>> {machine.project.name}"
+    )
 
      # Get the company of the logged-in user    
     user_company = None
@@ -1526,6 +1539,11 @@ def CalculationSheet_get_data(request, machine_id):
     machine = get_object_or_404(modelcalc, id=machine_id)
     sheet_key = machine.oSec00Field03
     print(sheet_key)
+
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Get data of >>> {sheet_key} >>> {machine.project.name}"
+    )
     
     
     data = {
@@ -1602,6 +1620,13 @@ def generate_saved_report(request, machine_id):
     sheet_key = machine.oSec00Field03
     print(sheet_key)
 
+
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Generated Report of >>> {sheet_key} >>> {machine.project.name}"
+    )
+
+
     #Define Retrieve values from AddMachine model
     try:
         machine_config = AddMachine.objects.get(keyValue=sheet_key)
@@ -1629,48 +1654,38 @@ def generate_saved_report(request, machine_id):
         # Extract form data
         form_data = {
             "Input": [
-                (get_field_label(form_type, "oSec01Field01"), machine.oSec01Field01),
-                (get_field_label(form_type, "oSec01Field02"), machine.oSec01Field02),
-                (get_field_label(form_type, "oSec01Field03"), machine.oSec01Field03),
-                (get_field_label(form_type, "oSec01Field04"), machine.oSec01Field04),
-                (get_field_label(form_type, "oSec01Field05"), machine.oSec01Field05),
-                (get_field_label(form_type, "oSec01Field06"), machine.oSec01Field06),
-                (get_field_label(form_type, "oSec01Field07"), machine.oSec01Field07),
-                (get_field_label(form_type, "oSec01Field08"), machine.oSec01Field08),
-                (get_field_label(form_type, "oSec01Field09"), machine.oSec01Field09),
-                (get_field_label(form_type, "oSec01Field10"), machine.oSec01Field10),
-                (get_field_label(form_type, "oSec01Field11"), machine.oSec01Field11),
-                (get_field_label(form_type, "oSec01Field12"), machine.oSec01Field12),
-                (get_field_label(form_type, "oSec01Field13"), machine.oSec01Field13),
-                (get_field_label(form_type, "oSec01Field14"), machine.oSec01Field14),
-                (get_field_label(form_type, "oSec01Field15"), machine.oSec01Field15),
-                (get_field_label(form_type, "oSec01Field16"), machine.oSec01Field16),
-                (get_field_label(form_type, "oSec01Field17"), machine.oSec01Field17),
-                (get_field_label(form_type, "oSec01Field18"), machine.oSec01Field18),
-                (get_field_label(form_type, "oSec01Field19"), machine.oSec01Field19),
-                (get_field_label(form_type, "oSec01Field20"), machine.oSec01Field20),
+                (machine.oSec01Field01, machine.oSec01Field02),
+                (machine.oSec01Field03, machine.oSec01Field04),
+                (machine.oSec01Field05, machine.oSec01Field06),
+                (machine.oSec01Field07, machine.oSec01Field08),
+                (machine.oSec01Field09, machine.oSec01Field10),
+                (machine.oSec01Field11, machine.oSec01Field12),
+                (machine.oSec01Field13, machine.oSec01Field14),
+                (machine.oSec01Field15, machine.oSec01Field16),
+                (machine.oSec01Field17, machine.oSec01Field18),
+                (machine.oSec01Field19, machine.oSec01Field20),
+                (machine.oSec01Field21, machine.oSec01Field22),
+                (machine.oSec01Field23, machine.oSec01Field24),
+                (machine.oSec01Field25, machine.oSec01Field26),
+                (machine.oSec01Field27, machine.oSec01Field28),
+                (machine.oSec01Field29, machine.oSec01Field30),
             ],
             "Output": [
-                (get_field_label(form_type, "oSec02Field01"), machine.oSec02Field01),
-                (get_field_label(form_type, "oSec02Field02"), machine.oSec02Field02),
-                (get_field_label(form_type, "oSec02Field03"), machine.oSec02Field03),
-                (get_field_label(form_type, "oSec02Field04"), machine.oSec02Field04),
-                (get_field_label(form_type, "oSec02Field05"), machine.oSec02Field05),
-                (get_field_label(form_type, "oSec02Field06"), machine.oSec02Field06),
-                (get_field_label(form_type, "oSec02Field07"), machine.oSec02Field07),
-                (get_field_label(form_type, "oSec02Field08"), machine.oSec02Field08),
-                (get_field_label(form_type, "oSec02Field09"), machine.oSec02Field09),
-                (get_field_label(form_type, "oSec02Field10"), machine.oSec02Field10),
-                (get_field_label(form_type, "oSec02Field11"), machine.oSec02Field11),
-                (get_field_label(form_type, "oSec02Field12"), machine.oSec02Field12),
-                (get_field_label(form_type, "oSec02Field13"), machine.oSec02Field13),
-                (get_field_label(form_type, "oSec02Field14"), machine.oSec02Field14),
-                (get_field_label(form_type, "oSec02Field15"), machine.oSec02Field15),
-                (get_field_label(form_type, "oSec02Field16"), machine.oSec02Field16),
-                (get_field_label(form_type, "oSec02Field17"), machine.oSec02Field17),
-                (get_field_label(form_type, "oSec02Field18"), machine.oSec02Field18),
-                (get_field_label(form_type, "oSec02Field19"), machine.oSec02Field19),
-                (get_field_label(form_type, "oSec02Field20"), machine.oSec02Field20),
+                (machine.oSec02Field01, machine.oSec02Field02),
+                (machine.oSec02Field03, machine.oSec02Field04),
+                (machine.oSec02Field05, machine.oSec02Field06),
+                (machine.oSec02Field07, machine.oSec02Field08),
+                (machine.oSec02Field09, machine.oSec02Field10),
+                (machine.oSec02Field11, machine.oSec02Field12),
+                (machine.oSec02Field13, machine.oSec02Field14),
+                (machine.oSec02Field15, machine.oSec02Field16),
+                (machine.oSec02Field17, machine.oSec02Field18),
+                (machine.oSec02Field19, machine.oSec02Field20),
+                (machine.oSec02Field21, machine.oSec02Field22),
+                (machine.oSec02Field23, machine.oSec02Field24),
+                (machine.oSec02Field25, machine.oSec02Field26),
+                (machine.oSec02Field27, machine.oSec02Field28),
+                (machine.oSec02Field29, machine.oSec02Field30),
             ]
         }
 

@@ -9,4 +9,5 @@ urlpatterns = [
     path('get_machines/<int:project_id>/', views.get_machines, name='get_machines'),    
     path('get_calc_machines/<int:project_id>/', views.get_calc_machines, name='get_calc_machines'),    
     path('generate_report/<int:project_id>/', views.generate_report, name='generate_report'),
+    path('generate_calculation_report/<int:project_id>/', views.generate_calculation_report, name='generate_calculation_report'),
 ]
