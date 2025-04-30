@@ -56,12 +56,12 @@ def user_login(request):
 def create_role(request):
     if request.method == 'POST':
         form = RoleForm(request.POST)
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"{request.user} Created the Role>>> {request.POST.get("name")} "
+        )
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Created >>> {form.name} Role"
-            )
     else:
         form = RoleForm()
 
@@ -76,7 +76,7 @@ def delete_role(request, role_id):
     role = get_object_or_404(Role, id=role_id)
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} Deleted >>> {role.name} Role"
+        message=f"{request.user} Deleted the Role >>> {role.name} "
     )
     role.delete()
     return redirect('create_role')  # Redirect back to the list
@@ -88,17 +88,13 @@ def edit_role(request, role_id):
     role = get_object_or_404(Role, id=role_id)
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} Editing >>> {role.name} Role"
+        message=f"{request.user} Editing the Role >>> {role.name} "
     )
 
     if request.method == 'POST':
         form = RoleForm(request.POST, instance=role)
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Edited >>> {form.name} Role"
-            )
             return redirect('create_role')  # Redirect back to the main page
     else:
         form = RoleForm(instance=role)
@@ -111,12 +107,12 @@ def edit_role(request, role_id):
 def create_autho(request):
     if request.method == 'POST':
         form = AuthoForm(request.POST)
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"{request.user} Created the Autho >>> {request.POST.get("name")} "
+        )
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Created >>> {form.name} Autho"
-            )
     else:
         form = AuthoForm()
 
@@ -131,7 +127,7 @@ def delete_autho(request, autho_id):
     autho = get_object_or_404(Autho, id=autho_id)
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} Deleted >>> {autho.name} Autho"
+        message=f"{request.user} Deleted the Autho >>> {autho.name} "
     )
     autho.delete()
     return redirect('create_autho')  # Redirect back to the list
@@ -145,12 +141,12 @@ def delete_autho(request, autho_id):
 def assign_role_autho(request):
     if request.method == 'POST':
         form = RoleAuthoForm(request.POST)
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"{request.user} Assigned >>> {request.POST.get("role")} to Autho {request.POST.get("autho")} "
+        )
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Assigned >>> {form.role.name} to {form.autho.name} Autho"
-            )
             #return redirect('role_autho_list')
     else:
         form = RoleAuthoForm()
@@ -164,7 +160,7 @@ def delete_role_autho(request, role_autho_id):
     if request.method == 'POST':
         aLogEntry.objects.create(
             user=request.user,
-            message=f"{request.user} Deleted >>> {role_autho.role.name} from {role_autho.autho.name} Autho"
+            message=f"{request.user} Deleted >>> {role_autho.role.name} from Autho {role_autho.autho.name} "
         )
         role_autho.delete()
     return redirect('assign_role_autho')  # Redirect back to the assign page
@@ -176,12 +172,12 @@ def delete_role_autho(request, role_autho_id):
 def assign_user_role(request):
     if request.method == 'POST':
         form = UserRoleForm(request.POST)
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"{request.user} Assigned >>> {request.POST.get("user")} to Role {request.POST.get("role")} "
+        )
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Assigned >>> {form.user.username} to {form.role.name} Role"
-            )
             #return redirect('assign_user_role')  # Redirect to the same page after saving
     else:
         form = UserRoleForm()
@@ -196,7 +192,7 @@ def delete_user_role(request, user_role_id):
     if request.method == 'POST':
         aLogEntry.objects.create(
             user=request.user,
-            message=f"{request.user} Deleted >>> {user_role.user.username} from {user_role.role.name} Role"
+            message=f"{request.user} Deleted >>> {user_role.user.username} from Role {user_role.role.name} "
         )
         user_role.delete()
     return redirect('assign_user_role')  # Redirect back to the assign page

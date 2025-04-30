@@ -51,6 +51,10 @@ def project_list(request):
 
 
             form.save()
+            aLogEntry.objects.create(
+                user=request.user,
+                message=f"{request.user} Created a project {request.POST.get("name")} "
+            )
             return redirect('project_list')
     else:
         form = ProjectForm()
@@ -120,6 +124,11 @@ def get_machines(request, project_id):
     try:
         project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
+
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"{request.user} Get Data for >>>{project.name} "
+        )
         
         data = {
             "project_name": project.name,
@@ -204,6 +213,11 @@ def get_calc_machines(request, project_id):
     try:
         project = APP_Project.objects.get(id=project_id)
         machines = modelcalc.objects.filter(project=project)
+        
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"{request.user} Get Data for >>> {project.name} "
+        )
         
         data = {
             "project_name": project.name,

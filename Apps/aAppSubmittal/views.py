@@ -35,16 +35,16 @@ from docx.shared import Inches
 from docx.shared import Pt
 
 
-# Create Company
+# Create Machine
 def add_machine(request):
     if request.method == 'POST':
         form = MachineForm(request.POST)
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"{request.user} Added a Machine >>> {request.POST.get("nameMachine")} "
+        )
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Added >>> {form.nameMachine} "
-            )
     else:
         form = MachineForm()
 
@@ -53,19 +53,19 @@ def add_machine(request):
 
     return render(request, 'machine_list.html', {'form': form, 'machines': machines})
 
-# Delete Company
+# Delete Machine
 def delete_machine(request, machine_id):
     machine = get_object_or_404(AddMachine, id=machine_id)
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} Added >>> {machine.nameMachine} "
+        message=f"{request.user} Deleted Machine>>> {machine.nameMachine} "
     )
     machine.delete()
     return redirect('add_machine')  # Redirect back to the list
 
 
 
-# Edit Company
+# Edit Machine
 def edit_amachine(request, machine_id):
     machine = get_object_or_404(AddMachine, id=machine_id)
 
@@ -130,7 +130,7 @@ def LoadPageDataSheet(request):
 
     #Define Retrieve values from AddMachine model
     try:
-        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
         form_type = machine_config.nameForm
         DB_Name = machine_config.nameDB
         aMachineName = machine_config.nameMachine
@@ -344,19 +344,6 @@ def SavePageDataSheet(request):
         )
     
     
-    
-    #Define Retrieve values from AddMachine model
-    try:
-        machine_config = AddMachine.objects.get(keyValue=sheet_key)
-        form_type = machine_config.nameForm
-        DB_Name = machine_config.nameDB
-        aMachineName = machine_config.nameMachine
-    except AddMachine.DoesNotExist:
-        form_type = "None"
-        DB_Name = "None"
-        aMachineName = "None"
-        
-    
     # Get the company of the logged-in user    
     user_company = None
     if request.user.is_authenticated:
@@ -366,6 +353,18 @@ def SavePageDataSheet(request):
             user_company = None
 
     sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None").filter(company=user_company)
+
+    #Define Retrieve values from AddMachine model
+    try:
+        machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
+        form_type = machine_config.nameForm
+        DB_Name = machine_config.nameDB
+        aMachineName = machine_config.nameMachine
+    except AddMachine.DoesNotExist:
+        form_type = "None"
+        DB_Name = "None"
+        aMachineName = "None"
+        
 
     # Assign company filter only if the user has a company
     if user_company:
@@ -536,7 +535,6 @@ def SavePageDataSheet(request):
             print(aSection08Show)
             print(aSection09Show)
             print(aSection10Show)
-            
 
             # Update visibility based on field counts
             for i in range(0, 10):
@@ -639,7 +637,7 @@ def DeleteMachine(request, machine_id):
     machine = get_object_or_404(Machine, id=machine_id)
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} Deleted >>> {machine.nameMachine} form the log "
+        message=f"{request.user} Deleted >>> {machine.oSec00Field03} form the log "
     )
     machine.delete()
 
@@ -657,7 +655,7 @@ def DeleteMachine(request, machine_id):
 
     #Define Retrieve values from AddMachine model
     try:
-        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
         form_type = machine_config.nameForm
         DB_Name = machine_config.nameDB
         aMachineName = machine_config.nameMachine
@@ -861,7 +859,7 @@ def edit_machine(request, machine_id):
     machine = get_object_or_404(Machine, id=machine_id)  # Fetch the existing machine
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} Edited >>> {machine.nameMachine} "
+        message=f"{request.user} Edited >>> {machine.oSec00Field03} "
     )
 
     if request.method == "POST":
@@ -906,7 +904,7 @@ def DataSheetNS_get_datasheet_data(request, machine_id):
     machine = get_object_or_404(Machine, id=machine_id)
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} Get Data for >>> {machine.nameMachine} "
+        message=f"{request.user} Get Data for >>> {machine.oSec00Field03} "
     )
     
     data = {

@@ -149,7 +149,7 @@ def LoadPageCalculationSheet(request):
 
     #Define Retrieve values from AddMachine model
     try:
-        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
         form_type = machine_config.nameFormCalcXX
         aMachineName = machine_config.nameMachine
     except AddMachine.DoesNotExist:
@@ -818,7 +818,7 @@ def HandleCalculationSheetForm(request):
     
     #Define Retrieve values from AddMachine model
     try:
-        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
         form_type = machine_config.nameFormCalcXX
         aMachineName = machine_config.nameMachine
     except AddMachine.DoesNotExist:
@@ -850,7 +850,7 @@ def HandleCalculationSheetForm(request):
     
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} Calculated >>> {sheet_key} >>> {projects}"
+        message=f"{request.user} Calculated >>> {sheet_key} "
     )
 
     if request.method == 'POST' and 'form1_submit' in request.POST:
@@ -1016,9 +1016,19 @@ def generate_report(request):
         message=f"{request.user} Generated Report of >>> {sheet_key}"
     )
 
+    # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    print(user_company)
+
     #Define Retrieve values from AddMachine model
     try:
-        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
         form_type = machine_config.nameFormCalcXX
         aMachineName = machine_config.nameMachine
     except AddMachine.DoesNotExist:
@@ -1104,12 +1114,13 @@ def DeleteCalcMachine(request, machine_id):
     
 
     machine = get_object_or_404(modelcalc, id=machine_id)
-    machine.delete()
-
     aLogEntry.objects.create(
         user=request.user,
         message=f"{request.user} deleted >>> {sheet_key} >>> {machine.project.name}"
     )
+    machine.delete()
+
+    
 
      # Get the company of the logged-in user    
     user_company = None
@@ -1125,7 +1136,7 @@ def DeleteCalcMachine(request, machine_id):
 
     #Define Retrieve values from AddMachine model
     try:
-        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
         form_type = machine_config.nameFormCalcXX
         aMachineName = machine_config.nameMachine
     except AddMachine.DoesNotExist:
@@ -1626,10 +1637,19 @@ def generate_saved_report(request, machine_id):
         message=f"{request.user} Generated Report of >>> {sheet_key} >>> {machine.project.name}"
     )
 
+    # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    print(user_company)
 
     #Define Retrieve values from AddMachine model
     try:
-        machine_config = AddMachine.objects.get(keyValue=sheet_key)
+        machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
         form_type = machine_config.nameFormCalcXX
         aMachineName = machine_config.nameMachine
     except AddMachine.DoesNotExist:
@@ -1693,8 +1713,8 @@ def generate_saved_report(request, machine_id):
         for section, fields in form_data.items():
             doc.add_heading(section, level=3)
             for field, value in fields:
-                if value != "N/A":
-                    if field != "N/A":
+                if value not in ["N/A", ""] :
+                    if field not in ["N/A", ""]:
                         doc.add_paragraph(f"{field}: {value}")
 
         # Prepare the response to download the document

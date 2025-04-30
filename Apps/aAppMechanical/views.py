@@ -82,7 +82,7 @@ def add_config(request):
             form.save()
             aLogEntry.objects.create(
                 user=request.user,
-                message=f"{request.user} Add Configrations >>> {form.form_name}_{form.field_name}"
+                message=f"{request.user} Add Configrations >>> {request.POST.get("form_name")}_{request.POST.get("field_name")}"
             )
             return redirect('list_configs')
     else:
@@ -93,16 +93,12 @@ def edit_config(request, config_id):
     config = get_object_or_404(FormFieldConfig, id=config_id)
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} editing >>> {config.form_name}_{config.field_name}"
+        message=f"{request.user} edited >>> {config.form_name}_{config.field_name}"
     )
     if request.method == "POST":
         form = FormFieldConfigForm(request.POST, instance=config)
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} edited >>> {form.form_name}_{form.field_name}"
-            )
             return redirect('list_configs')
     else:
         form = FormFieldConfigForm(instance=config)
@@ -127,7 +123,7 @@ def add_company(request):
             form.save()
             aLogEntry.objects.create(
                 user=request.user,
-                message=f"{request.user} Added >>> {form.nameCompanies} Company"
+                message=f"{request.user} Added a Company >>> {request.POST.get("nameCompanies")} "
             )
     else:
         form = CompanyForm()
@@ -142,7 +138,7 @@ def delete_company(request, company_id):
     company = get_object_or_404(Companies, id=company_id)
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} Deleted >>> {company.nameCompanies} Company"
+        message=f"{request.user} Deleted the Company>>> {company.nameCompanies} "
     )
     company.delete()
     return redirect('add_company')  # Redirect back to the list
@@ -154,17 +150,13 @@ def edit_company(request, company_id):
     company = get_object_or_404(Companies, id=company_id)
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} Editing >>> {company.nameCompanies} Company"
+        message=f"{request.user} Edited the Company>>> {company.nameCompanies} "
     )
 
     if request.method == 'POST':
         form = CompanyForm(request.POST, instance=company)
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Edited >>> {form.nameCompanies} Company"
-            )
             return redirect('add_company')  # Redirect back to the main page
     else:
         form = CompanyForm(instance=company)
@@ -178,12 +170,12 @@ def companies_list(request):
 def assign_user_to_company(request):
     if request.method == "POST":
         form = UserCompanyForm(request.POST)
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"{request.user} Assigned >>>{request.POST.get("user")} to the Company {request.POST.get("company")} "
+        )
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Assigned >>> {form.user.username} to {form.company.nameCompanies} Company"
-            )
             return redirect("assign_user")  # Redirect to a success page
     else:
         form = UserCompanyForm()
@@ -197,7 +189,7 @@ def delete_user_company(request, user_company_id):
     if request.method == 'POST':
         aLogEntry.objects.create(
             user=request.user,
-            message=f"{request.user} Deleted >>> {user_company.user.username} from {user_company.company.nameCompanies} Company"
+            message=f"{request.user} Deleted >>> {user_company.user.username} from the Company {user_company.company.nameCompanies} "
         )
         user_company.delete()
     return redirect('assign_user')  # Redirect back to the assign page
