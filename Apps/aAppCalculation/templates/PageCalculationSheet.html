@@ -430,6 +430,7 @@
                         </button>
                         <form action="{% url 'generate_saved_report' machine_id=machine.id %}" method="POST" style="display: inline;">
                             {% csrf_token %}
+                            <input type="hidden" name="sheet_key" value="{{ sheet_key }}">
                             <button type="submit" name="generate_saved_report" class="btn btn-success btn-lg btn-sm">Report</button>
                         </form>
                     

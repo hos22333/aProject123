@@ -7,7 +7,6 @@ from Apps.aAppSubmittal.models import AddMachine
 from Apps.aAppProject.models import APP_Project
 from .models import modelcalc
 from Apps.aAppMechanical.models import UserCompany
-from Apps.aAppMechanical.models import FormFieldConfig
 import requests
 
 from .forms import FormCalculationSheet, FormCalculationSheet_log
@@ -16,10 +15,8 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
-from django.urls import reverse
 from django.utils.timezone import now 
 from django.contrib.auth.models import User
-from django.conf import settings
 
 import os
 import ezdxf
@@ -89,15 +86,6 @@ def interact_with_api(api_url, req_type, input_data):
         return None
 
 
-
-
-
-
-
-###################################
-###################################
-###################################
-###################################
 ###################################
 ###################################
 
@@ -1006,103 +994,532 @@ def HandleCalculationSheetForm(request):
 
     return redirect("PageCalculationSheet")
 
-
 def generate_report(request):
     sheet_key = request.POST.get("sheet_key")
     print(sheet_key)
-
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Generated Report of >>> {sheet_key}"
-    )
-
-    # Get the company of the logged-in user    
-    user_company = None
-    if request.user.is_authenticated:
-        try:
-            user_company = UserCompany.objects.get(user=request.user).company
-        except UserCompany.DoesNotExist:
-            user_company = None
-
-    print(user_company)
-
-    #Define Retrieve values from AddMachine model
     try:
-        machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
-        form_type = machine_config.nameFormCalcXX
-        aMachineName = machine_config.nameMachine
-    except AddMachine.DoesNotExist:
-        form_type = "None"
-        aMachineName = "None"
-
-    # Optional: Handle cases where the sheet_key is invalid
-    if form_type is None:
-        print(f"Warning: Unknown sheet_key '{sheet_key}'")
-
-    if request.method == "POST":
-        form1 = FormCalculationSheet(form_type=form_type)
+        #pdb.set_trace()
+        # Log the action
+        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
+        
+        #pdb.set_trace()
+        # Get the user’s company and project
+        aCompany = UserCompany.objects.get(user=request.user)
 
         project_id = request.POST.get("project")
-        theprojects = APP_Project.objects.get(id=project_id)
-        project_name = theprojects.name
+
+        #pdb.set_trace()
+        # Determine the company and generate the corresponding report
+        if aCompany.company.nameCompanies == "AAAA":
+            print("Company 1")
+            return generate_report_AAA(request, project_id, sheet_key)
+
+        elif aCompany.company.nameCompanies == "BBBB":
+            print("Company 2")
+            return generate_report_BBB(request, project_id, sheet_key)
+
+        else:
+            return HttpResponse("Invalid company ID", status=400)
+
+    except UserCompany.DoesNotExist:
+        return HttpResponse("User does not belong to a company", status=403)
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+
+
+def generate_report_AAA(request, project_id, sheet_key):
+    
+    def add_table(doc, data, title=None):
+        """Creates a table and applies a background color to the header."""
+        if title:
+            doc.add_heading(title, level=3)
+
+        table = doc.add_table(rows=len(data), cols=2)
+        table.style = "Table Grid"
+
+        for i, row in enumerate(data):
+            for j, text in enumerate(row):
+                cell = table.cell(i, j)
+                cell.text = text
+
+                # Apply background color only to the header row (first row)
+                if i == 0:
+                    shading_elm = OxmlElement("w:shd")
+                    shading_elm.set(ns.qn("w:fill"), "FFA500")  # Orange color                    
+                    #shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Blue color
+                        
+                    cell._tc.get_or_add_tcPr().append(shading_elm)
+                    
+            """Generates a Word report for a given project."""
+    
+    
+    
+    def add_header_footer(doc):
+        """Adds header and footer with page numbers in the format 'Page X of Y'."""
+        section = doc.sections[0]
+    
+        # Header
+        header = section.header
+        header_para = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+        # header_para.add_run("Company Name\n")
+        # header_para.add_run("Project Name\n")
+        # header_para.add_run("Date: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
+        header_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Adding logo
+        run_logo = header_para.add_run()  # Corrected reference to header paragraph
         
-        # Create a new Word document
+        try:
+            run_logo.add_picture("static/aLogo/LogoAAA.PNG", width=Inches(7.0))  # Adjust width as needed
+        except Exception as e:
+            print(f"Error adding logo: {e}")
+
+        # Footer
+        footer = section.footer
+        footer_para = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+        footer_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Add "Page X of Y" format
+        run = footer_para.add_run("Page ")
+    
+        # PAGE field (Current Page Number)
+        fldChar1 = OxmlElement("w:fldChar")
+        fldChar1.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText1 = OxmlElement("w:instrText")
+        instrText1.set(ns.qn("xml:space"), "preserve")
+        instrText1.text = "PAGE"
+    
+        fldChar2 = OxmlElement("w:fldChar")
+        fldChar2.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar1)
+        run._r.append(instrText1)
+        run._r.append(fldChar2)
+    
+        run.add_text(" of ")
+    
+        # NUMPAGES field (Total Number of Pages)
+        fldChar3 = OxmlElement("w:fldChar")
+        fldChar3.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText2 = OxmlElement("w:instrText")
+        instrText2.set(ns.qn("xml:space"), "preserve")
+        instrText2.text = "NUMPAGES"
+    
+        fldChar4 = OxmlElement("w:fldChar")
+        fldChar4.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar3)
+        run._r.append(instrText2)
+        run._r.append(fldChar4)
+    
+    
+    def add_colored_heading(doc, text, level, color):
+        """Adds a heading with color."""
+        heading = doc.add_paragraph()
+        run = heading.add_run(text)
+        run.bold = True
+        run.font.size = Pt(14) if level == 1 else Pt(12)
+        run.font.color.rgb = color
+        heading.style = f"Heading {level}"
+    
+    
+    
+    try:
+        
+        ###LOG
+        aLogEntry.objects.create(
+                user=request.user,
+                message=f"at {now()} {request.user} accessed Load  "
+            )
+        print(f"at {now()} {User} accessed Download Report")
+        ###LOG
+
+        # Get the company of the logged-in user    
+        user_company = None
+        if request.user.is_authenticated:
+            try:
+                user_company = UserCompany.objects.get(user=request.user).company
+            except UserCompany.DoesNotExist:
+                user_company = None
+
+        print(user_company)
+
+        #Define Retrieve values from AddMachine model
+        try:
+            machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
+            form_type = machine_config.nameFormCalcXX
+            aMachineName = machine_config.nameMachine
+        except AddMachine.DoesNotExist:
+            form_type = "None"
+            aMachineName = "None"
+
+        # Optional: Handle cases where the sheet_key is invalid
+        if form_type is None:
+            print(f"Warning: Unknown sheet_key '{sheet_key}'")
+
+        aCompany = UserCompany.objects.get(user=request.user)
+        project = APP_Project.objects.get(id=project_id)
+        form1 = FormCalculationSheet(form_type=form_type)
+        
+        
+        print(aCompany.id)
+        print(project.id)
+    
+        print("Company 1")
+    
+    
+        # Create a Word document
         doc = Document()
-        doc.add_heading(aMachineName, level=1)
-        doc.add_heading(f"Project Name : {project_name}", level=2)
+
+        # Add header and footer with page numbers
+        add_header_footer(doc)
+
+        # Add project title
+        doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        # Add project details
+        doc.add_heading("Project Details", level=2)     
+
+        doc.add_paragraph("\n")
+        doc.add_paragraph("Name: " + project.name)
+        doc.add_paragraph("Client Name: " + project.client_name)
+        doc.add_paragraph("Capacity: " + project.capacity)
+        doc.add_paragraph("\n")
+        
+        doc.add_page_break()     
+        doc.add_paragraph("\n")
+
 
         # Extract form data
-        form_data = {
-            "Input": [
-                (request.POST.get("oSec01Field01", "N/A"), request.POST.get("oSec01Field02", "N/A")),
-                (request.POST.get("oSec01Field03", "N/A"), request.POST.get("oSec01Field04", "N/A")),
-                (request.POST.get("oSec01Field05", "N/A"), request.POST.get("oSec01Field06", "N/A")),
-                (request.POST.get("oSec01Field07", "N/A"), request.POST.get("oSec01Field08", "N/A")),
-                (request.POST.get("oSec01Field09", "N/A"), request.POST.get("oSec01Field10", "N/A")),
-                (request.POST.get("oSec01Field11", "N/A"), request.POST.get("oSec01Field12", "N/A")),
-                (request.POST.get("oSec01Field13", "N/A"), request.POST.get("oSec01Field14", "N/A")),
-                (request.POST.get("oSec01Field15", "N/A"), request.POST.get("oSec01Field16", "N/A")),
-                (request.POST.get("oSec01Field17", "N/A"), request.POST.get("oSec01Field18", "N/A")),
-                (request.POST.get("oSec01Field19", "N/A"), request.POST.get("oSec01Field20", "N/A")),
-                (request.POST.get("oSec01Field21", "N/A"), request.POST.get("oSec01Field22", "N/A")),
-                (request.POST.get("oSec01Field23", "N/A"), request.POST.get("oSec01Field24", "N/A")),
-                (request.POST.get("oSec01Field25", "N/A"), request.POST.get("oSec01Field26", "N/A")),
-                (request.POST.get("oSec01Field27", "N/A"), request.POST.get("oSec01Field28", "N/A")),
-                (request.POST.get("oSec01Field29", "N/A"), request.POST.get("oSec01Field30", "N/A")),
-            ],
-            "Output": [
-                (request.POST.get("oSec02Field01", "N/A"), request.POST.get("oSec02Field02", "N/A")),
-                (request.POST.get("oSec02Field03", "N/A"), request.POST.get("oSec02Field04", "N/A")),
-                (request.POST.get("oSec02Field05", "N/A"), request.POST.get("oSec02Field06", "N/A")),
-                (request.POST.get("oSec02Field07", "N/A"), request.POST.get("oSec02Field08", "N/A")),
-                (request.POST.get("oSec02Field09", "N/A"), request.POST.get("oSec02Field10", "N/A")),
-                (request.POST.get("oSec02Field11", "N/A"), request.POST.get("oSec02Field12", "N/A")),
-                (request.POST.get("oSec02Field13", "N/A"), request.POST.get("oSec02Field14", "N/A")),
-                (request.POST.get("oSec02Field15", "N/A"), request.POST.get("oSec02Field16", "N/A")),
-                (request.POST.get("oSec02Field17", "N/A"), request.POST.get("oSec02Field18", "N/A")),
-                (request.POST.get("oSec02Field19", "N/A"), request.POST.get("oSec02Field20", "N/A")),
-                (request.POST.get("oSec02Field21", "N/A"), request.POST.get("oSec02Field22", "N/A")),
-                (request.POST.get("oSec02Field23", "N/A"), request.POST.get("oSec02Field24", "N/A")),
-                (request.POST.get("oSec02Field25", "N/A"), request.POST.get("oSec02Field26", "N/A")),
-                (request.POST.get("oSec02Field27", "N/A"), request.POST.get("oSec02Field28", "N/A")),
-                (request.POST.get("oSec02Field29", "N/A"), request.POST.get("oSec02Field30", "N/A")),
-            ]
-        }
+        Input_data = [
+            (request.POST.get("oSec01Field01", "N/A"), request.POST.get("oSec01Field02", "N/A")),
+            (request.POST.get("oSec01Field03", "N/A"), request.POST.get("oSec01Field04", "N/A")),
+            (request.POST.get("oSec01Field05", "N/A"), request.POST.get("oSec01Field06", "N/A")),
+            (request.POST.get("oSec01Field07", "N/A"), request.POST.get("oSec01Field08", "N/A")),
+            (request.POST.get("oSec01Field09", "N/A"), request.POST.get("oSec01Field10", "N/A")),
+            (request.POST.get("oSec01Field11", "N/A"), request.POST.get("oSec01Field12", "N/A")),
+            (request.POST.get("oSec01Field13", "N/A"), request.POST.get("oSec01Field14", "N/A")),
+            (request.POST.get("oSec01Field15", "N/A"), request.POST.get("oSec01Field16", "N/A")),
+            (request.POST.get("oSec01Field17", "N/A"), request.POST.get("oSec01Field18", "N/A")),
+            (request.POST.get("oSec01Field19", "N/A"), request.POST.get("oSec01Field20", "N/A")),
+            (request.POST.get("oSec01Field21", "N/A"), request.POST.get("oSec01Field22", "N/A")),
+            (request.POST.get("oSec01Field23", "N/A"), request.POST.get("oSec01Field24", "N/A")),
+            (request.POST.get("oSec01Field25", "N/A"), request.POST.get("oSec01Field26", "N/A")),
+            (request.POST.get("oSec01Field27", "N/A"), request.POST.get("oSec01Field28", "N/A")),
+            (request.POST.get("oSec01Field29", "N/A"), request.POST.get("oSec01Field30", "N/A")),
+        ]
+        Output_data = [
+            (request.POST.get("oSec02Field01", "N/A"), request.POST.get("oSec02Field02", "N/A")),
+            (request.POST.get("oSec02Field03", "N/A"), request.POST.get("oSec02Field04", "N/A")),
+            (request.POST.get("oSec02Field05", "N/A"), request.POST.get("oSec02Field06", "N/A")),
+            (request.POST.get("oSec02Field07", "N/A"), request.POST.get("oSec02Field08", "N/A")),
+            (request.POST.get("oSec02Field09", "N/A"), request.POST.get("oSec02Field10", "N/A")),
+            (request.POST.get("oSec02Field11", "N/A"), request.POST.get("oSec02Field12", "N/A")),
+            (request.POST.get("oSec02Field13", "N/A"), request.POST.get("oSec02Field14", "N/A")),
+            (request.POST.get("oSec02Field15", "N/A"), request.POST.get("oSec02Field16", "N/A")),
+            (request.POST.get("oSec02Field17", "N/A"), request.POST.get("oSec02Field18", "N/A")),
+            (request.POST.get("oSec02Field19", "N/A"), request.POST.get("oSec02Field20", "N/A")),
+            (request.POST.get("oSec02Field21", "N/A"), request.POST.get("oSec02Field22", "N/A")),
+            (request.POST.get("oSec02Field23", "N/A"), request.POST.get("oSec02Field24", "N/A")),
+            (request.POST.get("oSec02Field25", "N/A"), request.POST.get("oSec02Field26", "N/A")),
+            (request.POST.get("oSec02Field27", "N/A"), request.POST.get("oSec02Field28", "N/A")),
+            (request.POST.get("oSec02Field29", "N/A"), request.POST.get("oSec02Field30", "N/A")),
+        ]
+        
 
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=3)
-            for field, value in fields:
-                if value != "N/A":
-                    doc.add_paragraph(f"{field}: {value}")
+        # Add machine title with font size 14 and numbering
+        machine_title = doc.add_paragraph(f" {aMachineName}", style="Heading3")
+        machine_title.runs[0].font.size = Pt(14)
 
-        # Prepare the response to download the document
+        input_section_data = [("Field", "Value")]
+        for input_key, input_value in Input_data:
+            input_key = input_key.strip() if input_key else ""
+            input_value = input_value.strip() if input_value else ""
+            if input_key and input_value and input_key.lower() != "oooo" and input_key.lower() != "" and input_key.lower() != "n/a" and input_value.lower() != "oooo" and input_value.lower() != "" and input_value.lower() != "n/a":
+                input_section_data.append((input_key, input_value))
+        if len(input_section_data) > 1:  # If the section has valid data, create a table
+            doc.add_paragraph(f"Input", style="Heading3")  # Only one title now
+            add_table(doc, input_section_data)  # Removed redundant title
+
+        output_section_data = [("Field", "Value")]
+        for output_key, output_value in Output_data:
+            output_key = output_key.strip() if output_key else ""
+            output_value = output_value.strip() if output_value else ""
+            if output_key and output_value and output_key.lower() != "oooo" and output_key.lower() != "" and output_key.lower() != "n/a" and output_value.lower() != "oooo" and output_value.lower() != "" and output_value.lower() != "n/a":
+                output_section_data.append((output_key, output_value))
+        if len(output_section_data) > 1:  # If the section has valid data, create a table
+            doc.add_paragraph(f"Output", style="Heading3")  # Only one title now
+            add_table(doc, output_section_data)  # Removed redundant title
+
+        doc.add_page_break() 
+        
+        # Save the document to a response
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = f'attachment; filename="{sheet_key}_report.docx"'
+        response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
         doc.save(response)
         return response
 
-    return HttpResponse("Invalid request", status=400)
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+
+
+
+def generate_report_BBB(request, project_id, sheet_key):
+    
+    def add_table(doc, data, title=None):
+        """Creates a borderless table and applies a background color to the header."""
+        if title:
+            doc.add_heading(title, level=3)
+
+        table = doc.add_table(rows=len(data), cols=2)
+
+        # Remove all table borders manually
+        tbl = table._tbl  # Get the table's XML element
+        tblPr = tbl.find(ns.qn("w:tblPr"))  # Find existing table properties
+
+        if tblPr is None:
+            tblPr = OxmlElement("w:tblPr")  # Create table properties if missing
+            tbl.insert(0, tblPr)  # Insert as the first child of <w:tbl>
+
+        tblBorders = OxmlElement("w:tblBorders")  # Create <w:tblBorders>
+        for border_name in ["top", "left", "bottom", "right", "insideH", "insideV"]:
+            border = OxmlElement(f"w:{border_name}")
+            border.set(ns.qn("w:val"), "nil")  # Remove the border
+            tblBorders.append(border)
+
+        tblPr.append(tblBorders)  # Append border settings to the table properties
+
+        for i, row in enumerate(data):
+            for j, text in enumerate(row):
+                cell = table.cell(i, j)
+                cell.text = text
+
+                # Apply background color only to the header row (first row)
+                if i == 0:
+                    shading_elm = OxmlElement("w:shd")
+                    shading_elm.set(ns.qn("w:val"), "clear")  # Set shading value
+                    shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Light blue color
+                    cell._tc.get_or_add_tcPr().append(shading_elm)
+   
+    
+    
+    def add_header_footer(doc):
+        """Adds header and footer with page numbers in the format 'Page X of Y'."""
+        section = doc.sections[0]
+    
+        # Header
+        header = section.header
+        header_para = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+        # header_para.add_run("Company Name\n")
+        # header_para.add_run("Project Name\n")
+        # header_para.add_run("Date: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
+        header_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Adding logo
+        run_logo = header_para.add_run()  # Corrected reference to header paragraph
+        try:
+            run_logo.add_picture("static/aLogo/LogoBBB.PNG", width=Inches(7.0))  # Adjust width as needed
+        except Exception as e:
+            print(f"Error adding logo: {e}")
+
+        
+    
+        # Footer
+        footer = section.footer
+        footer_para = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+        footer_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Add "Page X of Y" format
+        run = footer_para.add_run("Page ")
+    
+        # PAGE field (Current Page Number)
+        fldChar1 = OxmlElement("w:fldChar")
+        fldChar1.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText1 = OxmlElement("w:instrText")
+        instrText1.set(ns.qn("xml:space"), "preserve")
+        instrText1.text = "PAGE"
+    
+        fldChar2 = OxmlElement("w:fldChar")
+        fldChar2.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar1)
+        run._r.append(instrText1)
+        run._r.append(fldChar2)
+    
+        run.add_text(" of ")
+    
+        # NUMPAGES field (Total Number of Pages)
+        fldChar3 = OxmlElement("w:fldChar")
+        fldChar3.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText2 = OxmlElement("w:instrText")
+        instrText2.set(ns.qn("xml:space"), "preserve")
+        instrText2.text = "NUMPAGES"
+    
+        fldChar4 = OxmlElement("w:fldChar")
+        fldChar4.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar3)
+        run._r.append(instrText2)
+        run._r.append(fldChar4)
+    
+    
+    def add_colored_heading(doc, text, level, color):
+        """Adds a heading with color."""
+        heading = doc.add_paragraph()
+        run = heading.add_run(text)
+        run.bold = True
+        run.font.size = Pt(14) if level == 1 else Pt(12)
+        run.font.color.rgb = color
+        heading.style = f"Heading {level}"
+    
+    
+    
+    try:
+        
+        ###LOG
+        aLogEntry.objects.create(
+                user=request.user,
+                message=f"at {now()} {request.user} accessed Load  "
+            )
+        print(f"at {now()} {User} accessed Download Report")
+        ###LOG
+
+        # Get the company of the logged-in user    
+        user_company = None
+        if request.user.is_authenticated:
+            try:
+                user_company = UserCompany.objects.get(user=request.user).company
+            except UserCompany.DoesNotExist:
+                user_company = None
+
+        print(user_company)
+
+        #Define Retrieve values from AddMachine model
+        try:
+            machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
+            form_type = machine_config.nameFormCalcXX
+            aMachineName = machine_config.nameMachine
+        except AddMachine.DoesNotExist:
+            form_type = "None"
+            aMachineName = "None"
+
+        # Optional: Handle cases where the sheet_key is invalid
+        if form_type is None:
+            print(f"Warning: Unknown sheet_key '{sheet_key}'")
+
+        aCompany = UserCompany.objects.get(user=request.user)
+        project = APP_Project.objects.get(id=project_id)
+        form1 = FormCalculationSheet(form_type=form_type)
+        
+        
+        print(aCompany.id)
+        print(project.id)
+    
+        print("Company 2")
+    
+    
+        # Create a Word document
+        doc = Document()
+
+        # Add header and footer with page numbers
+        add_header_footer(doc)
+
+        # Add project title
+        doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        # Add project details
+        doc.add_heading("Project Details", level=2)     
+
+        doc.add_paragraph("\n")
+        doc.add_paragraph("Name: " + project.name)
+        doc.add_paragraph("Client Name: " + project.client_name)
+        doc.add_paragraph("Capacity: " + project.capacity)
+        doc.add_paragraph("\n")
+        
+        doc.add_page_break()     
+        doc.add_paragraph("\n")
+
+        # Extract form data
+        Input_data = [
+            (request.POST.get("oSec01Field01", "N/A"), request.POST.get("oSec01Field02", "N/A")),
+            (request.POST.get("oSec01Field03", "N/A"), request.POST.get("oSec01Field04", "N/A")),
+            (request.POST.get("oSec01Field05", "N/A"), request.POST.get("oSec01Field06", "N/A")),
+            (request.POST.get("oSec01Field07", "N/A"), request.POST.get("oSec01Field08", "N/A")),
+            (request.POST.get("oSec01Field09", "N/A"), request.POST.get("oSec01Field10", "N/A")),
+            (request.POST.get("oSec01Field11", "N/A"), request.POST.get("oSec01Field12", "N/A")),
+            (request.POST.get("oSec01Field13", "N/A"), request.POST.get("oSec01Field14", "N/A")),
+            (request.POST.get("oSec01Field15", "N/A"), request.POST.get("oSec01Field16", "N/A")),
+            (request.POST.get("oSec01Field17", "N/A"), request.POST.get("oSec01Field18", "N/A")),
+            (request.POST.get("oSec01Field19", "N/A"), request.POST.get("oSec01Field20", "N/A")),
+            (request.POST.get("oSec01Field21", "N/A"), request.POST.get("oSec01Field22", "N/A")),
+            (request.POST.get("oSec01Field23", "N/A"), request.POST.get("oSec01Field24", "N/A")),
+            (request.POST.get("oSec01Field25", "N/A"), request.POST.get("oSec01Field26", "N/A")),
+            (request.POST.get("oSec01Field27", "N/A"), request.POST.get("oSec01Field28", "N/A")),
+            (request.POST.get("oSec01Field29", "N/A"), request.POST.get("oSec01Field30", "N/A")),
+        ]
+        Output_data = [
+            (request.POST.get("oSec02Field01", "N/A"), request.POST.get("oSec02Field02", "N/A")),
+            (request.POST.get("oSec02Field03", "N/A"), request.POST.get("oSec02Field04", "N/A")),
+            (request.POST.get("oSec02Field05", "N/A"), request.POST.get("oSec02Field06", "N/A")),
+            (request.POST.get("oSec02Field07", "N/A"), request.POST.get("oSec02Field08", "N/A")),
+            (request.POST.get("oSec02Field09", "N/A"), request.POST.get("oSec02Field10", "N/A")),
+            (request.POST.get("oSec02Field11", "N/A"), request.POST.get("oSec02Field12", "N/A")),
+            (request.POST.get("oSec02Field13", "N/A"), request.POST.get("oSec02Field14", "N/A")),
+            (request.POST.get("oSec02Field15", "N/A"), request.POST.get("oSec02Field16", "N/A")),
+            (request.POST.get("oSec02Field17", "N/A"), request.POST.get("oSec02Field18", "N/A")),
+            (request.POST.get("oSec02Field19", "N/A"), request.POST.get("oSec02Field20", "N/A")),
+            (request.POST.get("oSec02Field21", "N/A"), request.POST.get("oSec02Field22", "N/A")),
+            (request.POST.get("oSec02Field23", "N/A"), request.POST.get("oSec02Field24", "N/A")),
+            (request.POST.get("oSec02Field25", "N/A"), request.POST.get("oSec02Field26", "N/A")),
+            (request.POST.get("oSec02Field27", "N/A"), request.POST.get("oSec02Field28", "N/A")),
+            (request.POST.get("oSec02Field29", "N/A"), request.POST.get("oSec02Field30", "N/A")),
+        ]
+
+
+        # Add machine title with font size 14 and numbering
+        machine_title = doc.add_paragraph(f" {aMachineName}", style="Heading3")
+        machine_title.runs[0].font.size = Pt(14)
+
+        input_section_data = [("Field", "Value")]
+        for input_key, input_value in Input_data:
+            input_key = input_key.strip() if input_key else ""
+            input_value = input_value.strip() if input_value else ""
+            if input_key and input_value and input_key.lower() != "oooo" and input_key.lower() != "" and input_key.lower() != "n/a" and input_value.lower() != "oooo" and input_value.lower() != "" and input_value.lower() != "n/a":
+                input_section_data.append((input_key, input_value))
+        if len(input_section_data) > 1:  # If the section has valid data, create a table
+            doc.add_paragraph(f"Input", style="Heading3")  # Only one title now
+            add_table(doc, input_section_data)  # Removed redundant title
+
+        output_section_data = [("Field", "Value")]
+        for output_key, output_value in Output_data:
+            output_key = output_key.strip() if output_key else ""
+            output_value = output_value.strip() if output_value else ""
+            if output_key and output_value and output_key.lower() != "oooo" and output_key.lower() != "" and output_key.lower() != "n/a" and output_value.lower() != "oooo" and output_value.lower() != "" and output_value.lower() != "n/a":
+                output_section_data.append((output_key, output_value))
+        if len(output_section_data) > 1:  # If the section has valid data, create a table
+            doc.add_paragraph(f"Output", style="Heading3")  # Only one title now
+            add_table(doc, output_section_data)  # Removed redundant title
+
+
+        doc.add_page_break()     
+
+        # Save the document to a response
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+        doc.save(response)
+        return response
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
 
 
 def DeleteCalcMachine(request, machine_id):  
@@ -1626,101 +2043,532 @@ def CalculationSheet_get_data(request, machine_id):
     return JsonResponse(data)
 
 
+
+
 def generate_saved_report(request, machine_id):
-    machine = get_object_or_404(modelcalc, id=machine_id)
-    sheet_key = machine.oSec00Field03
-    print(sheet_key)
-
-
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Generated Report of >>> {sheet_key} >>> {machine.project.name}"
-    )
-
-    # Get the company of the logged-in user    
-    user_company = None
-    if request.user.is_authenticated:
-        try:
-            user_company = UserCompany.objects.get(user=request.user).company
-        except UserCompany.DoesNotExist:
-            user_company = None
-
-    print(user_company)
-
-    #Define Retrieve values from AddMachine model
     try:
-        machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
-        form_type = machine_config.nameFormCalcXX
-        aMachineName = machine_config.nameMachine
-    except AddMachine.DoesNotExist:
-        form_type = "None"
-        aMachineName = "None"
+        #pdb.set_trace()
+        # Log the action
+        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
+        
+        #pdb.set_trace()
+        # Get the user’s company and project
+        aCompany = UserCompany.objects.get(user=request.user)
 
-    # Optional: Handle cases where the sheet_key is invalid
-    if form_type is None:
-        print(f"Warning: Unknown sheet_key '{sheet_key}'")
 
-    # Helper function to get the label from FormFieldConfig
-    def get_field_label(form_type, field_name):
-        field_config = FormFieldConfig.objects.filter(form_name=form_type, field_name=field_name).first()
-        return field_config.label if field_config else "N/A"
 
-    if request.method == "POST":
-        # Create a new Word document
+        #pdb.set_trace()
+        # Determine the company and generate the corresponding report
+        if aCompany.company.nameCompanies == "AAAA":
+            print("Company 1")
+            return generate_saved_report_AAA(request, machine_id)
+
+        elif aCompany.company.nameCompanies == "BBBB":
+            print("Company 2")
+            return generate_saved_report_BBB(request, machine_id)
+
+        else:
+            return HttpResponse("Invalid company ID", status=400)
+
+    except UserCompany.DoesNotExist:
+        return HttpResponse("User does not belong to a company", status=403)
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+
+
+def generate_saved_report_AAA(request, machine_id):
+    
+    def add_table(doc, data, title=None):
+        """Creates a table and applies a background color to the header."""
+        if title:
+            doc.add_heading(title, level=3)
+
+        table = doc.add_table(rows=len(data), cols=2)
+        table.style = "Table Grid"
+
+        for i, row in enumerate(data):
+            for j, text in enumerate(row):
+                cell = table.cell(i, j)
+                cell.text = text
+
+                # Apply background color only to the header row (first row)
+                if i == 0:
+                    shading_elm = OxmlElement("w:shd")
+                    shading_elm.set(ns.qn("w:fill"), "FFA500")  # Orange color                    
+                    #shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Blue color
+                        
+                    cell._tc.get_or_add_tcPr().append(shading_elm)
+                    
+            """Generates a Word report for a given project."""
+    
+    
+    
+    def add_header_footer(doc):
+        """Adds header and footer with page numbers in the format 'Page X of Y'."""
+        section = doc.sections[0]
+    
+        # Header
+        header = section.header
+        header_para = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+        # header_para.add_run("Company Name\n")
+        # header_para.add_run("Project Name\n")
+        # header_para.add_run("Date: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
+        header_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Adding logo
+        run_logo = header_para.add_run()  # Corrected reference to header paragraph
+        
+        try:
+            run_logo.add_picture("static/aLogo/LogoAAA.PNG", width=Inches(7.0))  # Adjust width as needed
+        except Exception as e:
+            print(f"Error adding logo: {e}")
+
+        # Footer
+        footer = section.footer
+        footer_para = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+        footer_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Add "Page X of Y" format
+        run = footer_para.add_run("Page ")
+    
+        # PAGE field (Current Page Number)
+        fldChar1 = OxmlElement("w:fldChar")
+        fldChar1.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText1 = OxmlElement("w:instrText")
+        instrText1.set(ns.qn("xml:space"), "preserve")
+        instrText1.text = "PAGE"
+    
+        fldChar2 = OxmlElement("w:fldChar")
+        fldChar2.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar1)
+        run._r.append(instrText1)
+        run._r.append(fldChar2)
+    
+        run.add_text(" of ")
+    
+        # NUMPAGES field (Total Number of Pages)
+        fldChar3 = OxmlElement("w:fldChar")
+        fldChar3.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText2 = OxmlElement("w:instrText")
+        instrText2.set(ns.qn("xml:space"), "preserve")
+        instrText2.text = "NUMPAGES"
+    
+        fldChar4 = OxmlElement("w:fldChar")
+        fldChar4.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar3)
+        run._r.append(instrText2)
+        run._r.append(fldChar4)
+    
+    
+    def add_colored_heading(doc, text, level, color):
+        """Adds a heading with color."""
+        heading = doc.add_paragraph()
+        run = heading.add_run(text)
+        run.bold = True
+        run.font.size = Pt(14) if level == 1 else Pt(12)
+        run.font.color.rgb = color
+        heading.style = f"Heading {level}"
+    
+    
+    
+    try:
+        
+        ###LOG
+        aLogEntry.objects.create(
+                user=request.user,
+                message=f"at {now()} {request.user} accessed Load  "
+            )
+        print(f"at {now()} {User} accessed Download Report")
+        ###LOG
+
+        # Get the company of the logged-in user    
+        user_company = None
+        if request.user.is_authenticated:
+            try:
+                user_company = UserCompany.objects.get(user=request.user).company
+            except UserCompany.DoesNotExist:
+                user_company = None
+
+        print(user_company)
+
+        aCompany = UserCompany.objects.get(user=request.user)
+        machine = get_object_or_404(modelcalc, id=machine_id)
+        project = APP_Project.objects.get(name=machine.project.name)
+        
+        print(aCompany.id)
+        print(project.id)
+    
+        print("Company 1")
+
+        sheet_key = machine.oSec00Field03
+
+        #Define Retrieve values from AddMachine model
+        try:
+            machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
+            form_type = machine_config.nameFormCalcXX
+            aMachineName = machine_config.nameMachine
+        except AddMachine.DoesNotExist:
+            form_type = "None"
+            aMachineName = "None"
+
+        # Optional: Handle cases where the sheet_key is invalid
+        if form_type is None:
+            print(f"Warning: Unknown sheet_key '{sheet_key}'")
+    
+    
+        # Create a Word document
         doc = Document()
-        doc.add_heading(aMachineName, level=1)
-        doc.add_heading(f"Project Name : {machine.project.name}", level=2)
+
+        # Add header and footer with page numbers
+        add_header_footer(doc)
+
+        # Add project title
+        doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        # Add project details
+        doc.add_heading("Project Details", level=2)     
+
+        doc.add_paragraph("\n")
+        doc.add_paragraph("Name: " + project.name)
+        doc.add_paragraph("Client Name: " + project.client_name)
+        doc.add_paragraph("Capacity: " + project.capacity)
+        doc.add_paragraph("\n")
+        
+        doc.add_page_break()     
+        doc.add_paragraph("\n")
+
 
         # Extract form data
-        form_data = {
-            "Input": [
-                (machine.oSec01Field01, machine.oSec01Field02),
-                (machine.oSec01Field03, machine.oSec01Field04),
-                (machine.oSec01Field05, machine.oSec01Field06),
-                (machine.oSec01Field07, machine.oSec01Field08),
-                (machine.oSec01Field09, machine.oSec01Field10),
-                (machine.oSec01Field11, machine.oSec01Field12),
-                (machine.oSec01Field13, machine.oSec01Field14),
-                (machine.oSec01Field15, machine.oSec01Field16),
-                (machine.oSec01Field17, machine.oSec01Field18),
-                (machine.oSec01Field19, machine.oSec01Field20),
-                (machine.oSec01Field21, machine.oSec01Field22),
-                (machine.oSec01Field23, machine.oSec01Field24),
-                (machine.oSec01Field25, machine.oSec01Field26),
-                (machine.oSec01Field27, machine.oSec01Field28),
-                (machine.oSec01Field29, machine.oSec01Field30),
-            ],
-            "Output": [
-                (machine.oSec02Field01, machine.oSec02Field02),
-                (machine.oSec02Field03, machine.oSec02Field04),
-                (machine.oSec02Field05, machine.oSec02Field06),
-                (machine.oSec02Field07, machine.oSec02Field08),
-                (machine.oSec02Field09, machine.oSec02Field10),
-                (machine.oSec02Field11, machine.oSec02Field12),
-                (machine.oSec02Field13, machine.oSec02Field14),
-                (machine.oSec02Field15, machine.oSec02Field16),
-                (machine.oSec02Field17, machine.oSec02Field18),
-                (machine.oSec02Field19, machine.oSec02Field20),
-                (machine.oSec02Field21, machine.oSec02Field22),
-                (machine.oSec02Field23, machine.oSec02Field24),
-                (machine.oSec02Field25, machine.oSec02Field26),
-                (machine.oSec02Field27, machine.oSec02Field28),
-                (machine.oSec02Field29, machine.oSec02Field30),
-            ]
-        }
+        Input_data = [
+            (machine.oSec01Field01, machine.oSec01Field02),
+            (machine.oSec01Field03, machine.oSec01Field04),
+            (machine.oSec01Field05, machine.oSec01Field06),
+            (machine.oSec01Field07, machine.oSec01Field08),
+            (machine.oSec01Field09, machine.oSec01Field10),
+            (machine.oSec01Field11, machine.oSec01Field12),
+            (machine.oSec01Field13, machine.oSec01Field14),
+            (machine.oSec01Field15, machine.oSec01Field16),
+            (machine.oSec01Field17, machine.oSec01Field18),
+            (machine.oSec01Field19, machine.oSec01Field20),
+            (machine.oSec01Field21, machine.oSec01Field22),
+            (machine.oSec01Field23, machine.oSec01Field24),
+            (machine.oSec01Field25, machine.oSec01Field26),
+            (machine.oSec01Field27, machine.oSec01Field28),
+            (machine.oSec01Field29, machine.oSec01Field30),
+        ]
+        Output_data = [
+            (machine.oSec02Field01, machine.oSec02Field02),
+            (machine.oSec02Field03, machine.oSec02Field04),
+            (machine.oSec02Field05, machine.oSec02Field06),
+            (machine.oSec02Field07, machine.oSec02Field08),
+            (machine.oSec02Field09, machine.oSec02Field10),
+            (machine.oSec02Field11, machine.oSec02Field12),
+            (machine.oSec02Field13, machine.oSec02Field14),
+            (machine.oSec02Field15, machine.oSec02Field16),
+            (machine.oSec02Field17, machine.oSec02Field18),
+            (machine.oSec02Field19, machine.oSec02Field20),
+            (machine.oSec02Field21, machine.oSec02Field22),
+            (machine.oSec02Field23, machine.oSec02Field24),
+            (machine.oSec02Field25, machine.oSec02Field26),
+            (machine.oSec02Field27, machine.oSec02Field28),
+            (machine.oSec02Field29, machine.oSec02Field30),
+        ]
+        
 
-        # Add form data to the Word document
-        for section, fields in form_data.items():
-            doc.add_heading(section, level=3)
-            for field, value in fields:
-                if value not in ["N/A", ""] :
-                    if field not in ["N/A", ""]:
-                        doc.add_paragraph(f"{field}: {value}")
+        # Add machine title with font size 14 and numbering
+        machine_title = doc.add_paragraph(f" {aMachineName}", style="Heading3")
+        machine_title.runs[0].font.size = Pt(14)
 
-        # Prepare the response to download the document
+        input_section_data = [("Field", "Value")]
+        for input_key, input_value in Input_data:
+            input_key = input_key.strip() if input_key else ""
+            input_value = input_value.strip() if input_value else ""
+            if input_key and input_value and input_key.lower() != "oooo" and input_key.lower() != "" and input_key.lower() != "n/a" and input_value.lower() != "oooo" and input_value.lower() != "" and input_value.lower() != "n/a":
+                input_section_data.append((input_key, input_value))
+        if len(input_section_data) > 1:  # If the section has valid data, create a table
+            doc.add_paragraph(f"Input", style="Heading3")  # Only one title now
+            add_table(doc, input_section_data)  # Removed redundant title
+
+        output_section_data = [("Field", "Value")]
+        for output_key, output_value in Output_data:
+            output_key = output_key.strip() if output_key else ""
+            output_value = output_value.strip() if output_value else ""
+            if output_key and output_value and output_key.lower() != "oooo" and output_key.lower() != "" and output_key.lower() != "n/a" and output_value.lower() != "oooo" and output_value.lower() != "" and output_value.lower() != "n/a":
+                output_section_data.append((output_key, output_value))
+        if len(output_section_data) > 1:  # If the section has valid data, create a table
+            doc.add_paragraph(f"Output", style="Heading3")  # Only one title now
+            add_table(doc, output_section_data)  # Removed redundant title
+
+        doc.add_page_break() 
+        
+        # Save the document to a response
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = f'attachment; filename="{sheet_key}_report.docx"'
+        response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
         doc.save(response)
         return response
 
-    return HttpResponse("Invalid request", status=400)
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+
+
+
+def generate_saved_report_BBB(request, machine_id):
+    
+    def add_table(doc, data, title=None):
+        """Creates a borderless table and applies a background color to the header."""
+        if title:
+            doc.add_heading(title, level=3)
+
+        table = doc.add_table(rows=len(data), cols=2)
+
+        # Remove all table borders manually
+        tbl = table._tbl  # Get the table's XML element
+        tblPr = tbl.find(ns.qn("w:tblPr"))  # Find existing table properties
+
+        if tblPr is None:
+            tblPr = OxmlElement("w:tblPr")  # Create table properties if missing
+            tbl.insert(0, tblPr)  # Insert as the first child of <w:tbl>
+
+        tblBorders = OxmlElement("w:tblBorders")  # Create <w:tblBorders>
+        for border_name in ["top", "left", "bottom", "right", "insideH", "insideV"]:
+            border = OxmlElement(f"w:{border_name}")
+            border.set(ns.qn("w:val"), "nil")  # Remove the border
+            tblBorders.append(border)
+
+        tblPr.append(tblBorders)  # Append border settings to the table properties
+
+        for i, row in enumerate(data):
+            for j, text in enumerate(row):
+                cell = table.cell(i, j)
+                cell.text = text
+
+                # Apply background color only to the header row (first row)
+                if i == 0:
+                    shading_elm = OxmlElement("w:shd")
+                    shading_elm.set(ns.qn("w:val"), "clear")  # Set shading value
+                    shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Light blue color
+                    cell._tc.get_or_add_tcPr().append(shading_elm)
+   
+    
+    
+    def add_header_footer(doc):
+        """Adds header and footer with page numbers in the format 'Page X of Y'."""
+        section = doc.sections[0]
+    
+        # Header
+        header = section.header
+        header_para = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+        # header_para.add_run("Company Name\n")
+        # header_para.add_run("Project Name\n")
+        # header_para.add_run("Date: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
+        header_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Adding logo
+        run_logo = header_para.add_run()  # Corrected reference to header paragraph
+        try:
+            run_logo.add_picture("static/aLogo/LogoBBB.PNG", width=Inches(7.0))  # Adjust width as needed
+        except Exception as e:
+            print(f"Error adding logo: {e}")
+
+        
+    
+        # Footer
+        footer = section.footer
+        footer_para = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+        footer_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Add "Page X of Y" format
+        run = footer_para.add_run("Page ")
+    
+        # PAGE field (Current Page Number)
+        fldChar1 = OxmlElement("w:fldChar")
+        fldChar1.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText1 = OxmlElement("w:instrText")
+        instrText1.set(ns.qn("xml:space"), "preserve")
+        instrText1.text = "PAGE"
+    
+        fldChar2 = OxmlElement("w:fldChar")
+        fldChar2.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar1)
+        run._r.append(instrText1)
+        run._r.append(fldChar2)
+    
+        run.add_text(" of ")
+    
+        # NUMPAGES field (Total Number of Pages)
+        fldChar3 = OxmlElement("w:fldChar")
+        fldChar3.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText2 = OxmlElement("w:instrText")
+        instrText2.set(ns.qn("xml:space"), "preserve")
+        instrText2.text = "NUMPAGES"
+    
+        fldChar4 = OxmlElement("w:fldChar")
+        fldChar4.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar3)
+        run._r.append(instrText2)
+        run._r.append(fldChar4)
+    
+    
+    def add_colored_heading(doc, text, level, color):
+        """Adds a heading with color."""
+        heading = doc.add_paragraph()
+        run = heading.add_run(text)
+        run.bold = True
+        run.font.size = Pt(14) if level == 1 else Pt(12)
+        run.font.color.rgb = color
+        heading.style = f"Heading {level}"
+    
+    
+    
+    try:
+        
+        ###LOG
+        aLogEntry.objects.create(
+                user=request.user,
+                message=f"at {now()} {request.user} accessed Load  "
+            )
+        print(f"at {now()} {User} accessed Download Report")
+        ###LOG
+
+        # Get the company of the logged-in user    
+        user_company = None
+        if request.user.is_authenticated:
+            try:
+                user_company = UserCompany.objects.get(user=request.user).company
+            except UserCompany.DoesNotExist:
+                user_company = None
+
+        print(user_company)
+
+        aCompany = UserCompany.objects.get(user=request.user)
+        machine = get_object_or_404(modelcalc, id=machine_id)
+        project = APP_Project.objects.get(name=machine.project.name)
+        
+        
+        print(aCompany.id)
+        print(project.id)
+    
+        print("Company 2")
+
+        
+        sheet_key = machine.oSec00Field03
+    
+        #Define Retrieve values from AddMachine model
+        try:
+            machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
+            form_type = machine_config.nameFormCalcXX
+            aMachineName = machine_config.nameMachine
+        except AddMachine.DoesNotExist:
+            form_type = "None"
+            aMachineName = "None"
+
+        # Optional: Handle cases where the sheet_key is invalid
+        if form_type is None:
+            print(f"Warning: Unknown sheet_key '{sheet_key}'")
+
+        # Create a Word document
+        doc = Document()
+
+        # Add header and footer with page numbers
+        add_header_footer(doc)
+
+        # Add project title
+        doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        # Add project details
+        doc.add_heading("Project Details", level=2)     
+
+        doc.add_paragraph("\n")
+        doc.add_paragraph("Name: " + project.name)
+        doc.add_paragraph("Client Name: " + project.client_name)
+        doc.add_paragraph("Capacity: " + project.capacity)
+        doc.add_paragraph("\n")
+        
+        doc.add_page_break()     
+        doc.add_paragraph("\n")
+
+        # Extract form data
+        Input_data = [
+            (machine.oSec01Field01, machine.oSec01Field02),
+            (machine.oSec01Field03, machine.oSec01Field04),
+            (machine.oSec01Field05, machine.oSec01Field06),
+            (machine.oSec01Field07, machine.oSec01Field08),
+            (machine.oSec01Field09, machine.oSec01Field10),
+            (machine.oSec01Field11, machine.oSec01Field12),
+            (machine.oSec01Field13, machine.oSec01Field14),
+            (machine.oSec01Field15, machine.oSec01Field16),
+            (machine.oSec01Field17, machine.oSec01Field18),
+            (machine.oSec01Field19, machine.oSec01Field20),
+            (machine.oSec01Field21, machine.oSec01Field22),
+            (machine.oSec01Field23, machine.oSec01Field24),
+            (machine.oSec01Field25, machine.oSec01Field26),
+            (machine.oSec01Field27, machine.oSec01Field28),
+            (machine.oSec01Field29, machine.oSec01Field30),
+        ]
+        Output_data = [
+            (machine.oSec02Field01, machine.oSec02Field02),
+            (machine.oSec02Field03, machine.oSec02Field04),
+            (machine.oSec02Field05, machine.oSec02Field06),
+            (machine.oSec02Field07, machine.oSec02Field08),
+            (machine.oSec02Field09, machine.oSec02Field10),
+            (machine.oSec02Field11, machine.oSec02Field12),
+            (machine.oSec02Field13, machine.oSec02Field14),
+            (machine.oSec02Field15, machine.oSec02Field16),
+            (machine.oSec02Field17, machine.oSec02Field18),
+            (machine.oSec02Field19, machine.oSec02Field20),
+            (machine.oSec02Field21, machine.oSec02Field22),
+            (machine.oSec02Field23, machine.oSec02Field24),
+            (machine.oSec02Field25, machine.oSec02Field26),
+            (machine.oSec02Field27, machine.oSec02Field28),
+            (machine.oSec02Field29, machine.oSec02Field30),
+        ]
+
+
+        # Add machine title with font size 14 and numbering
+        machine_title = doc.add_paragraph(f" {aMachineName}", style="Heading3")
+        machine_title.runs[0].font.size = Pt(14)
+
+        input_section_data = [("Field", "Value")]
+        for input_key, input_value in Input_data:
+            input_key = input_key.strip() if input_key else ""
+            input_value = input_value.strip() if input_value else ""
+            if input_key and input_value and input_key.lower() != "oooo" and input_key.lower() != "" and input_key.lower() != "n/a" and input_value.lower() != "oooo" and input_value.lower() != "" and input_value.lower() != "n/a":
+                input_section_data.append((input_key, input_value))
+        if len(input_section_data) > 1:  # If the section has valid data, create a table
+            doc.add_paragraph(f"Input", style="Heading3")  # Only one title now
+            add_table(doc, input_section_data)  # Removed redundant title
+
+        output_section_data = [("Field", "Value")]
+        for output_key, output_value in Output_data:
+            output_key = output_key.strip() if output_key else ""
+            output_value = output_value.strip() if output_value else ""
+            if output_key and output_value and output_key.lower() != "oooo" and output_key.lower() != "" and output_key.lower() != "n/a" and output_value.lower() != "oooo" and output_value.lower() != "" and output_value.lower() != "n/a":
+                output_section_data.append((output_key, output_value))
+        if len(output_section_data) > 1:  # If the section has valid data, create a table
+            doc.add_paragraph(f"Output", style="Heading3")  # Only one title now
+            add_table(doc, output_section_data)  # Removed redundant title
+
+
+        doc.add_page_break()     
+
+        # Save the document to a response
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+        doc.save(response)
+        return response
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)

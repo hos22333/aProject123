@@ -1,7 +1,6 @@
 import pdb
 
-from Apps.aAppProject.models import APP_Project
-from Apps.aAppSubmittal.models import Machine
+
 from .models import Companies
 from .models import UserCompany
 from .models import aLogEntry
@@ -12,26 +11,12 @@ from .forms import FormFieldConfigForm
 from .forms import UserCompanyForm
 from .forms import CompanyForm
 
-from datetime import datetime
-from Apps.aAdmin.models import UserRole, RoleAutho, Autho
 import requests
 
-from django.http import HttpResponse
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.utils.timezone import now 
-from django.contrib.auth.models import User
-from django.conf import settings
 
 
-
-
-###################################
-###################################
-###################################
-###################################
 ###################################
 ###################################
 

@@ -37,6 +37,16 @@ from docx.shared import Pt
 
 # Create Machine
 def add_machine(request):
+     # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    print(user_company)
+
     if request.method == 'POST':
         form = MachineForm(request.POST)
         aLogEntry.objects.create(
@@ -49,7 +59,7 @@ def add_machine(request):
         form = MachineForm()
 
     # Fetch all current roles
-    machines = AddMachine.objects.all()
+    machines = AddMachine.objects.filter(company=user_company)
 
     return render(request, 'machine_list.html', {'form': form, 'machines': machines})
 

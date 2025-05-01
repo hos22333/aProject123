@@ -12,10 +12,8 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
-from django.urls import reverse
 from django.utils.timezone import now 
 from django.contrib.auth.models import User
-from django.conf import settings
 
 
 import os
@@ -333,7 +331,7 @@ def generate_report_AAA(request, project_id):
         run_logo = header_para.add_run()  # Corrected reference to header paragraph
         
         try:
-            run_logo.add_picture("LogoAAA.PNG", width=Inches(7.0))  # Adjust width as needed
+            run_logo.add_picture("static/aLogo/LogoAAA.PNG", width=Inches(7.0))  # Adjust width as needed
         except Exception as e:
             print(f"Error adding logo: {e}")
 
@@ -561,7 +559,7 @@ def generate_report_BBB(request, project_id):
         # Adding logo
         run_logo = header_para.add_run()  # Corrected reference to header paragraph
         try:
-            run_logo.add_picture("LogoBBB.PNG", width=Inches(7.0))  # Adjust width as needed
+            run_logo.add_picture("static/aLogo/LogoBBB.PNG", width=Inches(7.0))  # Adjust width as needed
         except Exception as e:
             print(f"Error adding logo: {e}")
 
@@ -811,7 +809,7 @@ def generate_calculation_report_AAA(request, project_id):
         run_logo = header_para.add_run()  # Corrected reference to header paragraph
         
         try:
-            run_logo.add_picture("LogoAAA.PNG", width=Inches(7.0))  # Adjust width as needed
+            run_logo.add_picture("static/aLogo/LogoAAA.PNG", width=Inches(7.0))  # Adjust width as needed
         except Exception as e:
             print(f"Error adding logo: {e}")
 
@@ -1039,7 +1037,7 @@ def generate_calculation_report_BBB(request, project_id):
         # Adding logo
         run_logo = header_para.add_run()  # Corrected reference to header paragraph
         try:
-            run_logo.add_picture("LogoBBB.PNG", width=Inches(7.0))  # Adjust width as needed
+            run_logo.add_picture("static/aLogo/LogoBBB.PNG", width=Inches(7.0))  # Adjust width as needed
         except Exception as e:
             print(f"Error adding logo: {e}")
 
