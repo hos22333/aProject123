@@ -12,8 +12,16 @@ from Apps.aAppCalculation.models import modelcalc_log
 from Apps.aAppSubmittal.models import Machine_log
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppMechanical.models import aLogEntry
+from Apps.aAppMechanical.models import Companies
+from Apps.aAppMechanical.models import FormFieldConfig
 from Apps.aAppSubmittal.models import AddMachine
 from django.shortcuts import get_object_or_404
+
+
+from Apps.aAppMechanical.forms import UserCompanyForm
+from Apps.aAppMechanical.forms import CompanyForm
+from Apps.aAppMechanical.forms import FormFieldConfigForm
+from Apps.aAppSubmittal.forms import MachineForm  
 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -234,6 +242,8 @@ def user_roles_with_authos(request):
     return render(request, 'user_roles.html', context)
 
 
+#######################################
+
 def Log_history(request):
     
     records = aLogEntry.objects.filter(user=request.user)
@@ -292,6 +302,7 @@ def modelmachine_list(request):
 
 
 
+#######################################
 
 
 @login_required
@@ -342,3 +353,232 @@ def profile(request):
 def users_list(request):
     users = User.objects.all()  # Fetch all users
     return render(request, 'users_list.html', {'users': users})
+
+
+#######################################
+
+# Create Company
+def add_company(request):
+    if request.method == 'POST':
+        form = CompanyForm(request.POST)
+        if form.is_valid():
+            form.save()
+            aLogEntry.objects.create(
+                user=request.user,
+                message=f"{request.user} Added a Company >>> {request.POST.get("nameCompanies")} "
+            )
+    else:
+        form = CompanyForm()
+
+    # Fetch all current roles
+    companies = Companies.objects.all()
+
+    return render(request, 'add_company.html', {'form': form, 'companies': companies})
+
+# Delete Company
+def delete_company(request, company_id):
+    company = get_object_or_404(Companies, id=company_id)
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Deleted the Company>>> {company.nameCompanies} "
+    )
+    company.delete()
+    return redirect('add_company')  # Redirect back to the list
+
+
+
+# Edit Company
+def edit_company(request, company_id):
+    company = get_object_or_404(Companies, id=company_id)
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Edited the Company>>> {company.nameCompanies} "
+    )
+
+    if request.method == 'POST':
+        form = CompanyForm(request.POST, instance=company)
+        if form.is_valid():
+            form.save()
+            return redirect('add_company')  # Redirect back to the main page
+    else:
+        form = CompanyForm(instance=company)
+
+    return render(request, 'edit_company.html', {'form': form, 'company': company})
+
+def companies_list(request):
+    companies = Companies.objects.all()  # Fetch all users
+    return render(request, 'companies_list.html', {'companies': companies})
+
+def assign_user_to_company(request):
+    if request.method == "POST":
+        form = UserCompanyForm(request.POST)
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"{request.user} Assigned >>>{request.POST.get("user")} to the Company {request.POST.get("company")} "
+        )
+        if form.is_valid():
+            form.save()
+            return redirect("assign_user")  # Redirect to a success page
+    else:
+        form = UserCompanyForm()
+
+    user_companies = UserCompany.objects.all()
+    
+    return render(request, "assign_user_to_company.html", {"form": form, 'user_companies': user_companies})
+
+def delete_user_company(request, user_company_id):
+    user_company = get_object_or_404(UserCompany, id=user_company_id)
+    if request.method == 'POST':
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"{request.user} Deleted >>> {user_company.user.username} from the Company {user_company.company.nameCompanies} "
+        )
+        user_company.delete()
+    return redirect('assign_user')  # Redirect back to the assign page
+
+
+#######################################
+
+# Create Machine
+def add_machine(request):
+     # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    print(user_company)
+
+    if request.method == 'POST':
+        form = MachineForm(request.POST)
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"{request.user} Added a Machine >>> {request.POST.get("nameMachine")} "
+        )
+        if form.is_valid():
+            form.save()
+    else:
+        form = MachineForm()
+
+    # Fetch all current roles
+    machines = AddMachine.objects.all()
+
+    return render(request, 'machine_list.html', {'form': form, 'machines': machines})
+
+# Delete Machine
+def delete_machine(request, machine_id):
+    machine = get_object_or_404(AddMachine, id=machine_id)
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Deleted Machine>>> {machine.nameMachine} "
+    )
+    machine.delete()
+    return redirect('add_machine')  # Redirect back to the list
+
+
+
+# Edit Machine
+def edit_amachine(request, machine_id):
+    machine = get_object_or_404(AddMachine, id=machine_id)
+
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Edited >>> {machine.nameMachine} "
+    )
+
+    if request.method == 'POST':
+        form = MachineForm(request.POST, instance=machine)
+        if form.is_valid():
+            form.save()
+            return redirect('add_machine')  # Redirect back to the main page
+    else:
+        form = MachineForm(instance=machine)
+
+    return render(request, 'edit_machine.html', {'form': form, 'machine': machine})
+
+
+
+#######################################
+
+
+def configurations(request):
+    return render(request, 'form_config_list.html')
+
+def list_configs(request):
+    print("LINE52")
+    sort_by = request.GET.get('sort', 'id')  # Default sorting by ID
+    order = request.GET.get('order', 'asc')  # Default order is ascending
+
+    valid_fields = ['id', 'form_name', 'field_name', 'label', 'initial_value', 'visibility', 'company']
+    if sort_by not in valid_fields:
+        sort_by = 'id'
+
+    
+    print("LINE61")
+    
+    # Apply sorting order
+    if order == 'desc':
+        sort_by = f'-{sort_by}'
+    
+     # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    print(user_company)
+
+    configs = FormFieldConfig.objects.filter(company=user_company).order_by(sort_by)
+    
+    
+    print("LINE70")
+    
+    return render(request, 'form_config.html', {
+        'configs': configs,
+        'sort_by': sort_by.strip(''),  # Remove '-' to keep track of column sorting
+        'order': order
+    })
+
+def add_config(request):
+    if request.method == "POST":
+        form = FormFieldConfigForm(request.POST)
+        if form.is_valid():
+            form.save()
+            aLogEntry.objects.create(
+                user=request.user,
+                message=f"{request.user} Add Configrations >>> {request.POST.get("form_name")}_{request.POST.get("field_name")}"
+            )
+            return redirect('list_configs')
+    else:
+        form = FormFieldConfigForm()
+    return render(request, 'form_config_form.html', {'form': form})
+
+def edit_config(request, config_id):
+    config = get_object_or_404(FormFieldConfig, id=config_id)
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} edited >>> {config.form_name}_{config.field_name}"
+    )
+    if request.method == "POST":
+        form = FormFieldConfigForm(request.POST, instance=config)
+        if form.is_valid():
+            form.save()
+            return redirect('list_configs')
+    else:
+        form = FormFieldConfigForm(instance=config)
+    return render(request, 'form_config_form.html', {'form': form})
+
+def delete_config(request, config_id):
+    config = get_object_or_404(FormFieldConfig, id=config_id)
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"{request.user} Deleted >>> {config.form_name}_{config.field_name}"
+    )
+    config.delete()
+    return redirect('list_configs')
+
+#######################################

@@ -67,7 +67,7 @@ def interact_with_api(api_url, req_type, input_data):
     """
     # Prepare the payload
     payload = {
-        "reqType": req_type,
+        **req_type,
         **input_data  # Merge the input data into the payload
     }
 
@@ -557,10 +557,24 @@ def HandleCalculationSheetForm(request):
     print(request.user)
     print(f"{request.user} accessed Load {sheet_key}")
     
+    # Get the company of the logged-in user    
+    user_company = None
+    firstletter = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+            firstletter = user_company.nameCompanies[0]
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    print(user_company)
+
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").filter(company=user_company)
     
 
+
     form_mapping = {
-        "NS": {
+        f"NS_{firstletter}": {
             "input_fields": {
                 "NS_Ch_Height":       'oSec01Field02', 
                 "NS_Ch_Width":        'oSec01Field04', 
@@ -574,8 +588,11 @@ def HandleCalculationSheetForm(request):
             "output_fields": {
                 "oSec02Field02": "O_Weight",
             },
+            "req_type": {
+                "reqType": "NS"
+            },
         },
-        "MS": {
+        f"MS_{firstletter}": {
             "input_fields": {
                 "MS_ChannelHeight":     'oSec01Field02',
                 "MS_ScreenWidth":       'oSec01Field04',
@@ -594,8 +611,11 @@ def HandleCalculationSheetForm(request):
                 "oSec02Field04": "MS_p",
                 "oSec02Field06": "MS_s",
             },
+            "req_type": {
+                "reqType": "MS"
+            },
         },
-        "BC": {
+        f"BC_{firstletter}": {
             "input_fields": {
                 "BC_Length": 'oSec01Field02',
                 "BC_Width": 'oSec01Field04',
@@ -609,8 +629,11 @@ def HandleCalculationSheetForm(request):
                 "oSec02Field04": "BC_p",
                 "oSec02Field06": "BC_s",
             },
+            "req_type": {
+                "reqType": "BC"
+            },
         },
-        "GR": {
+        f"GR_{firstletter}": {
             "input_fields": {
                 "GR_n_channel":       'oSec01Field02',
                 "GR_channel_width":   'oSec01Field04',
@@ -629,8 +652,11 @@ def HandleCalculationSheetForm(request):
                 "oSec02Field10": "GR_out5",
                 "oSec02Field12": "GR_out6",
             },
+            "req_type": {
+                "reqType": "GR"
+            },
         },
-        "PS": {
+        f"PS_{firstletter}": {
             "input_fields": {
                 "PS_walkway_length": 'oSec01Field02',
                 "PS_Friction":       'oSec01Field04',
@@ -644,8 +670,11 @@ def HandleCalculationSheetForm(request):
                 "oSec02Field08": "PS_out3",
                 "oSec02Field10": "PS_out4",
             },
+            "req_type": {
+                "reqType": "PS"
+            },
         },
-        "TH": {
+        f"TH_{firstletter}": {
             "input_fields": {
                 "TH_diameter":  'oSec01Field02', 
                 "TH_n_arm":     'oSec01Field04', 
@@ -657,8 +686,11 @@ def HandleCalculationSheetForm(request):
                 "oSec02Field04": "TH_p",
                 "oSec02Field06": "TH_s",
             },
+            "req_type": {
+                "reqType": "TH"
+            },
         },
-        "MX": {
+        f"MX_{firstletter}": {
             "input_fields": {
                 "MX_length":        'oSec01Field02', 
                 "MX_width":         'oSec01Field04', 
@@ -678,8 +710,11 @@ def HandleCalculationSheetForm(request):
                 "oSec02Field12": "MX_shaftD",
                 "oSec02Field14": "MX_Type",
             },
+            "req_type": {
+                "reqType": "MX"
+            },
         },
-        "RT": {
+        f"RT_{firstletter}": {
             "input_fields": {
                 "RT_Length":    'oSec01Field02', 
                 "RT_Width":     'oSec01Field04', 
@@ -691,8 +726,11 @@ def HandleCalculationSheetForm(request):
             "output_fields": {
                 "oSec02Field02": "RT_w10",
             },
+            "req_type": {
+                "reqType": "RT"
+            },
         },
-        "CT": {
+        f"CT_{firstletter}": {
             "input_fields": {
                 "CT_Diameter": 'oSec01Field02', 
                 "CT_Height": 'oSec01Field04',
@@ -707,8 +745,11 @@ def HandleCalculationSheetForm(request):
                 "oSec02Field14": "O_Tank_Base_UPN_Weight",
                 "oSec02Field16": "O_Tank_Cover_Weight",
             },
+            "req_type": {
+                "reqType": "CT"
+            },
         },
-        "SC": {
+        f"SC_{firstletter}": {
             "input_fields": {
                 "aInput01": 'oSec01Field02', 
                 "aInput02": 'oSec01Field04', 
@@ -727,8 +768,11 @@ def HandleCalculationSheetForm(request):
                 "oSec02Field10": "FrameWeight",
                 "oSec02Field12": "1111",
             },
+            "req_type": {
+                "reqType": "SC"
+            },
         },
-        "BS": {
+        f"BS_{firstletter}": {
             "input_fields": {
                 "BS_Bar_Dia":     'oSec01Field02', 
                 "BS_Bar_Space":     'oSec01Field04', 
@@ -742,8 +786,11 @@ def HandleCalculationSheetForm(request):
                 "oSec02Field04": "O_Plate_weight",
                 "oSec02Field06": "O_Total_weight",
             },
+            "req_type": {
+                "reqType": "BS"
+            },
         },
-        "PNch": {
+        f"PNch_{firstletter}": {
             "input_fields": {
                 "PNch_Channel_Height":             'oSec01Field02', 
                 "PNch_Frame_Height_Over_Channel":  'oSec01Field04', 
@@ -765,8 +812,11 @@ def HandleCalculationSheetForm(request):
                 "oSec02Field12": "O_Gate_Weight",
                 "oSec02Field14": "O_Total_Weight",
             },
+            "req_type": {
+                "reqType": "PNch"
+            },
         },
-        "PNwa": {
+        f"PNwa_{firstletter}": {
             "input_fields": {
                 "aInput01":   'oSec01Field03', 
                 "aInput02":   'oSec01Field04', 
@@ -788,21 +838,11 @@ def HandleCalculationSheetForm(request):
                 "oSec02Field12": "O_PNwa_Out06",
                 "oSec02Field14": "O_PNwa_Out07",
             },
+            "req_type": {
+                "reqType": "PNwa"
+            },
         },
     }
-
-    # Get the company of the logged-in user    
-    user_company = None
-    if request.user.is_authenticated:
-        try:
-            user_company = UserCompany.objects.get(user=request.user).company
-        except UserCompany.DoesNotExist:
-            user_company = None
-
-    print(user_company)
-
-    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").filter(company=user_company)
-    
     
     #Define Retrieve values from AddMachine model
     try:
@@ -820,7 +860,7 @@ def HandleCalculationSheetForm(request):
         return redirect('PageCalculationSheet.html')  # Or a 404 page
 
     
-    req_type = sheet_key
+    req_type = config['req_type']
     input_fields = config['input_fields']
     output_fields = config['output_fields']
 
@@ -851,6 +891,7 @@ def HandleCalculationSheetForm(request):
                 for api_key, field in input_fields.items() if form.cleaned_data.get(field) is not None
             }
             print ("input_data : ", input_data)
+            
 
 
             response = interact_with_api(

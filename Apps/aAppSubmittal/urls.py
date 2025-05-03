@@ -3,9 +3,6 @@ from . import views
 
 
 urlpatterns = [
-    path('add-machine/', views.add_machine, name='add_machine'),
-    path('delete-machine/<int:machine_id>/', views.delete_machine, name='delete_machine'),
-    path('edit-machine/<int:machine_id>/', views.edit_amachine, name='edit_machine'),
 
     path('DeleteMachine/<int:machine_id>/', views.DeleteMachine, name='DeleteMachine'),
 

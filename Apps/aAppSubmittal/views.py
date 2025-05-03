@@ -8,7 +8,6 @@ from Apps.aAppMechanical.models import aLogEntry
 
 
 from .forms import FormDataSheet, FormDataSheet_log
-from .forms import MachineForm  
 
 
 from datetime import datetime
@@ -33,68 +32,6 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml import OxmlElement, ns
 from docx.shared import Inches
 from docx.shared import Pt
-
-
-# Create Machine
-def add_machine(request):
-     # Get the company of the logged-in user    
-    user_company = None
-    if request.user.is_authenticated:
-        try:
-            user_company = UserCompany.objects.get(user=request.user).company
-        except UserCompany.DoesNotExist:
-            user_company = None
-
-    print(user_company)
-
-    if request.method == 'POST':
-        form = MachineForm(request.POST)
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Added a Machine >>> {request.POST.get("nameMachine")} "
-        )
-        if form.is_valid():
-            form.save()
-    else:
-        form = MachineForm()
-
-    # Fetch all current roles
-    machines = AddMachine.objects.all()
-
-    return render(request, 'machine_list.html', {'form': form, 'machines': machines})
-
-# Delete Machine
-def delete_machine(request, machine_id):
-    machine = get_object_or_404(AddMachine, id=machine_id)
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Deleted Machine>>> {machine.nameMachine} "
-    )
-    machine.delete()
-    return redirect('add_machine')  # Redirect back to the list
-
-
-
-# Edit Machine
-def edit_amachine(request, machine_id):
-    machine = get_object_or_404(AddMachine, id=machine_id)
-
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Edited >>> {machine.nameMachine} "
-    )
-
-    if request.method == 'POST':
-        form = MachineForm(request.POST, instance=machine)
-        if form.is_valid():
-            form.save()
-            return redirect('add_machine')  # Redirect back to the main page
-    else:
-        form = MachineForm(instance=machine)
-
-    return render(request, 'edit_machine.html', {'form': form, 'machine': machine})
-
-
 
 
 def LoadPageDataSheet(request):
@@ -899,6 +836,195 @@ def edit_machine(request, machine_id):
             machine.oSec01Field18 = form.cleaned_data.get('oSec01Field18', '')
             machine.oSec01Field19 = form.cleaned_data.get('oSec01Field19', '')
             machine.oSec01Field20 = form.cleaned_data.get('oSec01Field20', '')
+
+            machine.oSec02Field01 = form.cleaned_data.get('oSec02Field01', '')
+            machine.oSec02Field02 = form.cleaned_data.get('oSec02Field02', '')
+            machine.oSec02Field03 = form.cleaned_data.get('oSec02Field03', '')
+            machine.oSec02Field04 = form.cleaned_data.get('oSec02Field04', '')
+            machine.oSec02Field05 = form.cleaned_data.get('oSec02Field05', '')
+            machine.oSec02Field06 = form.cleaned_data.get('oSec02Field06', '')
+            machine.oSec02Field07 = form.cleaned_data.get('oSec02Field07', '')
+            machine.oSec02Field08 = form.cleaned_data.get('oSec02Field08', '')
+            machine.oSec02Field09 = form.cleaned_data.get('oSec02Field09', '')
+            machine.oSec02Field10 = form.cleaned_data.get('oSec02Field10', '')
+            machine.oSec02Field11 = form.cleaned_data.get('oSec02Field11', '')
+            machine.oSec02Field12 = form.cleaned_data.get('oSec02Field12', '')
+            machine.oSec02Field13 = form.cleaned_data.get('oSec02Field13', '')
+            machine.oSec02Field14 = form.cleaned_data.get('oSec02Field14', '')
+            machine.oSec02Field15 = form.cleaned_data.get('oSec02Field15', '')
+            machine.oSec02Field16 = form.cleaned_data.get('oSec02Field16', '')
+            machine.oSec02Field17 = form.cleaned_data.get('oSec02Field17', '')
+            machine.oSec02Field18 = form.cleaned_data.get('oSec02Field18', '')
+            machine.oSec02Field19 = form.cleaned_data.get('oSec02Field19', '')
+            machine.oSec02Field20 = form.cleaned_data.get('oSec02Field20', '')
+
+            machine.oSec03Field01 = form.cleaned_data.get('oSec03Field01', '')
+            machine.oSec03Field02 = form.cleaned_data.get('oSec03Field02', '')
+            machine.oSec03Field03 = form.cleaned_data.get('oSec03Field03', '')
+            machine.oSec03Field04 = form.cleaned_data.get('oSec03Field04', '')
+            machine.oSec03Field05 = form.cleaned_data.get('oSec03Field05', '')
+            machine.oSec03Field06 = form.cleaned_data.get('oSec03Field06', '')
+            machine.oSec03Field07 = form.cleaned_data.get('oSec03Field07', '')
+            machine.oSec03Field08 = form.cleaned_data.get('oSec03Field08', '')
+            machine.oSec03Field09 = form.cleaned_data.get('oSec03Field09', '')
+            machine.oSec03Field10 = form.cleaned_data.get('oSec03Field10', '')
+            machine.oSec03Field11 = form.cleaned_data.get('oSec03Field11', '')
+            machine.oSec03Field12 = form.cleaned_data.get('oSec03Field12', '')
+            machine.oSec03Field13 = form.cleaned_data.get('oSec03Field13', '')
+            machine.oSec03Field14 = form.cleaned_data.get('oSec03Field14', '')
+            machine.oSec03Field15 = form.cleaned_data.get('oSec03Field15', '')
+            machine.oSec03Field16 = form.cleaned_data.get('oSec03Field16', '')
+            machine.oSec03Field17 = form.cleaned_data.get('oSec03Field17', '')
+            machine.oSec03Field18 = form.cleaned_data.get('oSec03Field18', '')
+            machine.oSec03Field19 = form.cleaned_data.get('oSec03Field19', '')
+            machine.oSec03Field20 = form.cleaned_data.get('oSec03Field20', '')
+
+            machine.oSec04Field01 = form.cleaned_data.get('oSec04Field01', '')
+            machine.oSec04Field02 = form.cleaned_data.get('oSec04Field02', '')
+            machine.oSec04Field03 = form.cleaned_data.get('oSec04Field03', '')
+            machine.oSec04Field04 = form.cleaned_data.get('oSec04Field04', '')
+            machine.oSec04Field05 = form.cleaned_data.get('oSec04Field05', '')
+            machine.oSec04Field06 = form.cleaned_data.get('oSec04Field06', '')
+            machine.oSec04Field07 = form.cleaned_data.get('oSec04Field07', '')
+            machine.oSec04Field08 = form.cleaned_data.get('oSec04Field08', '')
+            machine.oSec04Field09 = form.cleaned_data.get('oSec04Field09', '')
+            machine.oSec04Field10 = form.cleaned_data.get('oSec04Field10', '')
+            machine.oSec04Field11 = form.cleaned_data.get('oSec04Field11', '')
+            machine.oSec04Field12 = form.cleaned_data.get('oSec04Field12', '')
+            machine.oSec04Field13 = form.cleaned_data.get('oSec04Field13', '')
+            machine.oSec04Field14 = form.cleaned_data.get('oSec04Field14', '')
+            machine.oSec04Field15 = form.cleaned_data.get('oSec04Field15', '')
+            machine.oSec04Field16 = form.cleaned_data.get('oSec04Field16', '')
+            machine.oSec04Field17 = form.cleaned_data.get('oSec04Field17', '')
+            machine.oSec04Field18 = form.cleaned_data.get('oSec04Field18', '')
+            machine.oSec04Field19 = form.cleaned_data.get('oSec04Field19', '')
+            machine.oSec04Field20 = form.cleaned_data.get('oSec04Field20', '')
+
+            machine.oSec05Field01 = form.cleaned_data.get('oSec05Field01', '')
+            machine.oSec05Field02 = form.cleaned_data.get('oSec05Field02', '')
+            machine.oSec05Field03 = form.cleaned_data.get('oSec05Field03', '')
+            machine.oSec05Field04 = form.cleaned_data.get('oSec05Field04', '')
+            machine.oSec05Field05 = form.cleaned_data.get('oSec05Field05', '')
+            machine.oSec05Field06 = form.cleaned_data.get('oSec05Field06', '')
+            machine.oSec05Field07 = form.cleaned_data.get('oSec05Field07', '')
+            machine.oSec05Field08 = form.cleaned_data.get('oSec05Field08', '')
+            machine.oSec05Field09 = form.cleaned_data.get('oSec05Field09', '')
+            machine.oSec05Field10 = form.cleaned_data.get('oSec05Field10', '')
+            machine.oSec05Field11 = form.cleaned_data.get('oSec05Field11', '')
+            machine.oSec05Field12 = form.cleaned_data.get('oSec05Field12', '')
+            machine.oSec05Field13 = form.cleaned_data.get('oSec05Field13', '')
+            machine.oSec05Field14 = form.cleaned_data.get('oSec05Field14', '')
+            machine.oSec05Field15 = form.cleaned_data.get('oSec05Field15', '')
+            machine.oSec05Field16 = form.cleaned_data.get('oSec05Field16', '')
+            machine.oSec05Field17 = form.cleaned_data.get('oSec05Field17', '')
+            machine.oSec05Field18 = form.cleaned_data.get('oSec05Field18', '')
+            machine.oSec05Field19 = form.cleaned_data.get('oSec05Field19', '')
+            machine.oSec05Field20 = form.cleaned_data.get('oSec05Field20', '')
+
+            machine.oSec06Field01 = form.cleaned_data.get('oSec06Field01', '')
+            machine.oSec06Field02 = form.cleaned_data.get('oSec06Field02', '')
+            machine.oSec06Field03 = form.cleaned_data.get('oSec06Field03', '')
+            machine.oSec06Field04 = form.cleaned_data.get('oSec06Field04', '')
+            machine.oSec06Field05 = form.cleaned_data.get('oSec06Field05', '')
+            machine.oSec06Field06 = form.cleaned_data.get('oSec06Field06', '')
+            machine.oSec06Field07 = form.cleaned_data.get('oSec06Field07', '')
+            machine.oSec06Field08 = form.cleaned_data.get('oSec06Field08', '')
+            machine.oSec06Field09 = form.cleaned_data.get('oSec06Field09', '')
+            machine.oSec06Field10 = form.cleaned_data.get('oSec06Field10', '')
+            machine.oSec06Field11 = form.cleaned_data.get('oSec06Field11', '')
+            machine.oSec06Field12 = form.cleaned_data.get('oSec06Field12', '')
+            machine.oSec06Field13 = form.cleaned_data.get('oSec06Field13', '')
+            machine.oSec06Field14 = form.cleaned_data.get('oSec06Field14', '')
+            machine.oSec06Field15 = form.cleaned_data.get('oSec06Field15', '')
+            machine.oSec06Field16 = form.cleaned_data.get('oSec06Field16', '')
+            machine.oSec06Field17 = form.cleaned_data.get('oSec06Field17', '')
+            machine.oSec06Field18 = form.cleaned_data.get('oSec06Field18', '')
+            machine.oSec06Field19 = form.cleaned_data.get('oSec06Field19', '')
+            machine.oSec06Field20 = form.cleaned_data.get('oSec06Field20', '')
+
+            machine.oSec07Field01 = form.cleaned_data.get('oSec07Field01', '')
+            machine.oSec07Field02 = form.cleaned_data.get('oSec07Field02', '')
+            machine.oSec07Field03 = form.cleaned_data.get('oSec07Field03', '')
+            machine.oSec07Field04 = form.cleaned_data.get('oSec07Field04', '')
+            machine.oSec07Field05 = form.cleaned_data.get('oSec07Field05', '')
+            machine.oSec07Field06 = form.cleaned_data.get('oSec07Field06', '')
+            machine.oSec07Field07 = form.cleaned_data.get('oSec07Field07', '')
+            machine.oSec07Field08 = form.cleaned_data.get('oSec07Field08', '')
+            machine.oSec07Field09 = form.cleaned_data.get('oSec07Field09', '')
+            machine.oSec07Field10 = form.cleaned_data.get('oSec07Field10', '')
+            machine.oSec07Field11 = form.cleaned_data.get('oSec07Field11', '')
+            machine.oSec07Field12 = form.cleaned_data.get('oSec07Field12', '')
+            machine.oSec07Field13 = form.cleaned_data.get('oSec07Field13', '')
+            machine.oSec07Field14 = form.cleaned_data.get('oSec07Field14', '')
+            machine.oSec07Field15 = form.cleaned_data.get('oSec07Field15', '')
+            machine.oSec07Field16 = form.cleaned_data.get('oSec07Field16', '')
+            machine.oSec07Field17 = form.cleaned_data.get('oSec07Field17', '')
+            machine.oSec07Field18 = form.cleaned_data.get('oSec07Field18', '')
+            machine.oSec07Field19 = form.cleaned_data.get('oSec07Field19', '')
+            machine.oSec07Field20 = form.cleaned_data.get('oSec07Field20', '')
+
+            machine.oSec08Field01 = form.cleaned_data.get('oSec08Field01', '')
+            machine.oSec08Field02 = form.cleaned_data.get('oSec08Field02', '')
+            machine.oSec08Field03 = form.cleaned_data.get('oSec08Field03', '')
+            machine.oSec08Field04 = form.cleaned_data.get('oSec08Field04', '')
+            machine.oSec08Field05 = form.cleaned_data.get('oSec08Field05', '')
+            machine.oSec08Field06 = form.cleaned_data.get('oSec08Field06', '')
+            machine.oSec08Field07 = form.cleaned_data.get('oSec08Field07', '')
+            machine.oSec08Field08 = form.cleaned_data.get('oSec08Field08', '')
+            machine.oSec08Field09 = form.cleaned_data.get('oSec08Field09', '')
+            machine.oSec08Field10 = form.cleaned_data.get('oSec08Field10', '')
+            machine.oSec08Field11 = form.cleaned_data.get('oSec08Field11', '')
+            machine.oSec08Field12 = form.cleaned_data.get('oSec08Field12', '')
+            machine.oSec08Field13 = form.cleaned_data.get('oSec08Field13', '')
+            machine.oSec08Field14 = form.cleaned_data.get('oSec08Field14', '')
+            machine.oSec08Field15 = form.cleaned_data.get('oSec08Field15', '')
+            machine.oSec08Field16 = form.cleaned_data.get('oSec08Field16', '')
+            machine.oSec08Field17 = form.cleaned_data.get('oSec08Field17', '')
+            machine.oSec08Field18 = form.cleaned_data.get('oSec08Field18', '')
+            machine.oSec08Field19 = form.cleaned_data.get('oSec08Field19', '')
+            machine.oSec08Field20 = form.cleaned_data.get('oSec08Field20', '')
+
+            machine.oSec09Field01 = form.cleaned_data.get('oSec09Field01', '')
+            machine.oSec09Field02 = form.cleaned_data.get('oSec09Field02', '')
+            machine.oSec09Field03 = form.cleaned_data.get('oSec09Field03', '')
+            machine.oSec09Field04 = form.cleaned_data.get('oSec09Field04', '')
+            machine.oSec09Field05 = form.cleaned_data.get('oSec09Field05', '')
+            machine.oSec09Field06 = form.cleaned_data.get('oSec09Field06', '')
+            machine.oSec09Field07 = form.cleaned_data.get('oSec09Field07', '')
+            machine.oSec09Field08 = form.cleaned_data.get('oSec09Field08', '')
+            machine.oSec09Field09 = form.cleaned_data.get('oSec09Field09', '')
+            machine.oSec09Field10 = form.cleaned_data.get('oSec09Field10', '')
+            machine.oSec09Field11 = form.cleaned_data.get('oSec09Field11', '')
+            machine.oSec09Field12 = form.cleaned_data.get('oSec09Field12', '')
+            machine.oSec09Field13 = form.cleaned_data.get('oSec09Field13', '')
+            machine.oSec09Field14 = form.cleaned_data.get('oSec09Field14', '')
+            machine.oSec09Field15 = form.cleaned_data.get('oSec09Field15', '')
+            machine.oSec09Field16 = form.cleaned_data.get('oSec09Field16', '')
+            machine.oSec09Field17 = form.cleaned_data.get('oSec09Field17', '')
+            machine.oSec09Field18 = form.cleaned_data.get('oSec09Field18', '')
+            machine.oSec09Field19 = form.cleaned_data.get('oSec09Field19', '')
+            machine.oSec09Field20 = form.cleaned_data.get('oSec09Field20', '')
+
+            machine.oSec10Field01 = form.cleaned_data.get('oSec10Field01', '')
+            machine.oSec10Field02 = form.cleaned_data.get('oSec10Field02', '')
+            machine.oSec10Field03 = form.cleaned_data.get('oSec10Field03', '')
+            machine.oSec10Field04 = form.cleaned_data.get('oSec10Field04', '')
+            machine.oSec10Field05 = form.cleaned_data.get('oSec10Field05', '')
+            machine.oSec10Field06 = form.cleaned_data.get('oSec10Field06', '')
+            machine.oSec10Field07 = form.cleaned_data.get('oSec10Field07', '')
+            machine.oSec10Field08 = form.cleaned_data.get('oSec10Field08', '')
+            machine.oSec10Field09 = form.cleaned_data.get('oSec10Field09', '')
+            machine.oSec10Field10 = form.cleaned_data.get('oSec10Field10', '')
+            machine.oSec10Field11 = form.cleaned_data.get('oSec10Field11', '')
+            machine.oSec10Field12 = form.cleaned_data.get('oSec10Field12', '')
+            machine.oSec10Field13 = form.cleaned_data.get('oSec10Field13', '')
+            machine.oSec10Field14 = form.cleaned_data.get('oSec10Field14', '')
+            machine.oSec10Field15 = form.cleaned_data.get('oSec10Field15', '')
+            machine.oSec10Field16 = form.cleaned_data.get('oSec10Field16', '')
+            machine.oSec10Field17 = form.cleaned_data.get('oSec10Field17', '')
+            machine.oSec10Field18 = form.cleaned_data.get('oSec10Field18', '')
+            machine.oSec10Field19 = form.cleaned_data.get('oSec10Field19', '')
+            machine.oSec10Field20 = form.cleaned_data.get('oSec10Field20', '')
 
             machine.save()  # Save updates to the database
             return JsonResponse({"success": True})
