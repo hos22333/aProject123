@@ -1,11 +1,8 @@
 from django.shortcuts import render
-
-from config import settings
 from .forms import ProjectForm
 from .models import APP_Project
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppSubmittal.models import Machine
-from Apps.aAppSubmittal.models import AddMachine
 from Apps.aAppMechanical.models import aLogEntry
 from Apps.aAppCalculation.models import modelcalc
 
@@ -21,10 +18,6 @@ from django.contrib.auth.models import User
 
 import os
 import ezdxf
-import zipfile
-
-from django.utils.text import slugify
-from io import BytesIO
 
 from docx import Document
 from docx.shared import Pt, RGBColor
@@ -55,22 +48,7 @@ def project_list(request):
                 return render(request, 'project_list', {"form": form, "error": "User is not associated with a company"})
 
 
-            instance.save()  # Save the instance (now with company info)
-
-            # Create folder inside the company's directory in the static folder
-            company_name = slugify(user_company)  
-            project_name = slugify(instance.name)         
-            project_id = slugify(instance.id)         
-            folder_name = slugify(f"{project_id}_{company_name}_{project_name}")
-            
-            
-            base_static_path = os.path.join(settings.BASE_DIR, 'static', 'aReports')
-            company_folder = os.path.join(base_static_path, company_name)
-            project_folder = os.path.join(company_folder, folder_name)
-            
-            # Create the folders if they don't exist
-            os.makedirs(project_folder, exist_ok=True)
-
+            form.save()
             aLogEntry.objects.create(
                 user=request.user,
                 message=f"{request.user} Created a project {request.POST.get("name")} "
