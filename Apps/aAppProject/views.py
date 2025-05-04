@@ -1,8 +1,11 @@
 from django.shortcuts import render
+
+from config import settings
 from .forms import ProjectForm
 from .models import APP_Project
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppSubmittal.models import Machine
+from Apps.aAppSubmittal.models import AddMachine
 from Apps.aAppMechanical.models import aLogEntry
 from Apps.aAppCalculation.models import modelcalc
 
@@ -18,6 +21,10 @@ from django.contrib.auth.models import User
 
 import os
 import ezdxf
+import zipfile
+
+from django.utils.text import slugify
+from io import BytesIO
 
 from docx import Document
 from docx.shared import Pt, RGBColor
@@ -48,7 +55,22 @@ def project_list(request):
                 return render(request, 'project_list', {"form": form, "error": "User is not associated with a company"})
 
 
-            form.save()
+            instance.save()  # Save the instance (now with company info)
+
+            # Create folder inside the company's directory in the static folder
+            company_name = slugify(user_company)  
+            project_name = slugify(instance.name)         
+            project_id = slugify(instance.id)         
+            folder_name = slugify(f"{project_id}_{company_name}_{project_name}")
+            
+            
+            base_static_path = os.path.join(settings.BASE_DIR, 'static', 'aReports')
+            company_folder = os.path.join(base_static_path, company_name)
+            project_folder = os.path.join(company_folder, folder_name)
+            
+            # Create the folders if they don't exist
+            os.makedirs(project_folder, exist_ok=True)
+
             aLogEntry.objects.create(
                 user=request.user,
                 message=f"{request.user} Created a project {request.POST.get("name")} "
@@ -1205,6 +1227,1066 @@ def generate_calculation_report_BBB(request, project_id):
         response['Content-Disposition'] = f'attachment; filename={project.name}_Calculation_report.docx'
         doc.save(response)
         return response
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+def download_project_reports(request, project_id):
+
+    project = APP_Project.objects.get(id=project_id)
+    company_name = slugify(project.company.nameCompanies)
+    project_name = slugify(project.name)
+    folder_name = slugify(f"{project_id}_{company_name}_{project_name}")
+
+    folder_path = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_name, folder_name)
+
+    # In-memory zip
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                abs_path = os.path.join(root, file)
+                rel_path = os.path.relpath(abs_path, folder_path)
+                zip_file.write(abs_path, arcname=rel_path)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="{folder_name}_reports.zip"'
+    return response
+
+
+def save_reports(request, project_id):
+    try:
+        #pdb.set_trace()
+        # Log the action
+        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
+        
+        #pdb.set_trace()
+        # Get the user’s company and project
+        aCompany = UserCompany.objects.get(user=request.user)
+
+        #pdb.set_trace()
+        # Determine the company and generate the corresponding report
+        if aCompany:
+            save_submittal_report(request, project_id)
+
+        else:
+            return HttpResponse("Invalid company ID", status=400)
+        
+        if aCompany:
+            save_calculation_report(request, project_id)
+            return HttpResponse(status=204)
+        
+        else:
+            return HttpResponse("Invalid company ID", status=400)
+
+    except UserCompany.DoesNotExist:
+        return HttpResponse("User does not belong to a company", status=403)
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+    
+    
+
+
+
+def save_submittal_report(request, project_id):
+    try:
+        #pdb.set_trace()
+        # Log the action
+        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
+        
+        #pdb.set_trace()
+        # Get the user’s company and project
+        aCompany = UserCompany.objects.get(user=request.user)
+
+        #pdb.set_trace()
+        # Determine the company and generate the corresponding report
+        if aCompany.company.nameCompanies == "AAAA":
+            print("Company 1")
+            return save_submittal_report_AAA(request, project_id)
+
+        elif aCompany.company.nameCompanies == "BBBB":
+            print("Company 2")
+            return save_submittal_report_BBB(request, project_id)
+
+        else:
+            return HttpResponse("Invalid company ID", status=400)
+
+    except UserCompany.DoesNotExist:
+        return HttpResponse("User does not belong to a company", status=403)
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+
+
+def save_submittal_report_AAA(request, project_id):
+    
+    def add_table(doc, data, title=None):
+        """Creates a table and applies a background color to the header."""
+        if title:
+            doc.add_heading(title, level=3)
+
+        table = doc.add_table(rows=len(data), cols=2)
+        table.style = "Table Grid"
+
+        for i, row in enumerate(data):
+            for j, text in enumerate(row):
+                cell = table.cell(i, j)
+                cell.text = text
+
+                # Apply background color only to the header row (first row)
+                if i == 0:
+                    shading_elm = OxmlElement("w:shd")
+                    shading_elm.set(ns.qn("w:fill"), "FFA500")  # Orange color                    
+                    #shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Blue color
+                        
+                    cell._tc.get_or_add_tcPr().append(shading_elm)
+                    
+            """Generates a Word report for a given project."""
+    
+    
+    
+    def add_header_footer(doc):
+        """Adds header and footer with page numbers in the format 'Page X of Y'."""
+        section = doc.sections[0]
+    
+        # Header
+        header = section.header
+        header_para = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+        # header_para.add_run("Company Name\n")
+        # header_para.add_run("Project Name\n")
+        # header_para.add_run("Date: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
+        header_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Adding logo
+        run_logo = header_para.add_run()  # Corrected reference to header paragraph
+        
+        try:
+            run_logo.add_picture("static/aLogo/LogoAAA.PNG", width=Inches(7.0))  # Adjust width as needed
+        except Exception as e:
+            print(f"Error adding logo: {e}")
+
+        # Footer
+        footer = section.footer
+        footer_para = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+        footer_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Add "Page X of Y" format
+        run = footer_para.add_run("Page ")
+    
+        # PAGE field (Current Page Number)
+        fldChar1 = OxmlElement("w:fldChar")
+        fldChar1.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText1 = OxmlElement("w:instrText")
+        instrText1.set(ns.qn("xml:space"), "preserve")
+        instrText1.text = "PAGE"
+    
+        fldChar2 = OxmlElement("w:fldChar")
+        fldChar2.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar1)
+        run._r.append(instrText1)
+        run._r.append(fldChar2)
+    
+        run.add_text(" of ")
+    
+        # NUMPAGES field (Total Number of Pages)
+        fldChar3 = OxmlElement("w:fldChar")
+        fldChar3.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText2 = OxmlElement("w:instrText")
+        instrText2.set(ns.qn("xml:space"), "preserve")
+        instrText2.text = "NUMPAGES"
+    
+        fldChar4 = OxmlElement("w:fldChar")
+        fldChar4.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar3)
+        run._r.append(instrText2)
+        run._r.append(fldChar4)
+    
+    
+    def add_colored_heading(doc, text, level, color):
+        """Adds a heading with color."""
+        heading = doc.add_paragraph()
+        run = heading.add_run(text)
+        run.bold = True
+        run.font.size = Pt(14) if level == 1 else Pt(12)
+        run.font.color.rgb = color
+        heading.style = f"Heading {level}"
+    
+    
+    
+    try:
+        
+        ###LOG
+        aLogEntry.objects.create(
+                user=request.user,
+                message=f"at {now()} {request.user} accessed Load  "
+            )
+        print(f"at {now()} {User} accessed Download Report")
+        ###LOG
+
+        aCompany = UserCompany.objects.get(user=request.user)
+        company_name = aCompany.company.nameCompanies
+        project = APP_Project.objects.get(id=project_id)
+        machines = Machine.objects.filter(project=project)
+
+        print(aCompany.id)
+        print(project.id)
+    
+        print("Company 1")
+    
+    
+        # Create a Word document
+        doc = Document()
+
+        # Add header and footer with page numbers
+        add_header_footer(doc)
+
+        # Add project title
+        doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        # Add project details
+        doc.add_heading("Project Details", level=2)     
+
+        doc.add_paragraph("\n")
+        doc.add_paragraph("Name: " + project.name)
+        doc.add_paragraph("Client Name: " + project.client_name)
+        doc.add_paragraph("Capacity: " + project.capacity)
+        doc.add_paragraph("\n")
+        
+        doc.add_page_break()     
+        doc.add_paragraph("\n")
+
+        # Add machine details
+        for index, machine in enumerate(machines, start=1):  # Add numbering
+            machine_name = machine.oSec00Field03
+            section_titles = []
+
+            if machine_name == "DataSheetNS":
+                machine_name = "Manual Screen" 
+                section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetMS":
+                machine_name = "Mechanical Screen" 
+                section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetBC":
+                machine_name = "Belt Conveyor"
+                section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetCO":
+                machine_name = "Container"
+                section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetGR":
+                machine_name = "Gritremoval"
+                section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
+
+            if machine_name == "DataSheetSS":
+                machine_name = "Sand Silo"
+
+            if machine_name == "DataSheetPS":
+                machine_name = "Primary Sedimentation"
+
+            if machine_name == "DataSheetQV":
+                machine_name = "Quick Valve"
+
+            if machine_name == "DataSheetTV":
+                machine_name = "Telescopic Valve"
+                
+            if machine_name == "DataSheetTH":
+                machine_name = "Sludge Thickener"
+
+
+            machine_id = AddMachine.object.filter(nameMachine = machine_name,company = company_name).id
+            machine_type = AddMachine.object.filter(nameMachine = machine_name,company = company_name).keyValue
+
+            # Add machine title with font size 14 and numbering
+            machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
+            machine_title.runs[0].font.size = Pt(14)
+
+            for i in range(1, 11):  # Loop from Sec01 to Sec10
+                section_name = f"Sec{i:02d}"
+                section_data = [("Field", "Value")]
+
+                for j in range(1, 21, 2):  # Step by 2 to avoid duplication
+                    key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
+                    value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
+
+                    if key and value and key.lower() != "oooo" and value.lower() != "oooo":
+                        section_data.append((key, value))
+
+                if len(section_data) > 1:  # If the section has valid data, create a table
+                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                    doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
+
+                    add_table(doc, section_data)  # Removed redundant title
+
+            General_saved_DXF_ALL(request, machine_id, machine_type, project_id)
+
+            doc.add_page_break() 
+        
+        # Define the folder path
+        company_slug = slugify(project.company.nameCompanies)
+        project_slug = slugify(project.name)
+        folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
+
+        project_folder = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_slug, folder_name)
+        os.makedirs(project_folder, exist_ok=True)  # Create folder if it doesn't exist
+
+        # Save the file to that path
+        file_path = os.path.join(project_folder, f"{project_slug}_report.docx")
+        doc.save(file_path)
+        return HttpResponse(status=204)
+        
+
+        
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+
+
+
+def save_submittal_report_BBB(request, project_id):
+    
+    def add_table(doc, data, title=None):
+        """Creates a borderless table and applies a background color to the header."""
+        if title:
+            doc.add_heading(title, level=3)
+
+        table = doc.add_table(rows=len(data), cols=2)
+
+        # Remove all table borders manually
+        tbl = table._tbl  # Get the table's XML element
+        tblPr = tbl.find(ns.qn("w:tblPr"))  # Find existing table properties
+
+        if tblPr is None:
+            tblPr = OxmlElement("w:tblPr")  # Create table properties if missing
+            tbl.insert(0, tblPr)  # Insert as the first child of <w:tbl>
+
+        tblBorders = OxmlElement("w:tblBorders")  # Create <w:tblBorders>
+        for border_name in ["top", "left", "bottom", "right", "insideH", "insideV"]:
+            border = OxmlElement(f"w:{border_name}")
+            border.set(ns.qn("w:val"), "nil")  # Remove the border
+            tblBorders.append(border)
+
+        tblPr.append(tblBorders)  # Append border settings to the table properties
+
+        for i, row in enumerate(data):
+            for j, text in enumerate(row):
+                cell = table.cell(i, j)
+                cell.text = text
+
+                # Apply background color only to the header row (first row)
+                if i == 0:
+                    shading_elm = OxmlElement("w:shd")
+                    shading_elm.set(ns.qn("w:val"), "clear")  # Set shading value
+                    shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Light blue color
+                    cell._tc.get_or_add_tcPr().append(shading_elm)
+   
+    
+    
+    def add_header_footer(doc):
+        """Adds header and footer with page numbers in the format 'Page X of Y'."""
+        section = doc.sections[0]
+    
+        # Header
+        header = section.header
+        header_para = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+        # header_para.add_run("Company Name\n")
+        # header_para.add_run("Project Name\n")
+        # header_para.add_run("Date: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
+        header_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Adding logo
+        run_logo = header_para.add_run()  # Corrected reference to header paragraph
+        try:
+            run_logo.add_picture("static/aLogo/LogoBBB.PNG", width=Inches(7.0))  # Adjust width as needed
+        except Exception as e:
+            print(f"Error adding logo: {e}")
+
+        
+    
+        # Footer
+        footer = section.footer
+        footer_para = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+        footer_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Add "Page X of Y" format
+        run = footer_para.add_run("Page ")
+    
+        # PAGE field (Current Page Number)
+        fldChar1 = OxmlElement("w:fldChar")
+        fldChar1.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText1 = OxmlElement("w:instrText")
+        instrText1.set(ns.qn("xml:space"), "preserve")
+        instrText1.text = "PAGE"
+    
+        fldChar2 = OxmlElement("w:fldChar")
+        fldChar2.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar1)
+        run._r.append(instrText1)
+        run._r.append(fldChar2)
+    
+        run.add_text(" of ")
+    
+        # NUMPAGES field (Total Number of Pages)
+        fldChar3 = OxmlElement("w:fldChar")
+        fldChar3.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText2 = OxmlElement("w:instrText")
+        instrText2.set(ns.qn("xml:space"), "preserve")
+        instrText2.text = "NUMPAGES"
+    
+        fldChar4 = OxmlElement("w:fldChar")
+        fldChar4.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar3)
+        run._r.append(instrText2)
+        run._r.append(fldChar4)
+    
+    
+    def add_colored_heading(doc, text, level, color):
+        """Adds a heading with color."""
+        heading = doc.add_paragraph()
+        run = heading.add_run(text)
+        run.bold = True
+        run.font.size = Pt(14) if level == 1 else Pt(12)
+        run.font.color.rgb = color
+        heading.style = f"Heading {level}"
+    
+    
+    
+    try:
+        
+        ###LOG
+        aLogEntry.objects.create(
+                user=request.user,
+                message=f"at {now()} {request.user} accessed Load  "
+            )
+        print(f"at {now()} {User} accessed Download Report")
+        ###LOG
+
+        aCompany = UserCompany.objects.get(user=request.user)
+        project = APP_Project.objects.get(id=project_id)
+        machines = Machine.objects.filter(project=project)
+        
+        
+        print(aCompany.id)
+        print(project.id)
+    
+        print("Company 2")
+    
+    
+        # Create a Word document
+        doc = Document()
+
+        # Add header and footer with page numbers
+        add_header_footer(doc)
+
+        # Add project title
+        doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        # Add project details
+        doc.add_heading("Project Details", level=2)     
+
+        doc.add_paragraph("\n")
+        doc.add_paragraph("Name: " + project.name)
+        doc.add_paragraph("Client Name: " + project.client_name)
+        doc.add_paragraph("Capacity: " + project.capacity)
+        doc.add_paragraph("\n")
+        
+        doc.add_page_break()     
+        doc.add_paragraph("\n")
+
+        # Add machine details
+        for index, machine in enumerate(machines, start=1):  # Add numbering
+            machine_name = machine.oSec00Field03
+            section_titles = []
+
+            if machine_name == "DataSheetNS":
+                machine_name = "Manual Screen" 
+                section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetMS":
+                machine_name = "Mechanical Screen" 
+                section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetBC":
+                machine_name = "Belt Conveyor"
+                section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetCO":
+                machine_name = "Container"
+                section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetGR":
+                machine_name = "Gritremoval"
+                section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
+
+            if machine_name == "DataSheetSS":
+                machine_name = "Sand Silo"
+
+            if machine_name == "DataSheetPS":
+                machine_name = "Primary Sedimentation"
+
+            if machine_name == "DataSheetQV":
+                machine_name = "Quick Valve"
+
+            if machine_name == "DataSheetTV":
+                machine_name = "Telescopic Valve"
+                
+            if machine_name == "DataSheetTH":
+                machine_name = "Sludge Thickener"
+
+            # Add machine title with font size 14 and numbering
+            machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
+            machine_title.runs[0].font.size = Pt(14)
+
+            for i in range(1, 11):  # Loop from Sec01 to Sec10
+                section_name = f"Sec{i:02d}"
+                section_data = [("Field", "Value")]
+
+                for j in range(1, 21, 2):  # Step by 2 to avoid duplication
+                    key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
+                    value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
+
+                    if key and value and key.lower() != "oooo" and value.lower() != "oooo":
+                        section_data.append((key, value))
+
+                if len(section_data) > 1:  # If the section has valid data, create a table
+                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                    doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
+
+                    add_table(doc, section_data)  # Removed redundant title
+
+            doc.add_page_break()     
+
+        # Define the folder path
+        company_slug = slugify(project.company.nameCompanies)
+        project_slug = slugify(project.name)
+        folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
+
+        project_folder = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_slug, folder_name)
+        os.makedirs(project_folder, exist_ok=True)  # Create folder if it doesn't exist
+
+        # Save the file to that path
+        file_path = os.path.join(project_folder, f"{project_slug}_report.docx")
+        doc.save(file_path)
+        return HttpResponse(status=204)
+
+        
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+
+
+def save_calculation_report(request, project_id):
+    try:
+        #pdb.set_trace()
+        # Log the action
+        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
+        
+        #pdb.set_trace()
+        # Get the user’s company and project
+        aCompany = UserCompany.objects.get(user=request.user)
+
+        #pdb.set_trace()
+        # Determine the company and generate the corresponding report
+        if aCompany.company.nameCompanies == "AAAA":
+            print("Company 1")
+            return save_calculation_report_AAA(request, project_id)
+
+        elif aCompany.company.nameCompanies == "BBBB":
+            print("Company 2")
+            return save_calculation_report_BBB(request, project_id)
+
+        else:
+            return HttpResponse("Invalid company ID", status=400)
+
+    except UserCompany.DoesNotExist:
+        return HttpResponse("User does not belong to a company", status=403)
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+
+
+def save_calculation_report_AAA(request, project_id):
+    
+    def add_table(doc, data, title=None):
+        """Creates a table and applies a background color to the header."""
+        if title:
+            doc.add_heading(title, level=3)
+
+        table = doc.add_table(rows=len(data), cols=2)
+        table.style = "Table Grid"
+
+        for i, row in enumerate(data):
+            for j, text in enumerate(row):
+                cell = table.cell(i, j)
+                cell.text = text
+
+                # Apply background color only to the header row (first row)
+                if i == 0:
+                    shading_elm = OxmlElement("w:shd")
+                    shading_elm.set(ns.qn("w:fill"), "FFA500")  # Orange color                    
+                    #shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Blue color
+                        
+                    cell._tc.get_or_add_tcPr().append(shading_elm)
+                    
+            """Generates a Word report for a given project."""
+    
+    
+    
+    def add_header_footer(doc):
+        """Adds header and footer with page numbers in the format 'Page X of Y'."""
+        section = doc.sections[0]
+    
+        # Header
+        header = section.header
+        header_para = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+        # header_para.add_run("Company Name\n")
+        # header_para.add_run("Project Name\n")
+        # header_para.add_run("Date: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
+        header_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Adding logo
+        run_logo = header_para.add_run()  # Corrected reference to header paragraph
+        
+        try:
+            run_logo.add_picture("static/aLogo/LogoAAA.PNG", width=Inches(7.0))  # Adjust width as needed
+        except Exception as e:
+            print(f"Error adding logo: {e}")
+
+        # Footer
+        footer = section.footer
+        footer_para = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+        footer_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Add "Page X of Y" format
+        run = footer_para.add_run("Page ")
+    
+        # PAGE field (Current Page Number)
+        fldChar1 = OxmlElement("w:fldChar")
+        fldChar1.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText1 = OxmlElement("w:instrText")
+        instrText1.set(ns.qn("xml:space"), "preserve")
+        instrText1.text = "PAGE"
+    
+        fldChar2 = OxmlElement("w:fldChar")
+        fldChar2.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar1)
+        run._r.append(instrText1)
+        run._r.append(fldChar2)
+    
+        run.add_text(" of ")
+    
+        # NUMPAGES field (Total Number of Pages)
+        fldChar3 = OxmlElement("w:fldChar")
+        fldChar3.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText2 = OxmlElement("w:instrText")
+        instrText2.set(ns.qn("xml:space"), "preserve")
+        instrText2.text = "NUMPAGES"
+    
+        fldChar4 = OxmlElement("w:fldChar")
+        fldChar4.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar3)
+        run._r.append(instrText2)
+        run._r.append(fldChar4)
+    
+    
+    def add_colored_heading(doc, text, level, color):
+        """Adds a heading with color."""
+        heading = doc.add_paragraph()
+        run = heading.add_run(text)
+        run.bold = True
+        run.font.size = Pt(14) if level == 1 else Pt(12)
+        run.font.color.rgb = color
+        heading.style = f"Heading {level}"
+    
+    
+    
+    try:
+        
+        ###LOG
+        aLogEntry.objects.create(
+                user=request.user,
+                message=f"at {now()} {request.user} accessed Load  "
+            )
+        print(f"at {now()} {User} accessed Download Report")
+        ###LOG
+
+        aCompany = UserCompany.objects.get(user=request.user)
+        companyname=aCompany.company.nameCompanies
+        firstletter = companyname[0]
+        project = APP_Project.objects.get(id=project_id)
+        machines = modelcalc.objects.filter(project=project)
+        
+        
+        print(aCompany.id)
+        print(project.id)
+    
+        print("Company 1")
+    
+    
+        # Create a Word document
+        doc = Document()
+
+        # Add header and footer with page numbers
+        add_header_footer(doc)
+
+        # Add project title
+        doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        # Add project details
+        doc.add_heading("Project Details", level=2)     
+
+        doc.add_paragraph("\n")
+        doc.add_paragraph("Name: " + project.name)
+        doc.add_paragraph("Client Name: " + project.client_name)
+        doc.add_paragraph("Capacity: " + project.capacity)
+        doc.add_paragraph("\n")
+        
+        doc.add_page_break()     
+        doc.add_paragraph("\n")
+
+        # Add machine details
+        for index, machine in enumerate(machines, start=1):  # Add numbering
+            machine_name = machine.oSec00Field03
+            section_titles = []
+
+            if machine_name == f"NS_{firstletter}":
+                machine_name = "Manual Screen" 
+                section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == f"MS_{firstletter}":
+                machine_name = "Mechanical Screen" 
+                section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
+
+            if machine_name == f"BC_{firstletter}":
+                machine_name = "Belt Conveyor"
+                section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
+
+            if machine_name == f"CO_{firstletter}":
+                machine_name = "Container"
+                section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == f"GR_{firstletter}":
+                machine_name = "Gritremoval"
+                section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
+
+            if machine_name == f"SS_{firstletter}":
+                machine_name = "Sand Silo"
+
+            if machine_name == f"PS_{firstletter}":
+                machine_name = "Primary Sedimentation"
+
+            if machine_name == f"QV_{firstletter}":
+                machine_name = "Quick Valve"
+
+            if machine_name == f"TV_{firstletter}":
+                machine_name = "Telescopic Valve"
+                
+            if machine_name == f"TH_{firstletter}":
+                machine_name = "Sludge Thickener"
+
+            # Add machine title with font size 14 and numbering
+            machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
+            machine_title.runs[0].font.size = Pt(14)
+
+            for i in range(1, 11):  # Loop from Sec01 to Sec10
+                section_name = f"Sec{i:02d}"
+                section_data = [("Field", "Value")]
+
+                for j in range(1, 21, 2):  # Step by 2 to avoid duplication
+                    key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
+                    value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
+
+                    if key and value and key.lower() != "oooo" and value.lower() != "oooo":
+                        section_data.append((key, value))
+
+                if len(section_data) > 1:  # If the section has valid data, create a table
+                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                    doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
+
+                    add_table(doc, section_data)  # Removed redundant title
+
+            doc.add_page_break() 
+        
+        # Define the folder path
+        company_slug = slugify(project.company.nameCompanies)
+        project_slug = slugify(project.name)
+        folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
+
+        project_folder = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_slug, folder_name)
+        os.makedirs(project_folder, exist_ok=True)  # Create folder if it doesn't exist
+
+        # Save the file to that path
+        file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.docx")
+        doc.save(file_path)
+        return HttpResponse(status=204)
+
+        
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+
+
+
+def save_calculation_report_BBB(request, project_id):
+    
+    def add_table(doc, data, title=None):
+        """Creates a borderless table and applies a background color to the header."""
+        if title:
+            doc.add_heading(title, level=3)
+
+        table = doc.add_table(rows=len(data), cols=2)
+
+        # Remove all table borders manually
+        tbl = table._tbl  # Get the table's XML element
+        tblPr = tbl.find(ns.qn("w:tblPr"))  # Find existing table properties
+
+        if tblPr is None:
+            tblPr = OxmlElement("w:tblPr")  # Create table properties if missing
+            tbl.insert(0, tblPr)  # Insert as the first child of <w:tbl>
+
+        tblBorders = OxmlElement("w:tblBorders")  # Create <w:tblBorders>
+        for border_name in ["top", "left", "bottom", "right", "insideH", "insideV"]:
+            border = OxmlElement(f"w:{border_name}")
+            border.set(ns.qn("w:val"), "nil")  # Remove the border
+            tblBorders.append(border)
+
+        tblPr.append(tblBorders)  # Append border settings to the table properties
+
+        for i, row in enumerate(data):
+            for j, text in enumerate(row):
+                cell = table.cell(i, j)
+                cell.text = text
+
+                # Apply background color only to the header row (first row)
+                if i == 0:
+                    shading_elm = OxmlElement("w:shd")
+                    shading_elm.set(ns.qn("w:val"), "clear")  # Set shading value
+                    shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Light blue color
+                    cell._tc.get_or_add_tcPr().append(shading_elm)
+   
+    
+    
+    def add_header_footer(doc):
+        """Adds header and footer with page numbers in the format 'Page X of Y'."""
+        section = doc.sections[0]
+    
+        # Header
+        header = section.header
+        header_para = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+        # header_para.add_run("Company Name\n")
+        # header_para.add_run("Project Name\n")
+        # header_para.add_run("Date: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
+        header_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Adding logo
+        run_logo = header_para.add_run()  # Corrected reference to header paragraph
+        try:
+            run_logo.add_picture("static/aLogo/LogoBBB.PNG", width=Inches(7.0))  # Adjust width as needed
+        except Exception as e:
+            print(f"Error adding logo: {e}")
+
+        
+    
+        # Footer
+        footer = section.footer
+        footer_para = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+        footer_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+        # Add "Page X of Y" format
+        run = footer_para.add_run("Page ")
+    
+        # PAGE field (Current Page Number)
+        fldChar1 = OxmlElement("w:fldChar")
+        fldChar1.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText1 = OxmlElement("w:instrText")
+        instrText1.set(ns.qn("xml:space"), "preserve")
+        instrText1.text = "PAGE"
+    
+        fldChar2 = OxmlElement("w:fldChar")
+        fldChar2.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar1)
+        run._r.append(instrText1)
+        run._r.append(fldChar2)
+    
+        run.add_text(" of ")
+    
+        # NUMPAGES field (Total Number of Pages)
+        fldChar3 = OxmlElement("w:fldChar")
+        fldChar3.set(ns.qn("w:fldCharType"), "begin")
+    
+        instrText2 = OxmlElement("w:instrText")
+        instrText2.set(ns.qn("xml:space"), "preserve")
+        instrText2.text = "NUMPAGES"
+    
+        fldChar4 = OxmlElement("w:fldChar")
+        fldChar4.set(ns.qn("w:fldCharType"), "end")
+    
+        run._r.append(fldChar3)
+        run._r.append(instrText2)
+        run._r.append(fldChar4)
+    
+    
+    def add_colored_heading(doc, text, level, color):
+        """Adds a heading with color."""
+        heading = doc.add_paragraph()
+        run = heading.add_run(text)
+        run.bold = True
+        run.font.size = Pt(14) if level == 1 else Pt(12)
+        run.font.color.rgb = color
+        heading.style = f"Heading {level}"
+    
+    
+    
+    try:
+        
+        ###LOG
+        aLogEntry.objects.create(
+                user=request.user,
+                message=f"at {now()} {request.user} accessed Load  "
+            )
+        print(f"at {now()} {User} accessed Download Report")
+        ###LOG
+
+        aCompany = UserCompany.objects.get(user=request.user)
+        companyname=aCompany.company.nameCompanies
+        firstletter = companyname[0]
+        project = APP_Project.objects.get(id=project_id)
+        machines = modelcalc.objects.filter(project=project)
+        
+        
+        print(aCompany.id)
+        print(project.id)
+    
+        print("Company 2")
+    
+    
+        # Create a Word document
+        doc = Document()
+
+        # Add header and footer with page numbers
+        add_header_footer(doc)
+
+        # Add project title
+        doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        # Add project details
+        doc.add_heading("Project Details", level=2)     
+
+        doc.add_paragraph("\n")
+        doc.add_paragraph("Name: " + project.name)
+        doc.add_paragraph("Client Name: " + project.client_name)
+        doc.add_paragraph("Capacity: " + project.capacity)
+        doc.add_paragraph("\n")
+        
+        doc.add_page_break()     
+        doc.add_paragraph("\n")
+
+        # Add machine details
+        for index, machine in enumerate(machines, start=1):  # Add numbering
+            machine_name = machine.oSec00Field03
+            section_titles = []
+
+            if machine_name == f"NS_{firstletter}":
+                machine_name = "Manual Screen" 
+                section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == f"MS_{firstletter}":
+                machine_name = "Mechanical Screen" 
+                section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
+
+            if machine_name == f"BC_{firstletter}":
+                machine_name = "Belt Conveyor"
+                section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
+
+            if machine_name == f"CO_{firstletter}":
+                machine_name = "Container"
+                section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == f"GR_{firstletter}":
+                machine_name = "Gritremoval"
+                section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
+
+            if machine_name == f"SS_{firstletter}":
+                machine_name = "Sand Silo"
+
+            if machine_name == f"PS_{firstletter}":
+                machine_name = "Primary Sedimentation"
+
+            if machine_name == f"QV_{firstletter}":
+                machine_name = "Quick Valve"
+
+            if machine_name == f"TV_{firstletter}":
+                machine_name = "Telescopic Valve"
+                
+            if machine_name == f"TH_{firstletter}":
+                machine_name = "Sludge Thickener"
+
+            # Add machine title with font size 14 and numbering
+            machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
+            machine_title.runs[0].font.size = Pt(14)
+
+            for i in range(1, 11):  # Loop from Sec01 to Sec10
+                section_name = f"Sec{i:02d}"
+                section_data = [("Field", "Value")]
+
+                for j in range(1, 21, 2):  # Step by 2 to avoid duplication
+                    key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
+                    value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
+
+                    if key and value and key.lower() != "oooo" and value.lower() != "oooo":
+                        section_data.append((key, value))
+
+                if len(section_data) > 1:  # If the section has valid data, create a table
+                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                    doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
+
+                    add_table(doc, section_data)  # Removed redundant title
+
+            doc.add_page_break()     
+
+        # Define the folder path
+        company_slug = slugify(project.company.nameCompanies)
+        project_slug = slugify(project.name)
+        folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
+
+        project_folder = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_slug, folder_name)
+        os.makedirs(project_folder, exist_ok=True)  # Create folder if it doesn't exist
+
+        # Save the file to that path
+        file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.docx")
+        doc.save(file_path)
+        return HttpResponse(status=204)
+
+        
 
     except APP_Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
