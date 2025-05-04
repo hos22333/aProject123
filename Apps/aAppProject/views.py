@@ -1529,7 +1529,6 @@ def save_submittal_report_AAA(request, project_id):
 
                     add_table(doc, section_data)  # Removed redundant title
 
-            General_saved_DXF_ALL(request, machine_id, machine_type, project_id)
 
             doc.add_page_break() 
         
