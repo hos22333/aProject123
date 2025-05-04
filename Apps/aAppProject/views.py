@@ -1,4 +1,6 @@
 from django.shortcuts import render
+
+from config import settings
 from .forms import ProjectForm
 from .models import APP_Project
 from Apps.aAppMechanical.models import UserCompany
@@ -14,6 +16,12 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
 from django.utils.timezone import now 
 from django.contrib.auth.models import User
+
+
+
+import zipfile
+from django.utils.text import slugify
+from io import BytesIO
 
 
 import os
@@ -48,7 +56,23 @@ def project_list(request):
                 return render(request, 'project_list', {"form": form, "error": "User is not associated with a company"})
 
 
-            form.save()
+            instance.save()  # Save the instance (now with company info)
+
+            # Create folder inside the company's directory in the static folder
+            company_name = slugify(instance.company.name)  
+            project_name = slugify(instance.name)       
+            project_id = APP_Project.objects.get(name = project_name).id
+            folder_name = f"{project_id}_{company_name}_{project_name}"
+
+            
+            base_static_path = os.path.join(settings.BASE_DIR, 'static', 'aReports')
+            company_folder = os.path.join(base_static_path, company_name)
+            project_folder = os.path.join(company_folder, project_name)
+
+            # Create the folders if they don't exist
+            os.makedirs(project_folder, exist_ok=True)
+
+
             aLogEntry.objects.create(
                 user=request.user,
                 message=f"{request.user} Created a project {request.POST.get("name")} "
@@ -1482,9 +1506,6 @@ def save_submittal_report_AAA(request, project_id):
             if machine_name == "DataSheetTH":
                 machine_name = "Sludge Thickener"
 
-
-            machine_id = AddMachine.object.filter(nameMachine = machine_name,company = company_name).id
-            machine_type = AddMachine.object.filter(nameMachine = machine_name,company = company_name).keyValue
 
             # Add machine title with font size 14 and numbering
             machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")

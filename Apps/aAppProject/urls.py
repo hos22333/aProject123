@@ -10,4 +10,6 @@ urlpatterns = [
     path('get_calc_machines/<int:project_id>/', views.get_calc_machines, name='get_calc_machines'),    
     path('generate_report/<int:project_id>/', views.generate_report, name='generate_report'),
     path('generate_calculation_report/<int:project_id>/', views.generate_calculation_report, name='generate_calculation_report'),
+    path('download-reports/<int:project_id>/', views.download_project_reports, name='download_project_reports'),
+    path('save_reports/<int:project_id>/', views.save_reports, name='save_reports'),
 ]
