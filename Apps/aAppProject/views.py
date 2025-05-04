@@ -5,8 +5,10 @@ from .forms import ProjectForm
 from .models import APP_Project
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppSubmittal.models import Machine
+from Apps.aAppSubmittal.models import AddMachine
 from Apps.aAppMechanical.models import aLogEntry
 from Apps.aAppCalculation.models import modelcalc
+from Apps.aAppSubmittal.views import get_user_company
 
 import requests
 
@@ -59,7 +61,7 @@ def project_list(request):
             instance.save()  # Save the instance (now with company info)
 
             # Create folder inside the company's directory in the static folder
-            company_name = slugify(instance.company.name)  
+            company_name = slugify(instance.company.nameCompanies)  
             project_name = slugify(instance.name)       
             project_id = APP_Project.objects.get(name = project_name).id
             folder_name = f"{project_id}_{company_name}_{project_name}"
@@ -67,7 +69,8 @@ def project_list(request):
             
             base_static_path = os.path.join(settings.BASE_DIR, 'static', 'aReports')
             company_folder = os.path.join(base_static_path, company_name)
-            project_folder = os.path.join(company_folder, project_name)
+            project_folder = os.path.join(company_folder, folder_name)
+
 
             # Create the folders if they don't exist
             os.makedirs(project_folder, exist_ok=True)
@@ -457,6 +460,7 @@ def generate_report_AAA(request, project_id):
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
             section_titles = []
+            
 
             if machine_name == "DataSheetNS":
                 machine_name = "Manual Screen" 
@@ -1435,7 +1439,7 @@ def save_submittal_report_AAA(request, project_id):
         ###LOG
 
         aCompany = UserCompany.objects.get(user=request.user)
-        company_name = aCompany.company.nameCompanies
+        company_id = aCompany.company
         project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
 
@@ -1469,8 +1473,11 @@ def save_submittal_report_AAA(request, project_id):
         # Add machine details
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
+            machine_ID = machine.id
+            sheet_key = AddMachine.objects.get(nameDB=machine_name, company=company_id).keyValue
             section_titles = []
-
+            General_saved_DXF_ALL(request, machine_ID, sheet_key, project_id)
+            SavedFullDrawing(request, machine_ID, sheet_key)
             if machine_name == "DataSheetNS":
                 machine_name = "Manual Screen" 
                 section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
@@ -1677,6 +1684,7 @@ def save_submittal_report_BBB(request, project_id):
         ###LOG
 
         aCompany = UserCompany.objects.get(user=request.user)
+        company_id = aCompany.company
         project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
         
@@ -1711,7 +1719,11 @@ def save_submittal_report_BBB(request, project_id):
         # Add machine details
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
+            machine_ID = machine.id
+            sheet_key = AddMachine.objects.get(nameDB=machine_name, company=company_id).keyValue
             section_titles = []
+            General_saved_DXF_ALL(request, machine_ID, sheet_key, project_id)
+            SavedFullDrawing(request, machine_ID, sheet_key)
 
             if machine_name == "DataSheetNS":
                 machine_name = "Manual Screen" 
@@ -2288,3 +2300,509 @@ def save_calculation_report_BBB(request, project_id):
 
     except APP_Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
+
+
+
+# Helper function to define DXF paths
+def get_saved_dxf_paths(user_company, category, project_id):
+    # Get project info
+    project = APP_Project.objects.get(id=project_id)
+    company_slug = slugify(user_company.nameCompanies)
+    project_slug = slugify(project.name)
+    folder_name = f"{project_id}_{company_slug}_{project_slug}"
+
+    # Load original path (base DXF)
+    company_dxf_path = {
+        1: os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", f"AAA_{category}.dxf"),
+        2: os.path.join(settings.BASE_DIR, "static", "aDxfs", "BBB", f"{category}.dxf"),
+    }
+    static_path = company_dxf_path.get(user_company.id)
+    if not static_path or not os.path.exists(static_path):
+        raise FileNotFoundError(f"DXF not found: {static_path}")
+
+    # Target output path for modified DXF
+    target_dir = os.path.join(
+        settings.BASE_DIR,
+        "static",
+        "aReports",
+        company_slug.upper(),
+        folder_name
+    )
+    os.makedirs(target_dir, exist_ok=True)
+
+    modified_path = os.path.join(target_dir, f"{category}_new.dxf")
+
+    return static_path, modified_path
+    
+
+# Helper function to modify DXF files
+def modify_saved_dxf_file(static_path, modified_path, modifications):
+    doc = ezdxf.readfile(static_path)
+
+    for entity in doc.modelspace().query("DIMENSION"):
+        if entity.dxf.text in modifications:
+            entity.dxf.text = modifications[entity.dxf.text]
+
+        # Update text height and arrow size
+        dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)
+        if dimstyle:
+            dimstyle.dxf.dimtxt = 0.1  # Set text height
+            dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+        entity.render()
+
+    doc.saveas(modified_path)
+
+# Main DXF Processing Function
+def process_saved_dxf(request, aMachine_ID, category, project_id, modifications, output_filename):
+    # Log the request
+    aLogEntry.objects.create(
+        user=request.user,
+        message=f"at {now()} {request.user} Download DXF {category} {aMachine_ID}"
+    )
+
+    user_company = get_user_company(request)
+    if not user_company:
+        return HttpResponse("Unauthorized", status=403)
+
+    static_path, modified_path = get_saved_dxf_paths(user_company, category, project_id)
+    if not os.path.exists(static_path):
+        return HttpResponse("File not found", status=404)
+
+    machine = Machine.objects.get(id=aMachine_ID)
+
+    
+    modify_saved_dxf_file(static_path, modified_path, modifications(machine))
+
+    
+
+    
+
+# DXF Download Views
+
+
+def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
+    
+    print(aType)
+    
+    # Redirect unauthenticated users
+    if not request.user.is_authenticated:
+        return redirect("login")  
+    
+    
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} DXF download {aType} "
+        )
+    
+    
+    # Get the company of the logged-in user    
+    user_company = None
+    firstletter = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+            firstletter = user_company.nameCompanies[0]
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    
+    if aType == f"NS_{firstletter}":
+        return process_saved_dxf(
+            request,
+            aMachine_ID,
+            "NS",
+            project_id,
+            lambda machine: {
+                "ScreenLength": machine.oSec02Field06,
+                "BarLength": "500",
+                "ScreenWidth": machine.oSec02Field04,
+                "BarTh": "10",
+                "BarSpacing": machine.oSec02Field10,
+            },
+            f"new_NS_{user_company}.dxf"
+        )
+        
+    
+    if aType == f"MS_{firstletter}":
+        return process_saved_dxf(
+            request,
+            aMachine_ID,
+            "MS",
+            project_id,
+            lambda machine: {
+                "ChannelHeight": "0000",
+                "WaterLevel": "000",
+                "Width": machine.oSec02Field08,
+                "Length": machine.oSec02Field10,
+                "Angle": machine.oSec02Field20,
+            },
+            f"new_MS_{user_company}.dxf"
+        )
+        
+    if aType == f"BC_{firstletter}":
+        return process_saved_dxf(
+            request,
+            aMachine_ID,
+            "BC",
+            project_id,
+            lambda machine: {
+                "Length": machine.oSec02Field04,
+                "Width": machine.oSec02Field02,
+                "WidB": "000",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_BC_{user_company}.dxf"
+        )
+        
+    if aType == f"CO_{firstletter}":
+        return process_saved_dxf(
+            request,
+            aMachine_ID,
+            "CO",
+            project_id,
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_CO_{user_company}.dxf"
+        )
+        
+    if aType == f"GR_{firstletter}":
+        return process_saved_dxf(
+            request,
+            aMachine_ID,
+            "GR",
+            project_id,
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_GR_{user_company}.dxf"
+        )
+        
+    if aType == f"SS_{firstletter}":
+        return process_saved_dxf(
+            request,
+            aMachine_ID,
+            "SS",
+            project_id,
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_SS_{user_company}.dxf"
+        )
+        
+    if aType == f"PS_{firstletter}":
+        return process_saved_dxf(
+            request,
+            aMachine_ID,
+            "PS",
+            project_id,
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_PS_{user_company}.dxf"
+        )
+        
+    if aType == f"QV_{firstletter}":
+        return process_saved_dxf(
+            request,
+            aMachine_ID,
+            "QV",
+            project_id,
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_QV_{user_company}.dxf"
+        )
+        
+    if aType == f"TV_{firstletter}":
+        return process_saved_dxf(
+            request,
+            aMachine_ID,
+            "TV",
+            project_id,
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_TV_{user_company}.dxf"
+        )
+        
+    if aType == f"TH_{firstletter}":
+        return process_saved_dxf(
+            request,
+            aMachine_ID,
+            "TH",
+            project_id,
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"new_TH_{user_company}.dxf"
+        )
+        
+    
+    
+# DXF Download Views
+def SavedFullDrawing(request, aMachine_ID, aType):
+    
+    # Helper function to modify DXF files
+    def SavedFullDrawing_modify_dxf_file(static_path, modified_path, modifications):
+        doc = ezdxf.readfile(static_path)
+
+        # for entity in doc.modelspace().query("DIMENSION"):
+        #     if entity.dxf.text in modifications:
+        #         entity.dxf.text = modifications[entity.dxf.text]
+
+        #     # Update text height and arrow size
+        #     dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)
+        #     if dimstyle:
+        #         dimstyle.dxf.dimtxt = 0.1  # Set text height
+        #         dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+        #     entity.render()
+
+        doc.saveas(modified_path)    
+        
+    
+    # Main DXF Processing Function
+    def SavedFullDrawing_process_dxf(request, aMachine_ID, category, modifications, output_filename):
+
+        user_company = get_user_company(request)
+        if not user_company:
+            return HttpResponse("Unauthorized", status=403)
+
+        # Get machine and project
+        machine = Machine.objects.get(id=aMachine_ID)
+        project = machine.project  # Assumes FK from Machine to Project
+        company_slug = slugify(user_company.nameCompanies)
+        project_slug = slugify(project.name)
+        folder_name = f"{project.id}_{company_slug}_{project_slug}"
+
+
+        static_path  = os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", f"Full Drawing {category}.dxf")
+        
+        
+        if not os.path.exists(static_path):
+            return HttpResponse("File not found", status=404)
+
+        # Destination path
+        target_dir = os.path.join(
+            settings.BASE_DIR, "static", "aReports", company_slug.upper(), folder_name
+        )
+        os.makedirs(target_dir, exist_ok=True)
+        modified_path = os.path.join(target_dir, f"{category}_newFullDrawing.dxf")
+
+        machine = Machine.objects.get(id=aMachine_ID)
+        
+        SavedFullDrawing_modify_dxf_file(static_path, modified_path, modifications(machine))
+        
+
+        
+
+        return HttpResponse("Invalid request", status=400)
+        
+
+    
+    # Redirect unauthenticated users
+    if not request.user.is_authenticated:
+        return redirect("login") 
+        
+    # Get the company of the logged-in user    
+    user_company = None
+    firstletter = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+            firstletter = user_company.nameCompanies[0]
+        except UserCompany.DoesNotExist:
+            user_company = None 
+        
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} DXF download {aType} "
+        )
+
+    
+    if aType == f"NS_{firstletter}":
+        return SavedFullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "NS",
+            lambda machine: {
+                "ScreenLength": machine.oSec02Field06,
+                "BarLength": "500",
+                "ScreenWidth": machine.oSec02Field04,
+                "BarTh": "10",
+                "BarSpacing": machine.oSec02Field10,
+            },
+            f"newFullDrawing_ManualScreen_{user_company}.dxf"
+        )
+        
+    
+    if aType == f"MS_{firstletter}":
+        return SavedFullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "MS",
+            lambda machine: {
+                "ChannelHeight": "0000",
+                "WaterLevel": "000",
+                "Width": machine.oSec02Field08,
+                "Length": machine.oSec02Field10,
+                "Angle": machine.oSec02Field20,
+            },
+            f"newFullDrawing_MechanicalScreen_{user_company}.dxf"
+        )
+        
+    if aType == f"BC_{firstletter}":
+        return SavedFullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "BC",
+            lambda machine: {
+                "Length": machine.oSec02Field04,
+                "Width": machine.oSec02Field02,
+                "WidB": "000",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_BeltConveyor_{user_company}.dxf"
+        )
+        
+    if aType == f"CO_{firstletter}":
+        return SavedFullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "CO",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_Container_{user_company}.dxf"
+        )
+        
+    if aType == f"GR_{firstletter}":
+        return SavedFullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "GR",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_Gritremoval_{user_company}.dxf"
+        )
+        
+    if aType == f"SS_{firstletter}":
+        return SavedFullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "SS",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_SandSilo_{user_company}.dxf"
+        )
+        
+    if aType == f"PS_{firstletter}":
+        return SavedFullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "PS",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_PrimarySedimentation_{user_company}.dxf"
+        )
+        
+    if aType == f"QV_{firstletter}":
+        return SavedFullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "QV",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_QuickValve_{user_company}.dxf"
+        )
+        
+    if aType == f"TV_{firstletter}":
+        return SavedFullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "TV",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_TelescopicValve_{user_company}.dxf"
+        )
+        
+    if aType == f"TH_{firstletter}":
+        return SavedFullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "TH",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_SludgeThickener_{user_company}.dxf"
+        )
+        
+
+

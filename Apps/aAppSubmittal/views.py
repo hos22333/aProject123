@@ -10,6 +10,8 @@ from Apps.aAppMechanical.models import aLogEntry
 from .forms import FormDataSheet, FormDataSheet_log
 
 
+from django.utils.text import slugify
+
 from datetime import datetime
 import requests
 
@@ -1352,14 +1354,16 @@ def General_DXF_ALL(request, aMachine_ID, aType):
     
     # Get the company of the logged-in user    
     user_company = None
+    firstletter = None
     if request.user.is_authenticated:
         try:
             user_company = UserCompany.objects.get(user=request.user).company
+            firstletter = user_company.nameCompanies[0]
         except UserCompany.DoesNotExist:
             user_company = None
 
     
-    if aType == "NS":
+    if aType == f"NS_{firstletter}":
         return process_dxf(
             request,
             aMachine_ID,
@@ -1375,7 +1379,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
         )
         
     
-    if aType == "MS":
+    if aType == f"MS_{firstletter}":
         return process_dxf(
             request,
             aMachine_ID,
@@ -1390,7 +1394,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             f"new_MS_{user_company}.dxf"
         )
         
-    if aType == "BC":
+    if aType == f"BC_{firstletter}":
         return process_dxf(
             request,
             aMachine_ID,
@@ -1405,7 +1409,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             f"new_BC_{user_company}.dxf"
         )
         
-    if aType == "CO":
+    if aType == f"CO_{firstletter}":
         return process_dxf(
             request,
             aMachine_ID,
@@ -1420,7 +1424,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             f"new_CO_{user_company}.dxf"
         )
         
-    if aType == "GR":
+    if aType == f"GR_{firstletter}":
         return process_dxf(
             request,
             aMachine_ID,
@@ -1435,7 +1439,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             f"new_GR_{user_company}.dxf"
         )
         
-    if aType == "SS":
+    if aType == f"SS_{firstletter}":
         return process_dxf(
             request,
             aMachine_ID,
@@ -1450,7 +1454,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             f"new_SS_{user_company}.dxf"
         )
         
-    if aType == "PS":
+    if aType == f"PS_{firstletter}":
         return process_dxf(
             request,
             aMachine_ID,
@@ -1465,7 +1469,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             f"new_PS_{user_company}.dxf"
         )
         
-    if aType == "QV":
+    if aType == f"QV_{firstletter}":
         return process_dxf(
             request,
             aMachine_ID,
@@ -1480,7 +1484,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             f"new_QV_{user_company}.dxf"
         )
         
-    if aType == "TV":
+    if aType == f"TV_{firstletter}":
         return process_dxf(
             request,
             aMachine_ID,
@@ -1495,7 +1499,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             f"new_TV_{user_company}.dxf"
         )
         
-    if aType == "TH":
+    if aType == f"TH_{firstletter}":
         return process_dxf(
             request,
             aMachine_ID,
@@ -1545,7 +1549,7 @@ def FullDrawing(request, aMachine_ID, aType):
         if not user_company:
             return HttpResponse("Unauthorized", status=403)
 
-        static_path  = os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", "Full Drawing NS.dxf")
+        static_path  = os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", f"Full Drawing {category}.dxf")
         modified_path = static_path.replace(".dxf", "_newFullDrawing.dxf")
         
         if not os.path.exists(static_path):
@@ -1572,9 +1576,11 @@ def FullDrawing(request, aMachine_ID, aType):
         
     # Get the company of the logged-in user    
     user_company = None
+    firstletter = None
     if request.user.is_authenticated:
         try:
             user_company = UserCompany.objects.get(user=request.user).company
+            firstletter = user_company.nameCompanies[0]
         except UserCompany.DoesNotExist:
             user_company = None 
         
@@ -1585,18 +1591,156 @@ def FullDrawing(request, aMachine_ID, aType):
         )
 
     
-    #if aType == "NS":
-    return FullDrawing_process_dxf(
-        request,
-        aMachine_ID,
-        "NS",
-        lambda machine: {
-            "ScreenLength": machine.oSec02Field06,
-            "BarLength": "500",
-            "ScreenWidth": machine.oSec02Field04,
-            "BarTh": "10",
-            "BarSpacing": machine.oSec02Field10,
-        },
-        f"newFullDrawing_ManualScreen_{user_company}.dxf"
-    )
+    if aType == f"NS_{firstletter}":
+        return FullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "NS",
+            lambda machine: {
+                "ScreenLength": machine.oSec02Field06,
+                "BarLength": "500",
+                "ScreenWidth": machine.oSec02Field04,
+                "BarTh": "10",
+                "BarSpacing": machine.oSec02Field10,
+            },
+            f"newFullDrawing_ManualScreen_{user_company}.dxf"
+        )
         
+    
+    if aType == f"MS_{firstletter}":
+        return FullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "MS",
+            lambda machine: {
+                "ChannelHeight": "0000",
+                "WaterLevel": "000",
+                "Width": machine.oSec02Field08,
+                "Length": machine.oSec02Field10,
+                "Angle": machine.oSec02Field20,
+            },
+            f"newFullDrawing_MechanicalScreen_{user_company}.dxf"
+        )
+        
+    if aType == f"BC_{firstletter}":
+        return FullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "BC",
+            lambda machine: {
+                "Length": machine.oSec02Field04,
+                "Width": machine.oSec02Field02,
+                "WidB": "000",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_BeltConveyor_{user_company}.dxf"
+        )
+        
+    if aType == f"CO_{firstletter}":
+        return FullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "CO",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_Container_{user_company}.dxf"
+        )
+        
+    if aType == f"GR_{firstletter}":
+        return FullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "GR",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_Gritremoval_{user_company}.dxf"
+        )
+        
+    if aType == f"SS_{firstletter}":
+        return FullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "SS",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_SandSilo_{user_company}.dxf"
+        )
+        
+    if aType == f"PS_{firstletter}":
+        return FullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "PS",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_PrimarySedimentation_{user_company}.dxf"
+        )
+        
+    if aType == f"QV_{firstletter}":
+        return FullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "QV",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_QuickValve_{user_company}.dxf"
+        )
+        
+    if aType == f"TV_{firstletter}":
+        return FullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "TV",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_TelescopicValve_{user_company}.dxf"
+        )
+        
+    if aType == f"TH_{firstletter}":
+        return FullDrawing_process_dxf(
+            request,
+            aMachine_ID,
+            "TH",
+            lambda machine: {
+                "ScreenLength": "1000",
+                "BarLength": "500",
+                "ScreenWidth": "600",
+                "BarTh": "10",
+                "BarSpacing": "25",
+            },
+            f"newFullDrawing_SludgeThickener_{user_company}.dxf"
+        )
+        
+
+
