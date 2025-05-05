@@ -11,8 +11,10 @@ from Apps.aAppCalculation.models import modelcalc
 from Apps.aAppSubmittal.views import get_user_company
 
 import requests
+import cloudconvert
+import time
 
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
@@ -1442,18 +1444,7 @@ def save_submittal_report_AAA(request, project_id):
             self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
             self.set_font('DejaVu', '', 12)
 
-        def header_footer(self, projectname, clientname, capacity):
-            # Logo
-            page_width = self.w - 2 * self.l_margin
-            
-            try:
-                self.image("static/aLogo/LogoAAA.PNG", x=self.l_margin, y=10, w=page_width)  
-                # Move cursor below image to avoid overlapping next content
-                self.set_y(10 + self.get_image_height("static/aLogo/LogoAAA.PNG", page_width))
-            except Exception as e:
-                print(f"Error loading logo: {e}")
-
-            # Move below the logo
+        def header_page(self, projectname, clientname, capacity):
             self.set_y(50)
             self.set_font("DejaVu", "B", 16)
             self.set_text_color(33, 66, 133)
@@ -1465,6 +1456,19 @@ def save_submittal_report_AAA(request, project_id):
             self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
             self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
             self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+
+        def header(self):
+            # Logo
+            page_width = self.w - 2 * self.l_margin
+            
+            try:
+                self.image("static/aLogo/LogoAAA.PNG", x=self.l_margin, y=10, w=page_width)  
+
+                # Move cursor below image to avoid overlapping next content
+                self.set_y(10 + 50)
+            except Exception as e:
+                print(f"Error loading logo: {e}")
+
 
         def footer(self):
             self.set_y(-15)  # Position 15 mm from bottom
@@ -1532,7 +1536,7 @@ def save_submittal_report_AAA(request, project_id):
         # Add project title
         doc.add_heading(f'Project Report: {project.name}', level=1)
 
-        pdf.header_footer(project.name,  project.client_name, project.capacity)
+        pdf.header_page(project.name,  project.client_name, project.capacity)
 
         # Add project details
         doc.add_heading("Project Details", level=2)  
@@ -1778,17 +1782,6 @@ def save_submittal_report_BBB(request, project_id):
             self.set_font('DejaVu', '', 12)
 
         def header_footer(self, projectname, clientname, capacity):
-            # Logo
-            page_width = self.w - 2 * self.l_margin
-            
-            try:
-                self.image("static/aLogo/LogoBBB.PNG", x=self.l_margin, y=10, w=page_width)  
-                # Move cursor below image to avoid overlapping next content
-                self.set_y(10 + self.get_image_height("static/aLogo/LogoBBB.PNG", page_width))
-            except Exception as e:
-                print(f"Error loading logo: {e}")
-
-            # Move below the logo
             self.set_y(50)
             self.set_font("DejaVu", "B", 16)
             self.set_text_color(33, 66, 133)
@@ -1800,6 +1793,20 @@ def save_submittal_report_BBB(request, project_id):
             self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
             self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
             self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+
+        def header(self):
+            # Logo
+            page_width = self.w - 2 * self.l_margin
+            
+            try:
+                self.image("static/aLogo/LogoBBB.PNG", x=self.l_margin, y=10, w=page_width)  
+
+                # Move cursor below image to avoid overlapping next content
+                self.set_y(10 + 50)
+            except Exception as e:
+                print(f"Error loading logo: {e}")
+
+
 
         def footer(self):
             self.set_y(-15)  # Position 15 mm from bottom
@@ -2127,17 +2134,6 @@ def save_calculation_report_AAA(request, project_id):
             self.set_font('DejaVu', '', 12)
 
         def header_footer(self, projectname, clientname, capacity):
-            # Logo
-            page_width = self.w - 2 * self.l_margin
-            
-            try:
-                self.image("static/aLogo/LogoAAA.PNG", x=self.l_margin, y=10, w=page_width)  
-                # Move cursor below image to avoid overlapping next content
-                self.set_y(10 + self.get_image_height("static/aLogo/LogoAAA.PNG", page_width))
-            except Exception as e:
-                print(f"Error loading logo: {e}")
-
-            # Move below the logo
             self.set_y(50)
             self.set_font("DejaVu", "B", 16)
             self.set_text_color(33, 66, 133)
@@ -2149,6 +2145,19 @@ def save_calculation_report_AAA(request, project_id):
             self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
             self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
             self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+
+        def header(self):
+            # Logo
+            page_width = self.w - 2 * self.l_margin
+            
+            try:
+                self.image("static/aLogo/LogoAAA.PNG", x=self.l_margin, y=10, w=page_width)  
+
+                # Move cursor below image to avoid overlapping next content
+                self.set_y(10 + 50)
+            except Exception as e:
+                print(f"Error loading logo: {e}")
+
 
         def footer(self):
             self.set_y(-15)  # Position 15 mm from bottom
@@ -2457,17 +2466,6 @@ def save_calculation_report_BBB(request, project_id):
             self.set_font('DejaVu', '', 12)
 
         def header_footer(self, projectname, clientname, capacity):
-            # Logo
-            page_width = self.w - 2 * self.l_margin
-            
-            try:
-                self.image("static/aLogo/LogoBBB.PNG", x=self.l_margin, y=10, w=page_width)  
-                # Move cursor below image to avoid overlapping next content
-                self.set_y(10 + self.get_image_height("static/aLogo/LogoBBB.PNG", page_width))
-            except Exception as e:
-                print(f"Error loading logo: {e}")
-
-            # Move below the logo
             self.set_y(50)
             self.set_font("DejaVu", "B", 16)
             self.set_text_color(33, 66, 133)
@@ -2479,6 +2477,19 @@ def save_calculation_report_BBB(request, project_id):
             self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
             self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
             self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+
+        def header(self):
+            # Logo
+            page_width = self.w - 2 * self.l_margin
+            
+            try:
+                self.image("static/aLogo/LogoBBB.PNG", x=self.l_margin, y=10, w=page_width)  
+
+                # Move cursor below image to avoid overlapping next content
+                self.set_y(10 + 50)
+            except Exception as e:
+                print(f"Error loading logo: {e}")
+
 
         def footer(self):
             self.set_y(-15)  # Position 15 mm from bottom
@@ -2660,6 +2671,59 @@ def save_calculation_report_BBB(request, project_id):
 
 
 
+
+def convert_dxf_to_pdf_cloudconvert(input_path, output_path):
+    cloudconvert.configure(api_key="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZGViYWJiNGMzMjI3ZTA5YjgyYTUyZDI2NWY3ZTAxNmNhZjg2NWQ5MDRjYWIyMGEzMDYxN2I3MTlmYmYwMjZjYTZiODgxMmM5MDlkZmI4NzYiLCJpYXQiOjE3NDU2NzI2MTIuMjg2MTI2LCJuYmYiOjE3NDU2NzI2MTIuMjg2MTI3LCJleHAiOjQ5MDEzNDYyMTIuMjgxMjYxLCJzdWIiOiI3MTc0ODg5NyIsInNjb3BlcyI6WyJ1c2VyLnJlYWQiLCJ1c2VyLndyaXRlIiwidGFzay5yZWFkIiwidGFzay53cml0ZSIsIndlYmhvb2sucmVhZCIsIndlYmhvb2sud3JpdGUiLCJwcmVzZXQucmVhZCIsInByZXNldC53cml0ZSJdfQ.DGh70qP2W1ofilMBqzP_IkmqGvHpfiIn0jQou3w2gRpU2-gjz6CPlsxhhx6qLQ8EaYrQXHr_PCIwHR-m4sBbfNhKQ7N_gQ8j-dyZchk9GAj5I_uIHVLOwR-zQsmV-fNKVA55YG2n8Wy-PeV8rw7lP92a01vdgoK-sfyc-i4OjuhtlID7HuxB7p-yf6jya6EHY_gp_9NzeR_4RVRbIJkgejTXKVrTErs-6rTy-YruFzIkZev_w8ekryRzNv1Q0qm8rTAyTw-Pi3cmwFw4bbuLoiAxxOVG1K5JPqbPO2QVMn4-sgll3VIZwWvAQq-XhvMlf3AF5qMcDsCE-I1RcBcAg-Hr-_D-HjyHUB3Y63GYt2FRCw1OnwQ6ug4t9xrNcwiZOOdPrASpRlK0KN3S6pRG77lVM9rPCTu-khjG9B6b20ws8K0FmmiZBS7XxhPR94F1srD3K47LLPBW8OaAZFmiRdexa-cELxhPj1_VVYbNS5AazpjOCGkhiRbSO4KJEGr5fNFezUFqcLilyIM7TXBuwa5Oykoetx5McmCSJ8XgRwca1fCSmHXmY0VN8aczAwoKes4N8j5BMscJ1qq4v3FesXLP7hZunc08DFnYZAk3jZjddzfZPzzS84xQIVLsVGDw-Ig9T4LZdiJpDi5vaxv7m10nTan_IAOMhjGmIEw0FrQ", sandbox=False)
+
+    job = cloudconvert.Job.create(payload={
+        "tasks": {
+            'import-my-file': {
+                'operation': 'import/upload'
+            },
+            'convert-my-file': {
+                'operation': 'convert',
+                'input': 'import-my-file',
+                'input_format': 'dxf',
+                'output_format': 'pdf'
+            },
+            'export-my-file': {
+                'operation': 'export/url',
+                'input': 'convert-my-file'
+            }
+        }
+    })
+
+    job = cloudconvert.Job.find(id=job['id'])
+    upload_task = [task for task in job['tasks'] if task['name'] == 'import-my-file'][0]
+    upload_url = upload_task['result']['form']['url']
+    parameters = upload_task['result']['form']['parameters']
+
+    with open(input_path, 'rb') as file:
+        response = requests.post(
+            upload_url,
+            data=parameters,
+            files={'file': file}
+        )
+
+    if response.status_code not in [200, 201, 204]:
+        raise Exception(f"Upload failed: {response.text}")
+
+    while True:
+        job = cloudconvert.Job.find(id=job['id'])
+        if job['status'] == 'finished':
+            break
+        elif job['status'] == 'error':
+            raise Exception("CloudConvert job failed.")
+        time.sleep(2)
+
+    export_task = [task for task in job['tasks'] if task['name'] == 'export-my-file'][0]
+    file_url = export_task['result']['files'][0]['url']
+
+    response = requests.get(file_url)
+    with open(output_path, 'wb') as f:
+        f.write(response.content)
+
+
 # Helper function to define DXF paths
 def get_saved_dxf_paths(user_company, category, project_id):
     # Get project info
@@ -2731,6 +2795,18 @@ def process_saved_dxf(request, aMachine_ID, category, project_id, modifications,
     
     modify_saved_dxf_file(static_path, modified_path, modifications(machine))
 
+
+    # Define PDF output path
+    pdf_output_path = modified_path.replace(".dxf", ".pdf")
+
+    try:
+        convert_dxf_to_pdf_cloudconvert(modified_path, pdf_output_path)
+        print(f"PDF saved to {pdf_output_path}")
+    except Exception as e:
+        print("DXF to PDF conversion failed:", e)
+        return HttpResponse("DXF to PDF conversion failed", status=500)
+
+    return FileResponse(open(pdf_output_path, 'rb'), as_attachment=True, filename=os.path.basename(pdf_output_path))
     
 
     
