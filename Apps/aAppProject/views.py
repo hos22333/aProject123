@@ -35,7 +35,11 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml import OxmlElement, ns
 from docx.shared import Inches
 from docx.shared import Pt
+
+from fpdf import FPDF
+
 # Create your views here.
+
 
 
 def project_list(request):
@@ -1426,6 +1430,72 @@ def save_submittal_report_AAA(request, project_id):
         run.font.color.rgb = color
         heading.style = f"Heading {level}"
     
+    # Define a custom class for the PDF layout
+    class PDF(FPDF):
+        def __init__(self):
+            super().__init__()
+            self.set_auto_page_break(auto=True, margin=15)
+
+            # Add the TrueType Unicode font (DejaVuSans)
+            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.set_font('DejaVu', '', 12)
+
+        def header_footer(self, projectname, clientname, capacity):
+            # Logo
+            page_width = self.w - 2 * self.l_margin
+            
+            try:
+                self.image("static/aLogo/LogoAAA.PNG", x=self.l_margin, y=10, w=page_width)  
+                # Move cursor below image to avoid overlapping next content
+                self.set_y(10 + self.get_image_height("static/aLogo/LogoAAA.PNG", page_width))
+            except Exception as e:
+                print(f"Error loading logo: {e}")
+
+            # Move below the logo
+            self.set_y(50)
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
+            self.set_font("DejaVu", "B", 14)
+            self.cell(0, 10, f"Project Details", ln=True,) 
+            self.set_text_color(0, 0, 0)
+            self.set_font("DejaVu", "", 12)
+            self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
+            self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
+            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+
+        def footer(self):
+            self.set_y(-15)  # Position 15 mm from bottom
+            self.set_font("DejaVu", "I", 8)
+            self.set_text_color(128)
+
+            # Add "Page X of Y"
+            self.cell(0, 10, f"Page {self.page_no()} of {{nb}}", align='C')
+
+        def colored_header(self, number, name):
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            self.cell(0, 10, f"{number}. {name}", ln=True)
+
+        def section_title(self, title):
+            self.set_font("DejaVu", "B", 12)
+            self.set_text_color(33, 66, 133)
+            self.ln(5)
+            self.cell(0, 10, title, ln=True)
+
+        def add_table(self, data):
+            self.set_font("DejaVu", "B", 10)
+            self.set_fill_color(255, 153, 0)
+            self.set_text_color(0)
+            self.cell(60, 8, "Field", border=1, fill=True)
+            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+
+            self.set_font("DejaVu", "", 10)
+            for field, value in data:
+                self.cell(60, 8, field, border=1)
+                self.cell(130, 8, value, border=1, ln=True)
     
     
     try:
@@ -1435,7 +1505,7 @@ def save_submittal_report_AAA(request, project_id):
                 user=request.user,
                 message=f"at {now()} {request.user} accessed Load  "
             )
-        print(f"at {now()} {User} accessed Download Report")
+        print(f"at {now()} {User} accessed Save Report")
         ###LOG
 
         aCompany = UserCompany.objects.get(user=request.user)
@@ -1452,14 +1522,21 @@ def save_submittal_report_AAA(request, project_id):
         # Create a Word document
         doc = Document()
 
+        pdf = PDF()
         # Add header and footer with page numbers
         add_header_footer(doc)
 
+        pdf.alias_nb_pages()  # Important for "of {nb}" to work
+        pdf.add_page()
+        
         # Add project title
         doc.add_heading(f'Project Report: {project.name}', level=1)
 
+        pdf.header_footer(project.name,  project.client_name, project.capacity)
+
         # Add project details
-        doc.add_heading("Project Details", level=2)     
+        doc.add_heading("Project Details", level=2)  
+    
 
         doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
@@ -1469,6 +1546,8 @@ def save_submittal_report_AAA(request, project_id):
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
+
+        
 
         # Add machine details
         for index, machine in enumerate(machines, start=1):  # Add numbering
@@ -1517,23 +1596,33 @@ def save_submittal_report_AAA(request, project_id):
             # Add machine title with font size 14 and numbering
             machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
             machine_title.runs[0].font.size = Pt(14)
+            
+            pdf.alias_nb_pages()  # Important for "of {nb}" to work
+            pdf.add_page()
+            pdf.colored_header(index, machine_name)
 
             for i in range(1, 11):  # Loop from Sec01 to Sec10
                 section_name = f"Sec{i:02d}"
-                section_data = [("Field", "Value")]
+                word_section_data = [("Field", "Value")]
+                pdf_section_data = []
 
                 for j in range(1, 21, 2):  # Step by 2 to avoid duplication
                     key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
                     value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
 
                     if key and value and key.lower() != "oooo" and value.lower() != "oooo":
-                        section_data.append((key, value))
+                        word_section_data.append((key, value))
+                        pdf_section_data.append((key, value))
 
-                if len(section_data) > 1:  # If the section has valid data, create a table
+                if len(word_section_data) > 1:  # If the section has valid data, create a table
                     section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
                     doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
 
-                    add_table(doc, section_data)  # Removed redundant title
+                    pdf.section_title(f"{section_name}: {section_title}")
+
+                    add_table(doc, word_section_data)  # Removed redundant title
+
+                    pdf.add_table(pdf_section_data)
 
 
             doc.add_page_break() 
@@ -1547,8 +1636,12 @@ def save_submittal_report_AAA(request, project_id):
         os.makedirs(project_folder, exist_ok=True)  # Create folder if it doesn't exist
 
         # Save the file to that path
-        file_path = os.path.join(project_folder, f"{project_slug}_report.docx")
-        doc.save(file_path)
+        word_file_path = os.path.join(project_folder, f"{project_slug}_report.docx")
+        doc.save(word_file_path)
+        
+        pdf_file_path = os.path.join(project_folder, f"{project_slug}_report.pdf")
+        pdf.output(pdf_file_path)
+
         return HttpResponse(status=204)
         
 
@@ -1672,6 +1765,73 @@ def save_submittal_report_BBB(request, project_id):
         heading.style = f"Heading {level}"
     
     
+    # Define a custom class for the PDF layout
+    class PDF(FPDF):
+        def __init__(self):
+            super().__init__()
+            self.set_auto_page_break(auto=True, margin=15)
+
+            # Add the TrueType Unicode font (DejaVuSans)
+            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.set_font('DejaVu', '', 12)
+
+        def header_footer(self, projectname, clientname, capacity):
+            # Logo
+            page_width = self.w - 2 * self.l_margin
+            
+            try:
+                self.image("static/aLogo/LogoBBB.PNG", x=self.l_margin, y=10, w=page_width)  
+                # Move cursor below image to avoid overlapping next content
+                self.set_y(10 + self.get_image_height("static/aLogo/LogoBBB.PNG", page_width))
+            except Exception as e:
+                print(f"Error loading logo: {e}")
+
+            # Move below the logo
+            self.set_y(50)
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
+            self.set_font("DejaVu", "B", 14)
+            self.cell(0, 10, f"Project Details", ln=True,) 
+            self.set_text_color(0, 0, 0)
+            self.set_font("DejaVu", "", 12)
+            self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
+            self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
+            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+
+        def footer(self):
+            self.set_y(-15)  # Position 15 mm from bottom
+            self.set_font("DejaVu", "I", 8)
+            self.set_text_color(128)
+
+            # Add "Page X of Y"
+            self.cell(0, 10, f"Page {self.page_no()} of {{nb}}", align='C')
+
+        def colored_header(self, number, name):
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            self.cell(0, 10, f"{number}. {name}", ln=True)
+
+        def section_title(self, title):
+            self.set_font("DejaVu", "B", 12)
+            self.set_text_color(33, 66, 133)
+            self.ln(5)
+            self.cell(0, 10, title, ln=True)
+
+        def add_table(self, data):
+            self.set_font("DejaVu", "B", 10)
+            self.set_fill_color(255, 153, 0)
+            self.set_text_color(0)
+            self.cell(60, 8, "Field", border=1, fill=True)
+            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+
+            self.set_font("DejaVu", "", 10)
+            for field, value in data:
+                self.cell(60, 8, field, border=1)
+                self.cell(130, 8, value, border=1, ln=True)
+    
     
     try:
         
@@ -1698,11 +1858,18 @@ def save_submittal_report_BBB(request, project_id):
         # Create a Word document
         doc = Document()
 
+        pdf = PDF()
+
         # Add header and footer with page numbers
         add_header_footer(doc)
 
+        pdf.alias_nb_pages()  # Important for "of {nb}" to work
+        pdf.add_page()
+
         # Add project title
         doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        pdf.header_footer(project.name,  project.client_name, project.capacity)
 
         # Add project details
         doc.add_heading("Project Details", level=2)     
@@ -1763,10 +1930,15 @@ def save_submittal_report_BBB(request, project_id):
             # Add machine title with font size 14 and numbering
             machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
             machine_title.runs[0].font.size = Pt(14)
+            
+            pdf.alias_nb_pages()  # Important for "of {nb}" to work
+            pdf.add_page()
+            pdf.colored_header(index, machine_name)
 
             for i in range(1, 11):  # Loop from Sec01 to Sec10
                 section_name = f"Sec{i:02d}"
                 section_data = [("Field", "Value")]
+                pdf_section_data = []
 
                 for j in range(1, 21, 2):  # Step by 2 to avoid duplication
                     key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
@@ -1774,12 +1946,17 @@ def save_submittal_report_BBB(request, project_id):
 
                     if key and value and key.lower() != "oooo" and value.lower() != "oooo":
                         section_data.append((key, value))
+                        pdf_section_data.append((key, value))
 
                 if len(section_data) > 1:  # If the section has valid data, create a table
                     section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
                     doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
 
+                    pdf.section_title(f"{section_name}: {section_title}")
+
                     add_table(doc, section_data)  # Removed redundant title
+
+                    pdf.add_table(pdf_section_data)
 
             doc.add_page_break()     
 
@@ -1794,6 +1971,10 @@ def save_submittal_report_BBB(request, project_id):
         # Save the file to that path
         file_path = os.path.join(project_folder, f"{project_slug}_report.docx")
         doc.save(file_path)
+
+        pdf_file_path = os.path.join(project_folder, f"{project_slug}_report.pdf")
+        pdf.output(pdf_file_path)
+
         return HttpResponse(status=204)
 
         
@@ -1933,6 +2114,73 @@ def save_calculation_report_AAA(request, project_id):
         run.font.color.rgb = color
         heading.style = f"Heading {level}"
     
+    # Define a custom class for the PDF layout
+    class PDF(FPDF):
+        def __init__(self):
+            super().__init__()
+            self.set_auto_page_break(auto=True, margin=15)
+
+            # Add the TrueType Unicode font (DejaVuSans)
+            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.set_font('DejaVu', '', 12)
+
+        def header_footer(self, projectname, clientname, capacity):
+            # Logo
+            page_width = self.w - 2 * self.l_margin
+            
+            try:
+                self.image("static/aLogo/LogoAAA.PNG", x=self.l_margin, y=10, w=page_width)  
+                # Move cursor below image to avoid overlapping next content
+                self.set_y(10 + self.get_image_height("static/aLogo/LogoAAA.PNG", page_width))
+            except Exception as e:
+                print(f"Error loading logo: {e}")
+
+            # Move below the logo
+            self.set_y(50)
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
+            self.set_font("DejaVu", "B", 14)
+            self.cell(0, 10, f"Project Details", ln=True,) 
+            self.set_text_color(0, 0, 0)
+            self.set_font("DejaVu", "", 12)
+            self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
+            self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
+            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+
+        def footer(self):
+            self.set_y(-15)  # Position 15 mm from bottom
+            self.set_font("DejaVu", "I", 8)
+            self.set_text_color(128)
+
+            # Add "Page X of Y"
+            self.cell(0, 10, f"Page {self.page_no()} of {{nb}}", align='C')
+
+        def colored_header(self, number, name):
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            self.cell(0, 10, f"{number}. {name}", ln=True)
+
+        def section_title(self, title):
+            self.set_font("DejaVu", "B", 12)
+            self.set_text_color(33, 66, 133)
+            self.ln(5)
+            self.cell(0, 10, title, ln=True)
+
+        def add_table(self, data):
+            self.set_font("DejaVu", "B", 10)
+            self.set_fill_color(255, 153, 0)
+            self.set_text_color(0)
+            self.cell(60, 8, "Field", border=1, fill=True)
+            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+
+            self.set_font("DejaVu", "", 10)
+            for field, value in data:
+                self.cell(60, 8, field, border=1)
+                self.cell(130, 8, value, border=1, ln=True)
+    
     
     
     try:
@@ -1961,11 +2209,18 @@ def save_calculation_report_AAA(request, project_id):
         # Create a Word document
         doc = Document()
 
+        pdf = PDF()
+
         # Add header and footer with page numbers
         add_header_footer(doc)
 
+        pdf.alias_nb_pages()  # Important for "of {nb}" to work
+        pdf.add_page()
+
         # Add project title
         doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        pdf.header_footer(project.name,  project.client_name, project.capacity)
 
         # Add project details
         doc.add_heading("Project Details", level=2)     
@@ -2022,10 +2277,15 @@ def save_calculation_report_AAA(request, project_id):
             # Add machine title with font size 14 and numbering
             machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
             machine_title.runs[0].font.size = Pt(14)
+            
+            pdf.alias_nb_pages()  # Important for "of {nb}" to work
+            pdf.add_page()
+            pdf.colored_header(index, machine_name)
 
             for i in range(1, 11):  # Loop from Sec01 to Sec10
                 section_name = f"Sec{i:02d}"
                 section_data = [("Field", "Value")]
+                pdf_section_data = []
 
                 for j in range(1, 21, 2):  # Step by 2 to avoid duplication
                     key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
@@ -2033,12 +2293,17 @@ def save_calculation_report_AAA(request, project_id):
 
                     if key and value and key.lower() != "oooo" and value.lower() != "oooo":
                         section_data.append((key, value))
+                        pdf_section_data.append((key, value))
 
                 if len(section_data) > 1:  # If the section has valid data, create a table
                     section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
                     doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
 
+                    pdf.section_title(f"{section_name}: {section_title}")
+
                     add_table(doc, section_data)  # Removed redundant title
+
+                    pdf.add_table(pdf_section_data)
 
             doc.add_page_break() 
         
@@ -2053,6 +2318,10 @@ def save_calculation_report_AAA(request, project_id):
         # Save the file to that path
         file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.docx")
         doc.save(file_path)
+        
+        pdf_file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.pdf")
+        pdf.output(pdf_file_path)
+
         return HttpResponse(status=204)
 
         
@@ -2175,6 +2444,73 @@ def save_calculation_report_BBB(request, project_id):
         heading.style = f"Heading {level}"
     
     
+    # Define a custom class for the PDF layout
+    class PDF(FPDF):
+        def __init__(self):
+            super().__init__()
+            self.set_auto_page_break(auto=True, margin=15)
+
+            # Add the TrueType Unicode font (DejaVuSans)
+            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.set_font('DejaVu', '', 12)
+
+        def header_footer(self, projectname, clientname, capacity):
+            # Logo
+            page_width = self.w - 2 * self.l_margin
+            
+            try:
+                self.image("static/aLogo/LogoBBB.PNG", x=self.l_margin, y=10, w=page_width)  
+                # Move cursor below image to avoid overlapping next content
+                self.set_y(10 + self.get_image_height("static/aLogo/LogoBBB.PNG", page_width))
+            except Exception as e:
+                print(f"Error loading logo: {e}")
+
+            # Move below the logo
+            self.set_y(50)
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
+            self.set_font("DejaVu", "B", 14)
+            self.cell(0, 10, f"Project Details", ln=True,) 
+            self.set_text_color(0, 0, 0)
+            self.set_font("DejaVu", "", 12)
+            self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
+            self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
+            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+
+        def footer(self):
+            self.set_y(-15)  # Position 15 mm from bottom
+            self.set_font("DejaVu", "I", 8)
+            self.set_text_color(128)
+
+            # Add "Page X of Y"
+            self.cell(0, 10, f"Page {self.page_no()} of {{nb}}", align='C')
+
+        def colored_header(self, number, name):
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            self.cell(0, 10, f"{number}. {name}", ln=True)
+
+        def section_title(self, title):
+            self.set_font("DejaVu", "B", 12)
+            self.set_text_color(33, 66, 133)
+            self.ln(5)
+            self.cell(0, 10, title, ln=True)
+
+        def add_table(self, data):
+            self.set_font("DejaVu", "B", 10)
+            self.set_fill_color(255, 153, 0)
+            self.set_text_color(0)
+            self.cell(60, 8, "Field", border=1, fill=True)
+            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+
+            self.set_font("DejaVu", "", 10)
+            for field, value in data:
+                self.cell(60, 8, field, border=1)
+                self.cell(130, 8, value, border=1, ln=True)
+    
     
     try:
         
@@ -2202,11 +2538,18 @@ def save_calculation_report_BBB(request, project_id):
         # Create a Word document
         doc = Document()
 
+        pdf = PDF()
+
         # Add header and footer with page numbers
         add_header_footer(doc)
 
+        pdf.alias_nb_pages()  # Important for "of {nb}" to work
+        pdf.add_page()
+
         # Add project title
         doc.add_heading(f'Project Report: {project.name}', level=1)
+
+        pdf.header_footer(project.name,  project.client_name, project.capacity)
 
         # Add project details
         doc.add_heading("Project Details", level=2)     
@@ -2263,10 +2606,15 @@ def save_calculation_report_BBB(request, project_id):
             # Add machine title with font size 14 and numbering
             machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
             machine_title.runs[0].font.size = Pt(14)
+            
+            pdf.alias_nb_pages()  # Important for "of {nb}" to work
+            pdf.add_page()
+            pdf.colored_header(index, machine_name)
 
             for i in range(1, 11):  # Loop from Sec01 to Sec10
                 section_name = f"Sec{i:02d}"
                 section_data = [("Field", "Value")]
+                pdf_section_data = []
 
                 for j in range(1, 21, 2):  # Step by 2 to avoid duplication
                     key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
@@ -2274,12 +2622,17 @@ def save_calculation_report_BBB(request, project_id):
 
                     if key and value and key.lower() != "oooo" and value.lower() != "oooo":
                         section_data.append((key, value))
+                        pdf_section_data.append((key, value))
 
                 if len(section_data) > 1:  # If the section has valid data, create a table
                     section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
                     doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
 
+                    pdf.section_title(f"{section_name}: {section_title}")
+
                     add_table(doc, section_data)  # Removed redundant title
+
+                    pdf.add_table(pdf_section_data)
 
             doc.add_page_break()     
 
@@ -2294,6 +2647,10 @@ def save_calculation_report_BBB(request, project_id):
         # Save the file to that path
         file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.docx")
         doc.save(file_path)
+
+        pdf_file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.pdf")
+        pdf.output(pdf_file_path)
+
         return HttpResponse(status=204)
 
         
