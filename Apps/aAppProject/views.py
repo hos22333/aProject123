@@ -40,6 +40,8 @@ from docx.shared import Pt
 
 from fpdf import FPDF
 
+from PyPDF2 import PdfReader, PdfWriter
+
 # Create your views here.
 
 
@@ -1282,16 +1284,14 @@ def save_reports(request, project_id):
         # Determine the company and generate the corresponding report
         if aCompany:
             save_submittal_report(request, project_id)
+            save_pdf_report(request, project_id)
+            save_calculation_report(request, project_id)
+            return HttpResponse(status=204)
 
         else:
             return HttpResponse("Invalid company ID", status=400)
         
-        if aCompany:
-            save_calculation_report(request, project_id)
-            return HttpResponse(status=204)
         
-        else:
-            return HttpResponse("Invalid company ID", status=400)
 
     except UserCompany.DoesNotExist:
         return HttpResponse("User does not belong to a company", status=403)
@@ -2807,6 +2807,7 @@ def process_saved_dxf(request, aMachine_ID, category, project_id, modifications,
         return HttpResponse("DXF to PDF conversion failed", status=500)
 
     return FileResponse(open(pdf_output_path, 'rb'), as_attachment=True, filename=os.path.basename(pdf_output_path))
+
     
 
     
@@ -3238,4 +3239,527 @@ def SavedFullDrawing(request, aMachine_ID, aType):
         )
         
 
+
+
+
+def save_pdf_report(request, project_id):
+    try:
+        #pdb.set_trace()
+        # Log the action
+        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Pdf Report")
+        
+        #pdb.set_trace()
+        # Get the user’s company and project
+        aCompany = UserCompany.objects.get(user=request.user)
+
+        #pdb.set_trace()
+        # Determine the company and generate the corresponding report
+        if aCompany.company.nameCompanies == "AAAA":
+            print("Company 1")
+            return save_pdf_report_AAA(request, project_id)
+
+        elif aCompany.company.nameCompanies == "BBBB":
+            print("Company 2")
+            return save_pdf_report_BBB(request, project_id)
+
+        else:
+            return HttpResponse("Invalid company ID", status=400)
+
+    except UserCompany.DoesNotExist:
+        return HttpResponse("User does not belong to a company", status=403)
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+
+
+def save_pdf_report_AAA(request, project_id):
+    
+    # Define a custom class for the PDF layout
+    class PDF(FPDF):
+        def __init__(self):
+            super().__init__()
+            self.set_auto_page_break(auto=True, margin=15)
+
+            # Add the TrueType Unicode font (DejaVuSans)
+            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.set_font('DejaVu', '', 12)
+
+        def header_page(self, projectname, clientname, capacity):
+            self.set_y(50)
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
+            self.set_font("DejaVu", "B", 14)
+            self.cell(0, 10, f"Project Details", ln=True,) 
+            self.set_text_color(0, 0, 0)
+            self.set_font("DejaVu", "", 12)
+            self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
+            self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
+            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+
+        def header(self):
+            # Logo
+            page_width = self.w - 2 * self.l_margin
+            
+            try:
+                self.image("static/aLogo/LogoAAA.PNG", x=self.l_margin, y=10, w=page_width)  
+
+                # Move cursor below image to avoid overlapping next content
+                self.set_y(10 + 50)
+            except Exception as e:
+                print(f"Error loading logo: {e}")
+
+
+        def footer(self):
+            self.set_y(-15)  # Position 15 mm from bottom
+            self.set_font("DejaVu", "I", 8)
+            self.set_text_color(128)
+
+            # Add "Page X of Y"
+            self.cell(0, 10, f"Page {self.page_no()} of {{nb}}", align='C')
+
+        def colored_header(self, number, name):
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            
+            text = f"{number}. {name}"
+            text_width = self.get_string_width(text) + 2  # Optional padding
+            text_height = 10  # Height for one line of text
+
+            # Page dimensions
+            page_width = self.w
+            page_height = self.h
+
+            # Center position
+            x = (page_width - text_width) / 2
+            y = (page_height - text_height) / 2
+
+            self.set_xy(x, y)
+            self.cell(text_width, text_height, text, border=0, align='C')
+
+        def section_title(self, title):
+            self.set_font("DejaVu", "B", 12)
+            self.set_text_color(33, 66, 133)
+            self.ln(5)
+            self.cell(0, 10, title, ln=True)
+
+        def add_table(self, data):
+            self.set_font("DejaVu", "B", 10)
+            self.set_fill_color(255, 153, 0)
+            self.set_text_color(0)
+            self.cell(60, 8, "Field", border=1, fill=True)
+            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+
+            self.set_font("DejaVu", "", 10)
+            for field, value in data:
+                self.cell(60, 8, field, border=1)
+                self.cell(130, 8, value, border=1, ln=True)
+    
+    
+    try:
+        
+        ###LOG
+        aLogEntry.objects.create(
+                user=request.user,
+                message=f"at {now()} {request.user} accessed Load  "
+            )
+        print(f"at {now()} {User} accessed Save Report")
+        ###LOG
+
+        aCompany = UserCompany.objects.get(user=request.user)
+        company_id = aCompany.company
+        project = APP_Project.objects.get(id=project_id)
+        machines = Machine.objects.filter(project=project)
+        # Define the folder path
+        company_slug = slugify(project.company.nameCompanies)
+        project_slug = slugify(project.name)
+        folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
+
+        project_folder = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_slug, folder_name)
+        os.makedirs(project_folder, exist_ok=True)  # Create folder if it doesn't exist
+
+        
+        pdf_file_path = os.path.join(project_folder, f"all_{project_slug}_report.pdf")
+
+        print(aCompany.id)
+        print(project.id)
+    
+        print("Company 1")
+    
+
+        
+        output = PdfWriter()
+
+        # Create a Pdf document
+        pdf = PDF()
+
+        pdf.alias_nb_pages()  # Important for "of {nb}" to work
+        pdf.add_page()
+        
+        
+        pdf.header_page(project.name,  project.client_name, project.capacity)
+        pdf.output(pdf_file_path)
+
+        mainreader = PdfReader(pdf_file_path)
+
+        for page in mainreader.pages:
+            output.add_page(page)
+        
+        # clean up
+        os.remove(pdf_file_path)
+
+        # Add machine details
+        for index, machine in enumerate(machines, start=1):  # Add numbering
+            machine_name = machine.oSec00Field03
+            section_titles = []
+            if machine_name == "DataSheetNS":
+                machine_name = "Manual Screen" 
+                sheet_key = "NS"
+                section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetMS":
+                machine_name = "Mechanical Screen"
+                sheet_key = "MS" 
+                section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetBC":
+                machine_name = "Belt Conveyor"
+                sheet_key = "BC"
+                section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetCO":
+                machine_name = "Container"
+                sheet_key = "CO"
+                section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetGR":
+                machine_name = "Gritremoval"
+                sheet_key = "GR"
+                section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
+
+            if machine_name == "DataSheetSS":
+                machine_name = "Sand Silo"
+                sheet_key = "SS"
+
+            if machine_name == "DataSheetPS":
+                machine_name = "Primary Sedimentation"
+                sheet_key = "PS"
+
+            if machine_name == "DataSheetQV":
+                machine_name = "Quick Valve"
+                sheet_key = "QV"
+
+            if machine_name == "DataSheetTV":
+                machine_name = "Telescopic Valve"
+                sheet_key = "TV"
+                
+            if machine_name == "DataSheetTH":
+                machine_name = "Sludge Thickener"
+                sheet_key = "TH"
+
+
+            # Add machine name 
+            pdf = PDF()
+            pdf.alias_nb_pages()  
+            pdf.add_page()
+            pdf.colored_header(index, machine_name)
+
+            
+            pdf.alias_nb_pages()  
+            pdf.add_page()
+
+            for i in range(1, 11):  # Loop from Sec01 to Sec10
+                section_name = f"Sec{i:02d}"
+                pdf_section_data = []
+
+                for j in range(1, 21, 2):  # Step by 2 to avoid duplication
+                    key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
+                    value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
+
+                    if key and value and key.lower() != "oooo" and value.lower() != "oooo":
+                        pdf_section_data.append((key, value))
+
+                if len(pdf_section_data) > 1:  # If the section has valid data, create a table
+                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                    pdf.section_title(f"{section_name}: {section_title}")
+                    pdf.add_table(pdf_section_data)
+
+            
+            pdf.output(pdf_file_path)
+
+            mainreader = PdfReader(pdf_file_path)
+
+            for page in mainreader.pages:
+                output.add_page(page)
+
+            # clean up
+            os.remove(pdf_file_path)
+            
+
+            appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf")
+
+            
+            for page in appendix.pages:
+                output.add_page(page)
+
+        # Save the new PDF
+        with open(pdf_file_path, "wb") as f:
+            output.write(f)
+
+        return HttpResponse(status=204)
+        
+
+        
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
+
+
+def save_pdf_report_BBB(request, project_id):
+    
+    # Define a custom class for the PDF layout
+    class PDF(FPDF):
+        def __init__(self):
+            super().__init__()
+            self.set_auto_page_break(auto=True, margin=15)
+
+            # Add the TrueType Unicode font (DejaVuSans)
+            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.set_font('DejaVu', '', 12)
+
+        def header_page(self, projectname, clientname, capacity):
+            self.set_y(50)
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
+            self.set_font("DejaVu", "B", 14)
+            self.cell(0, 10, f"Project Details", ln=True,) 
+            self.set_text_color(0, 0, 0)
+            self.set_font("DejaVu", "", 12)
+            self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
+            self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
+            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+
+        def header(self):
+            # Logo
+            page_width = self.w - 2 * self.l_margin
+            
+            try:
+                self.image("static/aLogo/LogoBBB.PNG", x=self.l_margin, y=10, w=page_width)  
+
+                # Move cursor below image to avoid overlapping next content
+                self.set_y(10 + 50)
+            except Exception as e:
+                print(f"Error loading logo: {e}")
+
+
+        def footer(self):
+            self.set_y(-15)  # Position 15 mm from bottom
+            self.set_font("DejaVu", "I", 8)
+            self.set_text_color(128)
+
+            # Add "Page X of Y"
+            self.cell(0, 10, f"Page {self.page_no()} of {{nb}}", align='C')
+
+        def colored_header(self, number, name):
+            self.set_font("DejaVu", "B", 16)
+            self.set_text_color(33, 66, 133)
+            
+            text = f"{number}. {name}"
+            text_width = self.get_string_width(text) + 2  # Optional padding
+            text_height = 10  # Height for one line of text
+
+            # Page dimensions
+            page_width = self.w
+            page_height = self.h
+
+            # Center position
+            x = (page_width - text_width) / 2
+            y = (page_height - text_height) / 2
+
+            self.set_xy(x, y)
+            self.cell(text_width, text_height, text, border=0, align='C')
+
+        def section_title(self, title):
+            self.set_font("DejaVu", "B", 12)
+            self.set_text_color(33, 66, 133)
+            self.ln(5)
+            self.cell(0, 10, title, ln=True)
+
+        def add_table(self, data):
+            self.set_font("DejaVu", "B", 10)
+            self.set_fill_color(255, 153, 0)
+            self.set_text_color(0)
+            self.cell(60, 8, "Field", border=1, fill=True)
+            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+
+            self.set_font("DejaVu", "", 10)
+            for field, value in data:
+                self.cell(60, 8, field, border=1)
+                self.cell(130, 8, value, border=1, ln=True)
+    
+    
+    try:
+        
+        ###LOG
+        aLogEntry.objects.create(
+                user=request.user,
+                message=f"at {now()} {request.user} accessed Load  "
+            )
+        print(f"at {now()} {User} accessed Save Report")
+        ###LOG
+
+        aCompany = UserCompany.objects.get(user=request.user)
+        company_id = aCompany.company
+        project = APP_Project.objects.get(id=project_id)
+        machines = Machine.objects.filter(project=project)
+        # Define the folder path
+        company_slug = slugify(project.company.nameCompanies)
+        project_slug = slugify(project.name)
+        folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
+
+        project_folder = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_slug, folder_name)
+        os.makedirs(project_folder, exist_ok=True)  # Create folder if it doesn't exist
+
+        
+        pdf_file_path = os.path.join(project_folder, f"all_{project_slug}_report.pdf")
+
+        print(aCompany.id)
+        print(project.id)
+    
+        print("Company 2")
+    
+
+        
+        output = PdfWriter()
+
+        # Create a Pdf document
+        pdf = PDF()
+
+        pdf.alias_nb_pages()  # Important for "of {nb}" to work
+        pdf.add_page()
+        
+        
+        pdf.header_page(project.name,  project.client_name, project.capacity)
+        pdf.output(pdf_file_path)
+
+        mainreader = PdfReader(pdf_file_path)
+
+        for page in mainreader.pages:
+            output.add_page(page)
+        
+        # clean up
+        os.remove(pdf_file_path)
+
+        # Add machine details
+        for index, machine in enumerate(machines, start=1):  # Add numbering
+            machine_name = machine.oSec00Field03
+            section_titles = []
+            if machine_name == "DataSheetNS":
+                machine_name = "Manual Screen" 
+                sheet_key = "NS"
+                section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetMS":
+                machine_name = "Mechanical Screen"
+                sheet_key = "MS" 
+                section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetBC":
+                machine_name = "Belt Conveyor"
+                sheet_key = "BC"
+                section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetCO":
+                machine_name = "Container"
+                sheet_key = "CO"
+                section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
+
+            if machine_name == "DataSheetGR":
+                machine_name = "Gritremoval"
+                sheet_key = "GR"
+                section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
+
+            if machine_name == "DataSheetSS":
+                machine_name = "Sand Silo"
+                sheet_key = "SS"
+
+            if machine_name == "DataSheetPS":
+                machine_name = "Primary Sedimentation"
+                sheet_key = "PS"
+
+            if machine_name == "DataSheetQV":
+                machine_name = "Quick Valve"
+                sheet_key = "QV"
+
+            if machine_name == "DataSheetTV":
+                machine_name = "Telescopic Valve"
+                sheet_key = "TV"
+                
+            if machine_name == "DataSheetTH":
+                machine_name = "Sludge Thickener"
+                sheet_key = "TH"
+
+
+            # Add machine name 
+            pdf = PDF()
+            pdf.alias_nb_pages()  
+            pdf.add_page()
+            pdf.colored_header(index, machine_name)
+
+            
+            pdf.alias_nb_pages()  
+            pdf.add_page()
+
+            for i in range(1, 11):  # Loop from Sec01 to Sec10
+                section_name = f"Sec{i:02d}"
+                pdf_section_data = []
+
+                for j in range(1, 21, 2):  # Step by 2 to avoid duplication
+                    key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
+                    value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
+
+                    if key and value and key.lower() != "oooo" and value.lower() != "oooo":
+                        pdf_section_data.append((key, value))
+
+                if len(pdf_section_data) > 1:  # If the section has valid data, create a table
+                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                    pdf.section_title(f"{section_name}: {section_title}")
+                    pdf.add_table(pdf_section_data)
+
+            
+            pdf.output(pdf_file_path)
+
+            mainreader = PdfReader(pdf_file_path)
+
+            for page in mainreader.pages:
+                output.add_page(page)
+
+            # clean up
+            os.remove(pdf_file_path)
+
+
+            appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf")
+
+            
+            for page in appendix.pages:
+                output.add_page(page)
+
+        # Save the new PDF
+        with open(pdf_file_path, "wb") as f:
+            output.write(f)
+
+        return HttpResponse(status=204)
+        
+
+        
+
+    except APP_Project.DoesNotExist:
+        return HttpResponse("Project not found", status=404)
 
