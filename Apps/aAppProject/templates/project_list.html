@@ -6,12 +6,27 @@
         <h2 class="mb-3">Add New Project</h2>
         <form method="post">
             {% csrf_token %}
-            <div class="row">
-                <div class="col-md-4">{{ form.name }}</div>
-                <div class="col-md-4">{{ form.client_name }}</div>
-                <div class="col-md-4">{{ form.capacity }}</div>
+            <div class="container-fluid">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Add New Project</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row"> 
+                            <div class="col-md-4 mb-3">
+                                {{ form.name }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.client_name }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.capacity }}
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Save</button>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary mt-2">Save</button>
         </form>
         
         <h3 class="mt-4">Projects List</h3>
@@ -29,21 +44,32 @@
                     <td>{{ project.name }}</td>
                     <td>{{ project.client_name }}</td>
                     <td>
-                        <!-- <a href="{% url 'edit_project' project.id %}" class="btn btn-warning btn-sm" >Edit</a> -->
-                        <a href="{% url 'edit_project' project.id %}" class="btn btn-warning btn-sm edit-project-btn" data-project-id="{{ project.id }}"> Edit </a>
-                        <form action="{% url 'delete_project' project.id %}" method="POST" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>                    
-                        <button class="btn btn-info btn-sm" onclick="showDetails('{{ project.name }}', '{{ project.client_name }}', '{{ project.capacity }}')">Show All</button>
-                        <button class="btn btn-success btn-sm" onclick="reviewSubmittalMachines('{{ project.id }}')">Review Submittal Machines</button>
-                        <button class="btn btn-success btn-sm" onclick="reviewCalculationMachines('{{ project.id }}')">Review Calculation Machines</button>
-                        <a href="{% url 'generate_report' project.id %}" class="btn btn-secondary btn-sm">Generate Submittal (Word file)</a>
-                        <a href="{% url 'generate_calculation_report' project.id %}" class="btn btn-secondary btn-sm">Generate Calcualtion (Word file)</a>
-                        <a href="#" class="btn btn-secondary btn-sm disabled" aria-disabled="true">Generate Submittal (PDF)</a>
-                        <a href="{% url 'download_project_reports' project.id %}" class="btn btn-primary btn-sm"> Download All Reports (ZIP) </a>
-                        <a href="{% url 'save_reports' project.id %}" class="btn btn-secondary btn-sm">Save Reports</a>
-
+                        <div class="btn-group dropdown">
+                            <button
+                              class="btn btn-primary dropdown-toggle"
+                              type="button"
+                              data-bs-toggle="dropdown"
+                            >
+                            Show Actions
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                              <li>
+                                <a href="{% url 'edit_project' project.id %}" class="dropdown-item text-warning edit-project-btn" data-project-id="{{ project.id }}"> Edit </a>
+                                <form action="{% url 'delete_project' project.id %}" method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                </form>                    
+                                <button class="dropdown-item text-info" onclick="showDetails('{{ project.name }}', '{{ project.client_name }}', '{{ project.capacity }}')">Show All</button>
+                                <button class="dropdown-item text-success" onclick="reviewSubmittalMachines('{{ project.id }}')">Review Submittal Machines</button>
+                                <button class="dropdown-item text-success" onclick="reviewCalculationMachines('{{ project.id }}')">Review Calculation Machines</button>
+                                <a href="{% url 'generate_report' project.id %}" class="dropdown-item">Generate Submittal (Word file)</a>
+                                <a href="{% url 'generate_calculation_report' project.id %}" class="dropdown-item">Generate Calcualtion (Word file)</a>
+                                <a href="{% url 'download_project_reports' project.id %}" class="dropdown-item"> Download All Reports (ZIP) </a>
+                                <a href="{% url 'save_reports' project.id %}" class="dropdown-item">Save Reports</a>
+                              </li>
+                            </ul>
+                          </div>
+                        
                     </td>
                 </tr>
                 {% endfor %}

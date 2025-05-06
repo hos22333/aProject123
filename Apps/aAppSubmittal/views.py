@@ -810,7 +810,7 @@ def edit_machine(request, machine_id):
         user=request.user,
         message=f"{request.user} Edited >>> {machine.oSec00Field03} "
     )
-
+    instance=machine
     if request.method == "POST":
         #form = FDS_CO(request.POST)  # Bind the form with posted data
         form = FormDataSheet(data=request.POST)
@@ -1028,7 +1028,7 @@ def edit_machine(request, machine_id):
             machine.oSec10Field19 = form.cleaned_data.get('oSec10Field19', '')
             machine.oSec10Field20 = form.cleaned_data.get('oSec10Field20', '')
 
-            machine.save()  # Save updates to the database
+            instance.save()  # Save updates to the database
             return JsonResponse({"success": True})
         else:
             return JsonResponse({"success": False, "errors": form.errors})  # Send form validation errors

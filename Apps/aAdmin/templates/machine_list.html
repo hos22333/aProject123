@@ -3,18 +3,39 @@
 <div class="container">
     <div class="page-inner">
 
-        <h2 class="mb-3">Add New Machine</h2>
+        
         <form method="post">
             {% csrf_token %}
-            <div class="row">
-                <div class="col-md-4">{{ form.keyValue }}</div>
-                <div class="col-md-4">{{ form.nameForm }}</div>
-                <div class="col-md-4">{{ form.nameFormCalcXX }}</div>
-                <div class="col-md-4">{{ form.nameDB }}</div>
-                <div class="col-md-4">{{ form.nameMachine }}</div>
-                <div class="col-md-4">{{ form.company }}</div>
+            <div class="container-fluid">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Add New Machine</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row"> 
+                            <div class="col-md-4 mb-3">
+                                {{ form.keyValue }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.nameForm }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.nameFormCalcXX }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.nameDB }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.nameMachine }}
+                            </div>  
+                            <div class="col-md-4 mb-3">
+                                {{ form.company }}
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Save Machine</button>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary mt-2">Save Machine</button>
         </form>
         
         <h3 class="mt-4">Machines List</h3>

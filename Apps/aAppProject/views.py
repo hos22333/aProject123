@@ -1284,8 +1284,8 @@ def save_reports(request, project_id):
         # Determine the company and generate the corresponding report
         if aCompany:
             save_submittal_report(request, project_id)
-            save_pdf_report(request, project_id)
             save_calculation_report(request, project_id)
+            save_pdf_report(request, project_id)
             return HttpResponse(status=204)
 
         else:
@@ -1439,9 +1439,9 @@ def save_submittal_report_AAA(request, project_id):
             self.set_auto_page_break(auto=True, margin=15)
 
             # Add the TrueType Unicode font (DejaVuSans)
-            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
-            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
-            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.add_font('DejaVu', '', 'static/aApp1/fonts/DejaVu/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aApp1/fonts/DejaVu/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aApp1/fonts/DejaVu/DejaVuSerif-Italic.ttf', uni=True)  # Italic
             self.set_font('DejaVu', '', 12)
 
         def header_page(self, projectname, clientname, capacity):
@@ -1776,9 +1776,9 @@ def save_submittal_report_BBB(request, project_id):
             self.set_auto_page_break(auto=True, margin=15)
 
             # Add the TrueType Unicode font (DejaVuSans)
-            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
-            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
-            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.add_font('DejaVu', '', 'static/aApp1/fonts/DejaVu/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aApp1/fonts/DejaVu/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aApp1/fonts/DejaVu/DejaVuSerif-Italic.ttf', uni=True)  # Italic
             self.set_font('DejaVu', '', 12)
 
         def header_footer(self, projectname, clientname, capacity):
@@ -2128,9 +2128,9 @@ def save_calculation_report_AAA(request, project_id):
             self.set_auto_page_break(auto=True, margin=15)
 
             # Add the TrueType Unicode font (DejaVuSans)
-            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
-            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
-            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.add_font('DejaVu', '', 'static/aApp1/fonts/DejaVu/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aApp1/fonts/DejaVu/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aApp1/fonts/DejaVu/DejaVuSerif-Italic.ttf', uni=True)  # Italic
             self.set_font('DejaVu', '', 12)
 
         def header_footer(self, projectname, clientname, capacity):
@@ -2460,9 +2460,9 @@ def save_calculation_report_BBB(request, project_id):
             self.set_auto_page_break(auto=True, margin=15)
 
             # Add the TrueType Unicode font (DejaVuSans)
-            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
-            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
-            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.add_font('DejaVu', '', 'static/aApp1/fonts/DejaVu/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aApp1/fonts/DejaVu/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aApp1/fonts/DejaVu/DejaVuSerif-Italic.ttf', uni=True)  # Italic
             self.set_font('DejaVu', '', 12)
 
         def header_footer(self, projectname, clientname, capacity):
@@ -3283,9 +3283,9 @@ def save_pdf_report_AAA(request, project_id):
             self.set_auto_page_break(auto=True, margin=15)
 
             # Add the TrueType Unicode font (DejaVuSans)
-            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
-            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
-            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.add_font('DejaVu', '', 'static/aApp1/fonts/DejaVu/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aApp1/fonts/DejaVu/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aApp1/fonts/DejaVu/DejaVuSerif-Italic.ttf', uni=True)  # Italic
             self.set_font('DejaVu', '', 12)
 
         def header_page(self, projectname, clientname, capacity):
@@ -3528,9 +3528,9 @@ def save_pdf_report_BBB(request, project_id):
             self.set_auto_page_break(auto=True, margin=15)
 
             # Add the TrueType Unicode font (DejaVuSans)
-            self.add_font('DejaVu', '', 'static/aFonts/DejaVuSans.ttf', uni=True)  # Regular
-            self.add_font('DejaVu', 'B', 'static/aFonts/DejaVuSans-Bold.ttf', uni=True)  # Bold
-            self.add_font('DejaVu', 'I', 'static/aFonts/DejaVuSerif-Italic.ttf', uni=True)  # Italic
+            self.add_font('DejaVu', '', 'static/aApp1/fonts/DejaVu/DejaVuSans.ttf', uni=True)  # Regular
+            self.add_font('DejaVu', 'B', 'static/aApp1/fonts/DejaVu/DejaVuSans-Bold.ttf', uni=True)  # Bold
+            self.add_font('DejaVu', 'I', 'static/aApp1/fonts/DejaVu/DejaVuSerif-Italic.ttf', uni=True)  # Italic
             self.set_font('DejaVu', '', 12)
 
         def header_page(self, projectname, clientname, capacity):
