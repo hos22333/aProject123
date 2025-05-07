@@ -1576,7 +1576,7 @@ def DeleteCalcMachine(request, machine_id):
     machine = get_object_or_404(modelcalc, id=machine_id)
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} deleted >>> {sheet_key} >>> {machine.project.name}"
+        message=f"{request.user} deleted >>> {sheet_key} >>> {machine.project.name if machine.project else "No Project"}"
     )
     machine.delete()
 
@@ -2013,7 +2013,7 @@ def CalculationSheet_get_data(request, machine_id):
 
     aLogEntry.objects.create(
         user=request.user,
-        message=f"{request.user} Get data of >>> {sheet_key} >>> {machine.project.name}"
+        message=f"{request.user} Get data of >>> {sheet_key} >>> {machine.project.name if machine.project else "No Project"}"
     )
     
     

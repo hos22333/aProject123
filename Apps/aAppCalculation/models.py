@@ -78,7 +78,7 @@ class modelcalc(models.Model):
           
 
     def __str__(self):
-        return f"{self.project.name} ({self.oSec00Field03})"
+        return f"{self.project.name if project.name else "No Project"} ({self.oSec00Field03})"
 
 
 
