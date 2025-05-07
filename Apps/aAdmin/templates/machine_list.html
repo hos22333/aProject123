@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <div class="container">
     <div class="page-inner">
 
@@ -31,6 +32,12 @@
                             <div class="col-md-4 mb-3">
                                 {{ form.company }}
                             </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.nameDXF }}
+                            </div>  
+                            <div class="col-md-4 mb-3">
+                                {{ form.nameFullDrawing }}
+                            </div>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary mt-2">Save Machine</button>
@@ -38,48 +45,56 @@
             </div>
         </form>
         
-        <h3 class="mt-4">Machines List</h3>
-        <table class="table table-bordered mt-2">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>key Value</th>
-                    <th>Form Name</th>
-                    <th>Calculation Form Name</th>
-                    <th>DB Name</th>
-                    <th>Machine Name</th>
-                    <th>Company Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for machine in machines %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ machine.keyValue }}</td>
-                        <td>{{ machine.nameForm }}</td>
-                        <td>{{ machine.nameFormCalcXX }}</td>
-                        <td>{{ machine.nameDB }}</td>
-                        <td>{{ machine.nameMachine }}</td>
-                        <td>{{ machine.company }}</td>
-                        <td>
-                            <!-- Edit button -->
-                            <a href="{% url 'edit_machine' machine.id %}" class="btn btn-warning btn-sm">Edit</a>
 
-                            <!-- Delete button -->
-                            <form method="POST" action="{% url 'delete_machine' machine.id %}" class="delete-form d-inline">
-                                {% csrf_token %}
-                                <button type="button" class="btn btn-danger btn-sm delete-button">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% empty %}
+        <div style="overflow-x: auto;">
+            <h3 class="mt-4">Machines List</h3>
+            <table class="table table-bordered mt-2">
+                <thead>
                     <tr>
-                        <td colspan="3" class="text-center">No machines available.</td>
+                        <th>#</th>
+                        <th>key Value</th>
+                        <th>Form Name</th>
+                        <th>Calculation Form Name</th>
+                        <th>DB Name</th>
+                        <th>Machine Name</th>
+                        <th>Company Name</th>
+                        <th>DXF Name</th>
+                        <th>Full Drawing Name</th>
+                        <th>Actions</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for machine in machines %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ machine.keyValue }}</td>
+                            <td>{{ machine.nameForm }}</td>
+                            <td>{{ machine.nameFormCalcXX }}</td>
+                            <td>{{ machine.nameDB }}</td>
+                            <td>{{ machine.nameMachine }}</td>
+                            <td>{{ machine.company }}</td>
+                            <td>{{ machine.nameDXF }}</td>
+                            <td>{{ machine.nameFullDrawing }}</td>
+                            <td>
+                                <!-- Edit button -->
+                                <a href="{% url 'edit_machine' machine.id %}" class="btn btn-warning btn-sm">Edit</a>
+                            
+                                <!-- Delete button -->
+                                <form method="POST" action="{% url 'delete_machine' machine.id %}" class="delete-form d-inline">
+                                    {% csrf_token %}
+                                    <button type="button" class="btn btn-danger btn-sm delete-button">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">No machines available.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
     </div>
 </div>
 

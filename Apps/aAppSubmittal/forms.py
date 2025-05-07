@@ -9,13 +9,15 @@ from Apps.aAppMechanical.models import UserCompany
 class MachineForm(forms.ModelForm):
     class Meta:
         model = AddMachine
-        fields = ['keyValue', 'nameForm', 'nameFormCalcXX', 'nameDB', 'nameMachine', 'company']
+        fields = ['keyValue', 'nameForm', 'nameFormCalcXX', 'nameDB', 'nameMachine', 'company', 'nameDXF', 'nameFullDrawing']
         widgets = {
             'keyValue': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter key value'}),
             'nameForm': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter form name'}),
             'nameFormCalcXX': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Calculation form name'}),
             'nameDB': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter DB name'}),
             'nameMachine': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter machine name'}),
+            'nameDXF': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter DXF name'}),
+            'nameFullDrawing': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter FullDrawing name'}),
         }
 
     def __init__(self, *args, **kwargs):

@@ -356,7 +356,8 @@ def SavePageDataSheet(request):
                               {"form": form, 
                                "error": "User is not associated with a company",
                                "aMachineName": aMachineName,
-                               "sheet_key" : sheet_key})
+                               "sheet_key" : sheet_key,
+                               "machineShow": machineShow,})
 
             # Save the instance to the database
             instance.save()
@@ -396,7 +397,8 @@ def SavePageDataSheet(request):
                                   {"form": form, 
                                    "error": "User is not associated with a company",
                                    "aMachineName": aMachineName,
-                                   "sheet_key" : sheet_key})
+                                   "sheet_key" : sheet_key,
+                                   "machineShow": machineShow,})
 
                 # Save the instance to the database
                 instance1.save()
@@ -1351,6 +1353,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             message=f"at {now()} {request.user} DXF download {aType} "
         )
     
+    machine = AddMachine.objects.get(keyValue = aType)
+    file_name = machine.nameDXF
     
     # Get the company of the logged-in user    
     user_company = None
@@ -1375,7 +1379,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": machine.oSec02Field10,
             },
-            f"new_NS_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     
@@ -1391,7 +1395,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "Length": machine.oSec02Field10,
                 "Angle": machine.oSec02Field20,
             },
-            f"new_MS_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"BC_{firstletter}":
@@ -1406,7 +1410,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_BC_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"CO_{firstletter}":
@@ -1421,7 +1425,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_CO_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"GR_{firstletter}":
@@ -1436,7 +1440,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_GR_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"SS_{firstletter}":
@@ -1451,7 +1455,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_SS_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"PS_{firstletter}":
@@ -1466,7 +1470,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_PS_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"QV_{firstletter}":
@@ -1481,7 +1485,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_QV_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"TV_{firstletter}":
@@ -1496,7 +1500,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_TV_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"TH_{firstletter}":
@@ -1511,7 +1515,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_TH_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     
@@ -1583,6 +1587,9 @@ def FullDrawing(request, aMachine_ID, aType):
             firstletter = user_company.nameCompanies[0]
         except UserCompany.DoesNotExist:
             user_company = None 
+
+    machine = AddMachine.objects.get(keyValue = aType)
+    file_name = machine.nameFullDrawing
         
     ###LOG
     aLogEntry.objects.create(
@@ -1603,7 +1610,7 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": machine.oSec02Field10,
             },
-            f"newFullDrawing_ManualScreen_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     
@@ -1619,7 +1626,7 @@ def FullDrawing(request, aMachine_ID, aType):
                 "Length": machine.oSec02Field10,
                 "Angle": machine.oSec02Field20,
             },
-            f"newFullDrawing_MechanicalScreen_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"BC_{firstletter}":
@@ -1634,7 +1641,7 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_BeltConveyor_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"CO_{firstletter}":
@@ -1649,7 +1656,7 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_Container_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"GR_{firstletter}":
@@ -1664,7 +1671,7 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_Gritremoval_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"SS_{firstletter}":
@@ -1679,7 +1686,7 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_SandSilo_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"PS_{firstletter}":
@@ -1694,7 +1701,7 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_PrimarySedimentation_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"QV_{firstletter}":
@@ -1709,7 +1716,7 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_QuickValve_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"TV_{firstletter}":
@@ -1724,7 +1731,7 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_TelescopicValve_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"TH_{firstletter}":
@@ -1739,7 +1746,7 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_SludgeThickener_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
 

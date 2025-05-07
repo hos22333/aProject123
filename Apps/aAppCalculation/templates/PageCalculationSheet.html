@@ -55,7 +55,7 @@
                                             <option value="{{ project.id }}">{{ project.name }}</option>
                                         {% endfor %}
                                     </select>
-                                    <small id="project_error" class="text-danger" style="display:none;">Please select a project.</small>
+                                    <!-- <small id="project_error" class="text-danger" style="display:none;">Please select a project.</small> -->
                                 </div>
 
 
@@ -546,7 +546,7 @@
 </script>
 
 <!-- JS validation for choosing a machine -->
-<script>
+<!-- <script>
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById('machineForm');
         const select = document.getElementById('sheet_key');
@@ -568,29 +568,6 @@
     });
 </script>
 
-
-<!-- JS validation  for choosing a project-->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById('projectForm');
-        const select = document.getElementById('project');
-        const errorText = document.getElementById('project_error');
-
-        form.addEventListener("submit", function (event) {
-            if (select.value === "") {
-                event.preventDefault();
-                // Highlight the select with red color
-                select.classList.add("is-invalid");
-                // Show error message
-                errorText.style.display = "block";
-            } else {
-                // If the user selects something correctly, remove the alert.
-                select.classList.remove("is-invalid");
-                errorText.style.display = "none";
-            }
-        });
-    });
-</script>
-
+ -->
 
 {% endblock %}

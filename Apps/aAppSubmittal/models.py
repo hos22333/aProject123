@@ -11,6 +11,8 @@ class AddMachine(models.Model):
     nameDB      = models.CharField(max_length=255)
     nameMachine     = models.CharField(max_length=255)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
+    nameDXF     = models.CharField(max_length=255, null=True, blank=True)
+    nameFullDrawing     = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.nameMachine

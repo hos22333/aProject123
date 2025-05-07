@@ -933,7 +933,8 @@ def HandleCalculationSheetForm(request):
                                "error": "User is not associated with a company",
                                "aMachineName": aMachineName,
                                "sheet_key" : sheet_key,
-                               "sheet_keys": sheet_keys,})
+                               "sheet_keys": sheet_keys,
+                               "machineShow":machineShow,})
 
             instance.save()
 
@@ -993,7 +994,8 @@ def HandleCalculationSheetForm(request):
                                    "error": "User is not associated with a company",
                                    "aMachineName": aMachineName,
                                    "sheet_key" : sheet_key,
-                                   "sheet_keys": sheet_keys,})
+                                   "sheet_keys": sheet_keys,
+                                   "machineShow":machineShow,})
 
                 instance1.save()
 

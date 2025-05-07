@@ -71,7 +71,15 @@ def project_list(request):
             # Create folder inside the company's directory in the static folder
             company_name = slugify(instance.company.nameCompanies)  
             project_name = slugify(instance.name)       
-            project_id = APP_Project.objects.get(name = project_name).id
+            
+            project_id = None
+            try:
+                theproject = APP_Project.objects.get(name = project_name)
+                project_id = theproject.id
+            except APP_Project.DoesNotExist:
+                print(f"Skipping project '{project_name}' : not found in APP_Project.")
+            
+            
             folder_name = f"{project_id}_{company_name}_{project_name}"
 
             
@@ -1493,13 +1501,13 @@ def save_submittal_report_AAA(request, project_id):
             self.set_font("DejaVu", "B", 10)
             self.set_fill_color(255, 153, 0)
             self.set_text_color(0)
-            self.cell(60, 8, "Field", border=1, fill=True)
-            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+            self.cell(80, 8, "Field", border=1, fill=True)
+            self.cell(110, 8, "Value", border=1, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
-                self.cell(60, 8, field, border=1)
-                self.cell(130, 8, value, border=1, ln=True)
+                self.cell(80, 8, field, border=1)
+                self.cell(110, 8, value, border=1, ln=True)
     
     
     try:
@@ -1551,13 +1559,20 @@ def save_submittal_report_AAA(request, project_id):
         doc.add_page_break()     
         doc.add_paragraph("\n")
 
-        
 
         # Add machine details
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
+            machine_DB = machine.oSec00Field03
             machine_ID = machine.id
-            sheet_key = AddMachine.objects.get(nameDB=machine_name, company=company_id).keyValue
+
+            try:
+                themachines = AddMachine.objects.get(nameDB=machine_DB, company=company_id)
+            except AddMachine.DoesNotExist:
+                print(f"Skipping machine '{machine_DB}' for company ID {company_id}: not found in AddMachine.")
+                continue  # Skip this machine and continue with the rest
+            
+            sheet_key = themachines.keyValue
             section_titles = []
             General_saved_DXF_ALL(request, machine_ID, sheet_key, project_id)
             SavedFullDrawing(request, machine_ID, sheet_key)
@@ -1831,13 +1846,13 @@ def save_submittal_report_BBB(request, project_id):
             self.set_font("DejaVu", "B", 10)
             self.set_fill_color(255, 153, 0)
             self.set_text_color(0)
-            self.cell(60, 8, "Field", border=1, fill=True)
-            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+            self.cell(80, 8, "Field", border=1, fill=True)
+            self.cell(110, 8, "Value", border=1, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
-                self.cell(60, 8, field, border=1)
-                self.cell(130, 8, value, border=1, ln=True)
+                self.cell(80, 8, field, border=1)
+                self.cell(110, 8, value, border=1, ln=True)
     
     
     try:
@@ -1893,11 +1908,22 @@ def save_submittal_report_BBB(request, project_id):
         # Add machine details
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
+            machine_DB = machine.oSec00Field03
             machine_ID = machine.id
-            sheet_key = AddMachine.objects.get(nameDB=machine_name, company=company_id).keyValue
-            section_titles = []
+            
+            try:
+                themachines = AddMachine.objects.get(nameDB=machine_DB, company=company_id)
+            except AddMachine.DoesNotExist:
+                print(f"Skipping machine '{machine_DB}' for company ID {company_id}: not found in AddMachine.")
+                continue  # Skip this machine and continue with the rest
+            
+            sheet_key = themachines.keyValue
             General_saved_DXF_ALL(request, machine_ID, sheet_key, project_id)
             SavedFullDrawing(request, machine_ID, sheet_key)
+
+
+            
+            section_titles = []
 
             if machine_name == "DataSheetNS":
                 machine_name = "Manual Screen" 
@@ -2182,13 +2208,13 @@ def save_calculation_report_AAA(request, project_id):
             self.set_font("DejaVu", "B", 10)
             self.set_fill_color(255, 153, 0)
             self.set_text_color(0)
-            self.cell(60, 8, "Field", border=1, fill=True)
-            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+            self.cell(80, 8, "Field", border=1, fill=True)
+            self.cell(110, 8, "Value", border=1, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
-                self.cell(60, 8, field, border=1)
-                self.cell(130, 8, value, border=1, ln=True)
+                self.cell(80, 8, field, border=1)
+                self.cell(110, 8, value, border=1, ln=True)
     
     
     
@@ -2514,13 +2540,13 @@ def save_calculation_report_BBB(request, project_id):
             self.set_font("DejaVu", "B", 10)
             self.set_fill_color(255, 153, 0)
             self.set_text_color(0)
-            self.cell(60, 8, "Field", border=1, fill=True)
-            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+            self.cell(80, 8, "Field", border=1, fill=True)
+            self.cell(110, 8, "Value", border=1, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
-                self.cell(60, 8, field, border=1)
-                self.cell(130, 8, value, border=1, ln=True)
+                self.cell(80, 8, field, border=1)
+                self.cell(110, 8, value, border=1, ln=True)
     
     
     try:
@@ -2725,12 +2751,13 @@ def convert_dxf_to_pdf_cloudconvert(input_path, output_path):
 
 
 # Helper function to define DXF paths
-def get_saved_dxf_paths(user_company, category, project_id):
+def get_saved_dxf_paths(user_company, category, project_id, output_filename):
     # Get project info
     project = APP_Project.objects.get(id=project_id)
     company_slug = slugify(user_company.nameCompanies)
     project_slug = slugify(project.name)
     folder_name = f"{project_id}_{company_slug}_{project_slug}"
+
 
     # Load original path (base DXF)
     company_dxf_path = {
@@ -2751,7 +2778,8 @@ def get_saved_dxf_paths(user_company, category, project_id):
     )
     os.makedirs(target_dir, exist_ok=True)
 
-    modified_path = os.path.join(target_dir, f"{category}_new.dxf")
+    
+    modified_path = os.path.join(target_dir, output_filename)
 
     return static_path, modified_path
     
@@ -2786,7 +2814,7 @@ def process_saved_dxf(request, aMachine_ID, category, project_id, modifications,
     if not user_company:
         return HttpResponse("Unauthorized", status=403)
 
-    static_path, modified_path = get_saved_dxf_paths(user_company, category, project_id)
+    static_path, modified_path = get_saved_dxf_paths(user_company, category, project_id, output_filename)
     if not os.path.exists(static_path):
         return HttpResponse("File not found", status=404)
 
@@ -2830,7 +2858,15 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
             message=f"at {now()} {request.user} DXF download {aType} "
         )
     
-    
+    machine = AddMachine.objects.get(keyValue = aType)
+    file_model_name = machine.nameDXF
+    sheetkey = aType[0:-2]
+
+    if file_model_name not in ["", None] :
+        file_name = file_model_name
+    else :
+        file_name = f"{sheetkey}_new"
+
     # Get the company of the logged-in user    
     user_company = None
     firstletter = None
@@ -2855,7 +2891,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": machine.oSec02Field10,
             },
-            f"new_NS_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     
@@ -2872,7 +2908,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "Length": machine.oSec02Field10,
                 "Angle": machine.oSec02Field20,
             },
-            f"new_MS_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"BC_{firstletter}":
@@ -2888,7 +2924,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_BC_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"CO_{firstletter}":
@@ -2904,7 +2940,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_CO_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"GR_{firstletter}":
@@ -2920,7 +2956,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_GR_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"SS_{firstletter}":
@@ -2936,7 +2972,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_SS_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"PS_{firstletter}":
@@ -2952,7 +2988,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_PS_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"QV_{firstletter}":
@@ -2968,7 +3004,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_QV_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"TV_{firstletter}":
@@ -2984,7 +3020,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_TV_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"TH_{firstletter}":
@@ -3000,7 +3036,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"new_TH_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     
@@ -3053,7 +3089,10 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             settings.BASE_DIR, "static", "aReports", company_slug.upper(), folder_name
         )
         os.makedirs(target_dir, exist_ok=True)
-        modified_path = os.path.join(target_dir, f"{category}_newFullDrawing.dxf")
+        if output_filename != "None.dxf" :
+            modified_path = os.path.join(target_dir, output_filename)
+        else :
+            modified_path = os.path.join(target_dir, f"{category}_newFullDrawing.dxf")
 
         machine = Machine.objects.get(id=aMachine_ID)
         
@@ -3069,7 +3108,17 @@ def SavedFullDrawing(request, aMachine_ID, aType):
     # Redirect unauthenticated users
     if not request.user.is_authenticated:
         return redirect("login") 
-        
+    
+    
+    machine = AddMachine.objects.get(keyValue = aType)
+    file_model_name = machine.nameFullDrawing
+    sheetkey = aType[0:-2]
+
+    if file_model_name not in ["", None] :
+        file_name = file_model_name
+    else :
+        file_name = f"{sheetkey}_newFullDrawing"
+
     # Get the company of the logged-in user    
     user_company = None
     firstletter = None
@@ -3099,7 +3148,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": machine.oSec02Field10,
             },
-            f"newFullDrawing_ManualScreen_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     
@@ -3115,7 +3164,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
                 "Length": machine.oSec02Field10,
                 "Angle": machine.oSec02Field20,
             },
-            f"newFullDrawing_MechanicalScreen_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"BC_{firstletter}":
@@ -3130,7 +3179,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_BeltConveyor_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"CO_{firstletter}":
@@ -3145,7 +3194,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_Container_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"GR_{firstletter}":
@@ -3160,7 +3209,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_Gritremoval_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"SS_{firstletter}":
@@ -3175,7 +3224,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_SandSilo_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"PS_{firstletter}":
@@ -3190,7 +3239,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_PrimarySedimentation_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"QV_{firstletter}":
@@ -3205,7 +3254,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_QuickValve_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"TV_{firstletter}":
@@ -3220,7 +3269,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_TelescopicValve_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
     if aType == f"TH_{firstletter}":
@@ -3235,7 +3284,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"newFullDrawing_SludgeThickener_{user_company}.dxf"
+            f"{file_name}.dxf"
         )
         
 
@@ -3351,13 +3400,13 @@ def save_pdf_report_AAA(request, project_id):
             self.set_font("DejaVu", "B", 10)
             self.set_fill_color(255, 153, 0)
             self.set_text_color(0)
-            self.cell(60, 8, "Field", border=1, fill=True)
-            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+            self.cell(80, 8, "Field", border=1, fill=True)
+            self.cell(110, 8, "Value", border=1, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
-                self.cell(60, 8, field, border=1)
-                self.cell(130, 8, value, border=1, ln=True)
+                self.cell(80, 8, field, border=1)
+                self.cell(110, 8, value, border=1, ln=True)
     
     
     try:
@@ -3415,6 +3464,14 @@ def save_pdf_report_AAA(request, project_id):
         # Add machine details
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
+            try:
+                themachines = AddMachine.objects.get(nameDB=machine_name, company=company_id)
+                file_name = themachines.nameDXF
+                
+            except AddMachine.DoesNotExist:
+                print(f"Skipping machine '{machine_name}' for company ID {company_id}: not found in AddMachine.")
+                continue  # Skip this machine and continue with the rest
+
             section_titles = []
             if machine_name == "DataSheetNS":
                 machine_name = "Manual Screen" 
@@ -3499,12 +3556,15 @@ def save_pdf_report_AAA(request, project_id):
             # clean up
             os.remove(pdf_file_path)
             
+            appendix = None
+            if os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{file_name}.pdf") :
+                appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{file_name}.pdf")
+            elif os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf") :
+                appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf")
 
-            appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf")
-
-            
-            for page in appendix.pages:
-                output.add_page(page)
+            if appendix != None:
+                for page in appendix.pages:
+                    output.add_page(page)
 
         # Save the new PDF
         with open(pdf_file_path, "wb") as f:
@@ -3596,13 +3656,13 @@ def save_pdf_report_BBB(request, project_id):
             self.set_font("DejaVu", "B", 10)
             self.set_fill_color(255, 153, 0)
             self.set_text_color(0)
-            self.cell(60, 8, "Field", border=1, fill=True)
-            self.cell(130, 8, "Value", border=1, ln=True, fill=True)
+            self.cell(80, 8, "Field", border=1, fill=True)
+            self.cell(110, 8, "Value", border=1, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
-                self.cell(60, 8, field, border=1)
-                self.cell(130, 8, value, border=1, ln=True)
+                self.cell(80, 8, field, border=1)
+                self.cell(110, 8, value, border=1, ln=True)
     
     
     try:
@@ -3660,6 +3720,14 @@ def save_pdf_report_BBB(request, project_id):
         # Add machine details
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
+            try:
+                themachines = AddMachine.objects.get(nameDB=machine_name, company=company_id)
+                file_name = themachines.nameDXF
+                
+            except AddMachine.DoesNotExist:
+                print(f"Skipping machine '{machine_name}' for company ID {company_id}: not found in AddMachine.")
+                continue  # Skip this machine and continue with the rest
+
             section_titles = []
             if machine_name == "DataSheetNS":
                 machine_name = "Manual Screen" 
@@ -3744,12 +3812,15 @@ def save_pdf_report_BBB(request, project_id):
             # clean up
             os.remove(pdf_file_path)
 
+            appendix = None
+            if os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{file_name}.pdf") :
+                appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{file_name}.pdf")
+            elif os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf") :
+                appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf")
 
-            appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf")
-
-            
-            for page in appendix.pages:
-                output.add_page(page)
+            if appendix != None:
+                for page in appendix.pages:
+                    output.add_page(page)
 
         # Save the new PDF
         with open(pdf_file_path, "wb") as f:
