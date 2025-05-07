@@ -2827,14 +2827,14 @@ def process_saved_dxf(request, aMachine_ID, category, project_id, modifications,
     # Define PDF output path
     pdf_output_path = modified_path.replace(".dxf", ".pdf")
 
-    try:
+    """ try:
         convert_dxf_to_pdf_cloudconvert(modified_path, pdf_output_path)
         print(f"PDF saved to {pdf_output_path}")
     except Exception as e:
         print("DXF to PDF conversion failed:", e)
         return HttpResponse("DXF to PDF conversion failed", status=500)
 
-    return FileResponse(open(pdf_output_path, 'rb'), as_attachment=True, filename=os.path.basename(pdf_output_path))
+    return FileResponse(open(pdf_output_path, 'rb'), as_attachment=True, filename=os.path.basename(pdf_output_path)) """
 
     
 

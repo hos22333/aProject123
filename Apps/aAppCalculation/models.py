@@ -5,7 +5,7 @@ from Apps.aAppProject.models import APP_Project
 
 # Create your models here.
 class modelcalc(models.Model):
-    project         = models.ForeignKey(APP_Project, on_delete=models.CASCADE, related_name='calcmachines')
+    project         = models.ForeignKey(APP_Project, on_delete=models.CASCADE, related_name='calcmachines', null=True, blank=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
 
     
@@ -83,7 +83,7 @@ class modelcalc(models.Model):
 
 
 class modelcalc_log(models.Model):
-    project         = models.ForeignKey(APP_Project, on_delete=models.CASCADE, related_name='calcmachines_log')
+    project         = models.ForeignKey(APP_Project, on_delete=models.CASCADE, related_name='calcmachines_log', null=True, blank=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
 
     

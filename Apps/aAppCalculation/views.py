@@ -919,10 +919,10 @@ def HandleCalculationSheetForm(request):
                 try:
                     instance.project = APP_Project.objects.get(id=project_id)
                 except APP_Project.DoesNotExist:
-                    return render(request, "PageCalculationSheet.html", {"form": form, "sheet_keys": sheet_keys, "error": "Invalid Project ID"})
+                    """ return render(request, "PageCalculationSheet.html", {"form": form, "sheet_keys": sheet_keys, "projects": projects, "machines": machines, "aMachineName": aMachineName, "sheet_key": sheet_key, "machineShow": "Yes",  "error": "Invalid Project ID"})
             else:
-                return render(request, "PageCalculationSheet.html", {"form": form, "sheet_keys": sheet_keys, "error": "Project is required"})
-            
+                return render(request, "PageCalculationSheet.html", {"form": form, "sheet_keys": sheet_keys, "projects": projects, "machines": machines, "aMachineName": aMachineName, "sheet_key": sheet_key, "machineShow": "Yes",  "error": "Project is required"})
+            """ 
             # Get the company associated with the user
             try:
                 user_company = UserCompany.objects.get(user=request.user).company
@@ -980,9 +980,9 @@ def HandleCalculationSheetForm(request):
                     try:
                         instance1.project = APP_Project.objects.get(id=project_id)
                     except APP_Project.DoesNotExist:
-                        return render(request, "PageCalculationSheet.html", {"form": form, "sheet_keys": sheet_keys, "error": "Invalid Project ID"})
+                        """ return render(request, "PageCalculationSheet.html", {"form": form, "sheet_keys": sheet_keys, "projects": projects, "machines": machines, "aMachineName": aMachineName, "sheet_key": sheet_key, "machineShow": "Yes", "error": "Invalid Project ID"})
                 else:
-                    return render(request, "PageCalculationSheet.html", {"form": form, "sheet_keys": sheet_keys, "error": "Project is required"})
+                    return render(request, "PageCalculationSheet.html", {"form": form, "sheet_keys": sheet_keys, "projects": projects, "machines": machines, "aMachineName": aMachineName, "sheet_key": sheet_key, "machineShow": "Yes",  "error": "Project is required"}) """
 
                 # Get the company associated with the user
                 try:
