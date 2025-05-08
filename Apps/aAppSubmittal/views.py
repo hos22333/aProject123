@@ -1354,7 +1354,13 @@ def General_DXF_ALL(request, aMachine_ID, aType):
         )
     
     machine = AddMachine.objects.get(keyValue = aType)
-    file_name = machine.nameDXF
+    file_model_name = machine.nameDXF
+    sheetkey = aType[0:-2]
+
+    if file_model_name not in ["", None] :
+        file_name = file_model_name
+    else :
+        file_name = f"{sheetkey}_new"
     
     # Get the company of the logged-in user    
     user_company = None
@@ -1589,7 +1595,13 @@ def FullDrawing(request, aMachine_ID, aType):
             user_company = None 
 
     machine = AddMachine.objects.get(keyValue = aType)
-    file_name = machine.nameFullDrawing
+    file_model_name = machine.nameFullDrawing
+    sheetkey = aType[0:-2]
+
+    if file_model_name not in ["", None] :
+        file_name = file_model_name
+    else :
+        file_name = f"{sheetkey}_newFullDrawing"
         
     ###LOG
     aLogEntry.objects.create(

@@ -39,8 +39,9 @@ from docx.shared import Inches
 from docx.shared import Pt
 
 from fpdf import FPDF
-
 from PyPDF2 import PdfReader, PdfWriter
+from reportlab.pdfgen import canvas
+from openpyxl import Workbook
 
 # Create your views here.
 
@@ -74,7 +75,7 @@ def project_list(request):
             
             
             try:
-                theproject = APP_Project.objects.get(name = project_name)
+                theproject = APP_Project.objects.get(name = instance.name)
             except APP_Project.DoesNotExist:
                 print(f"Skipping project '{project_name}' : not found in APP_Project.")
             
@@ -85,10 +86,48 @@ def project_list(request):
             base_static_path = os.path.join(settings.BASE_DIR, 'static', 'aReports')
             company_folder = os.path.join(base_static_path, company_name)
             project_folder = os.path.join(company_folder, folder_name)
+            excel_file_path1 = os.path.join(project_folder, 'Cost1_excel.xlsx')
+            excel_file_path2 = os.path.join(project_folder, 'Cost2_excel.xlsx')
+            excel_file_path3 = os.path.join(project_folder, 'Cost3_excel.xlsx')
+            excel_file_path4 = os.path.join(project_folder, 'Cost4_excel.xlsx')
+            excel_file_path5 = os.path.join(project_folder, 'Cost5_excel.xlsx')
 
+            pdf_file_path1 = os.path.join(project_folder, 'Cost1_pdf.pdf')
+            pdf_file_path2 = os.path.join(project_folder, 'Cost2_pdf.pdf')
+            pdf_file_path3 = os.path.join(project_folder, 'Cost3_pdf.pdf')
+            pdf_file_path4 = os.path.join(project_folder, 'Cost4_pdf.pdf')
+            pdf_file_path5 = os.path.join(project_folder, 'Cost5_pdf.pdf')
 
             # Create the folders if they don't exist
             os.makedirs(project_folder, exist_ok=True)
+
+            ef = Workbook()  # Creates a new workbook with one empty sheet
+            ef.save(excel_file_path1)
+            ef.save(excel_file_path2)
+            ef.save(excel_file_path3)
+            ef.save(excel_file_path4)
+            ef.save(excel_file_path5)
+
+            pf1 = canvas.Canvas(pdf_file_path1)
+            pf1.showPage()  # Add a blank page
+            pf1.save()
+            
+            pf2 = canvas.Canvas(pdf_file_path2)
+            pf2.showPage()  # Add a blank page
+            pf2.save()
+            
+            pf3 = canvas.Canvas(pdf_file_path3)
+            pf3.showPage()  # Add a blank page
+            pf3.save()
+            
+            pf4 = canvas.Canvas(pdf_file_path4)
+            pf4.showPage()  # Add a blank page
+            pf4.save()
+            
+            pf5 = canvas.Canvas(pdf_file_path5)
+            pf5.showPage()  # Add a blank page
+            pf5.save()
+
 
 
             aLogEntry.objects.create(
@@ -3565,6 +3604,16 @@ def save_pdf_report_AAA(request, project_id):
                 for page in appendix.pages:
                     output.add_page(page)
 
+        for i in range(1 , 6):
+            emptyappendix = None
+            cost_file_name = f"cost{i}_pdf.pdf"
+            if os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{cost_file_name}") :
+                emptyappendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{cost_file_name}")
+
+            if emptyappendix != None:
+                for page in emptyappendix.pages:
+                    output.add_page(page)
+
         # Save the new PDF
         with open(pdf_file_path, "wb") as f:
             output.write(f)
@@ -3819,6 +3868,16 @@ def save_pdf_report_BBB(request, project_id):
 
             if appendix != None:
                 for page in appendix.pages:
+                    output.add_page(page)
+
+        for i in range(1 , 6):
+            emptyappendix = None
+            cost_file_name = f"cost{i}_pdf.pdf"
+            if os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{cost_file_name}") :
+                emptyappendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{cost_file_name}")
+
+            if emptyappendix != None:
+                for page in emptyappendix.pages:
                     output.add_page(page)
 
         # Save the new PDF

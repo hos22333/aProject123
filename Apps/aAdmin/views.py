@@ -27,6 +27,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 
+from config import settings
+import os
+
     
 def home(request):
     return render(request, 'home.html')
@@ -363,6 +366,11 @@ def add_company(request):
         form = CompanyForm(request.POST)
         if form.is_valid():
             form.save()
+            company_name = request.POST.get("nameCompanies")
+            base_static_path = os.path.join(settings.BASE_DIR, 'static', 'aReports')
+            company_folder = os.path.join(base_static_path, company_name)
+            # Create the folders if they don't exist
+            os.makedirs(company_folder, exist_ok=True)
             aLogEntry.objects.create(
                 user=request.user,
                 message=f"{request.user} Added a Company >>> {request.POST.get("nameCompanies")} "
@@ -463,7 +471,7 @@ def add_machine(request):
         form = MachineForm()
 
     # Fetch all current roles
-    machines = AddMachine.objects.all()
+    machines = AddMachine.objects.filter(company=user_company)
 
     return render(request, 'machine_list.html', {'form': form, 'machines': machines})
 
