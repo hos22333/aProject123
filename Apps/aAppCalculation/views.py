@@ -23,7 +23,7 @@ import ezdxf
 
 from docx import Document
 from docx.shared import Pt, RGBColor
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT,  WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement, ns
 from docx.shared import Inches
 from docx.shared import Pt
@@ -106,7 +106,7 @@ def LoadPageCalculationSheet(request):
 
     print(user_company)
 
-    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").filter(company=user_company)
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company)
 
     sheet_key = None
 
@@ -569,7 +569,7 @@ def HandleCalculationSheetForm(request):
 
     print(user_company)
 
-    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").filter(company=user_company)
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company)
     
 
 
@@ -1228,12 +1228,47 @@ def generate_report_AAA(request, project_id, sheet_key):
         # Add project details
         doc.add_heading("Project Details", level=2)     
 
-        doc.add_paragraph("\n")
-        doc.add_paragraph("Name: " + project.name)
-        doc.add_paragraph("Client Name: " + project.client_name)
-        doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
-        
+        for _ in range(7):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        """ para = doc.add_paragraph("\n")
+        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
+        para = doc.add_paragraph("Project Name: ")
+        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
+        para = doc.add_paragraph(project.name)
+        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
+        para = doc.add_paragraph("Client Name: ")
+        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
+        para = doc.add_paragraph(project.client_name)
+        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
+        para = doc.add_paragraph("Capacity: ")
+        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
+        para = doc.add_paragraph(project.capacity)
+        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
+        para = doc.add_paragraph("\n")
+        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
+         """
         doc.add_page_break()     
         doc.add_paragraph("\n")
 
@@ -1482,11 +1517,35 @@ def generate_report_BBB(request, project_id, sheet_key):
         # Add project details
         doc.add_heading("Project Details", level=2)     
 
-        doc.add_paragraph("\n")
+        for _ in range(7):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        """ doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
         doc.add_paragraph("Client Name: " + project.client_name)
         doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
+        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -2278,11 +2337,35 @@ def generate_saved_report_AAA(request, machine_id):
         # Add project details
         doc.add_heading("Project Details", level=2)     
 
-        doc.add_paragraph("\n")
+        for _ in range(7):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        """  doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
         doc.add_paragraph("Client Name: " + project.client_name)
         doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
+        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -2534,11 +2617,35 @@ def generate_saved_report_BBB(request, machine_id):
         # Add project details
         doc.add_heading("Project Details", level=2)     
 
-        doc.add_paragraph("\n")
+        for _ in range(7):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        """ doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
         doc.add_paragraph("Client Name: " + project.client_name)
         doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
+        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")

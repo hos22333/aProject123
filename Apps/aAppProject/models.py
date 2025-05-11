@@ -9,6 +9,7 @@ class APP_Project(models.Model):
     client_name     = models.CharField(max_length=255)
     capacity        = models.CharField(max_length=100)
     company         = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
+    last_saved_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.name

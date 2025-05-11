@@ -14,6 +14,7 @@ import requests
 import cloudconvert
 import time
 
+
 from django.http import FileResponse, HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -33,7 +34,7 @@ import ezdxf
 
 from docx import Document
 from docx.shared import Pt, RGBColor
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT,  WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement, ns
 from docx.shared import Inches
 from docx.shared import Pt
@@ -86,6 +87,7 @@ def project_list(request):
             base_static_path = os.path.join(settings.BASE_DIR, 'static', 'aReports')
             company_folder = os.path.join(base_static_path, company_name)
             project_folder = os.path.join(company_folder, folder_name)
+            print("project_folder_path : ", project_folder)
             excel_file_path1 = os.path.join(project_folder, 'Cost1_excel.xlsx')
             excel_file_path2 = os.path.join(project_folder, 'Cost2_excel.xlsx')
             excel_file_path3 = os.path.join(project_folder, 'Cost3_excel.xlsx')
@@ -501,11 +503,35 @@ def generate_report_AAA(request, project_id):
         # Add project details
         doc.add_heading("Project Details", level=2)     
 
-        doc.add_paragraph("\n")
+        for _ in range(7):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        """ doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
         doc.add_paragraph("Client Name: " + project.client_name)
         doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
+        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -732,11 +758,35 @@ def generate_report_BBB(request, project_id):
         # Add project details
         doc.add_heading("Project Details", level=2)     
 
-        doc.add_paragraph("\n")
+        for _ in range(3):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        """ doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
         doc.add_paragraph("Client Name: " + project.client_name)
         doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
+        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -980,11 +1030,35 @@ def generate_calculation_report_AAA(request, project_id):
         # Add project details
         doc.add_heading("Project Details", level=2)     
 
-        doc.add_paragraph("\n")
+        for _ in range(7):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        """ doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
         doc.add_paragraph("Client Name: " + project.client_name)
         doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
+        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -1210,11 +1284,35 @@ def generate_calculation_report_BBB(request, project_id):
         # Add project details
         doc.add_heading("Project Details", level=2)     
 
-        doc.add_paragraph("\n")
+        for _ in range(4):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        """ doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
         doc.add_paragraph("Client Name: " + project.client_name)
         doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
+        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -1292,31 +1390,8 @@ def generate_calculation_report_BBB(request, project_id):
         return HttpResponse("Project not found", status=404)
 
 
-def download_project_reports(request, project_id):
-
-    project = APP_Project.objects.get(id=project_id)
-    company_name = slugify(project.company.nameCompanies)
-    project_name = slugify(project.name)
-    folder_name = slugify(f"{project_id}_{company_name}_{project_name}")
-
-    folder_path = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_name, folder_name)
-
-    # In-memory zip
-    buffer = BytesIO()
-    with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-        for root, _, files in os.walk(folder_path):
-            for file in files:
-                abs_path = os.path.join(root, file)
-                rel_path = os.path.relpath(abs_path, folder_path)
-                zip_file.write(abs_path, arcname=rel_path)
-
-    buffer.seek(0)
-    response = HttpResponse(buffer, content_type='application/zip')
-    response['Content-Disposition'] = f'attachment; filename="{folder_name}_reports.zip"'
-    return response
-
-
 def save_reports(request, project_id):
+    project = get_object_or_404(APP_Project, pk=project_id)
     try:
         #pdb.set_trace()
         # Log the action
@@ -1332,6 +1407,8 @@ def save_reports(request, project_id):
             save_submittal_report(request, project_id)
             save_calculation_report(request, project_id)
             save_pdf_report(request, project_id)
+            project.last_saved_time = now()
+            project.save()
             return HttpResponse(status=204)
 
         else:
@@ -1497,11 +1574,39 @@ def save_submittal_report_AAA(request, project_id):
             self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
             self.set_font("DejaVu", "B", 14)
             self.cell(0, 10, f"Project Details", ln=True,) 
-            self.set_text_color(0, 0, 0)
-            self.set_font("DejaVu", "", 12)
-            self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
-            self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
-            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+            
+            page_height = self.h
+            top_margin = self.t_margin
+            bottom_margin = self.b_margin
+
+            
+            lines = [
+                ("Project Name: ", "", 14, (0, 0, 0)),
+                (projectname, "", 14, (0, 0, 0)),
+                ("Client Name: ", "", 14, (0, 0, 0)),
+                (clientname, "", 14, (0, 0, 0)),
+                ("Capacity: ", "", 14, (0, 0, 0)),
+                (capacity, "", 14, (0, 0, 0)),
+            ]
+
+            
+            line_height = 16
+            total_content_height = line_height * len(lines)
+
+            
+            y_position = (page_height - total_content_height) / 2
+            self.set_y(y_position)
+
+            
+            for text, style, size, color in lines:
+                self.set_font("DejaVu", style, size)
+                self.set_text_color(*color)
+                self.cell(0, line_height, text, ln=True, align="C")
+            #self.set_text_color(0, 0, 0)
+            #self.set_font("DejaVu", "", 12)
+            #self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
+            #self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
+            #self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
 
         def header(self):
             # Logo
@@ -1586,13 +1691,37 @@ def save_submittal_report_AAA(request, project_id):
 
         # Add project details
         doc.add_heading("Project Details", level=2)  
+
+        for _ in range(7):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
 
-        doc.add_paragraph("\n")
+        """ doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
         doc.add_paragraph("Client Name: " + project.client_name)
         doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
+        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -1841,11 +1970,39 @@ def save_submittal_report_BBB(request, project_id):
             self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
             self.set_font("DejaVu", "B", 14)
             self.cell(0, 10, f"Project Details", ln=True,) 
-            self.set_text_color(0, 0, 0)
-            self.set_font("DejaVu", "", 12)
-            self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
-            self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
-            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+            
+            page_height = self.h
+            top_margin = self.t_margin
+            bottom_margin = self.b_margin
+
+            
+            lines = [
+                ("Project Name: ", "", 14, (0, 0, 0)),
+                (projectname, "", 14, (0, 0, 0)),
+                ("Client Name: ", "", 14, (0, 0, 0)),
+                (clientname, "", 14, (0, 0, 0)),
+                ("Capacity: ", "", 14, (0, 0, 0)),
+                (capacity, "", 14, (0, 0, 0)),
+            ]
+
+            
+            line_height = 16
+            total_content_height = line_height * len(lines)
+
+            
+            y_position = (page_height - total_content_height) / 2
+            self.set_y(y_position)
+
+            
+            for text, style, size, color in lines:
+                self.set_font("DejaVu", style, size)
+                self.set_text_color(*color)
+                self.cell(0, line_height, text, ln=True, align="C")
+            #self.set_text_color(0, 0, 0)
+            #self.set_font("DejaVu", "", 12)
+            #self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
+            #self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
+            #self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
 
         def header(self):
             # Logo
@@ -1882,15 +2039,15 @@ def save_submittal_report_BBB(request, project_id):
 
         def add_table(self, data):
             self.set_font("DejaVu", "B", 10)
-            self.set_fill_color(255, 153, 0)
+            self.set_fill_color(173, 216, 230)
             self.set_text_color(0)
-            self.cell(80, 8, "Field", border=1, fill=True)
-            self.cell(110, 8, "Value", border=1, ln=True, fill=True)
+            self.cell(80, 8, "Field", border=0, fill=True)
+            self.cell(110, 8, "Value", border=0, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
-                self.cell(80, 8, field, border=1)
-                self.cell(110, 8, value, border=1, ln=True)
+                self.cell(80, 8, field, border=0)
+                self.cell(110, 8, value, border=0, ln=True)
     
     
     try:
@@ -1934,11 +2091,35 @@ def save_submittal_report_BBB(request, project_id):
         # Add project details
         doc.add_heading("Project Details", level=2)     
 
-        doc.add_paragraph("\n")
+        for _ in range(4):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        """ doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
         doc.add_paragraph("Client Name: " + project.client_name)
         doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
+        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -2204,11 +2385,39 @@ def save_calculation_report_AAA(request, project_id):
             self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
             self.set_font("DejaVu", "B", 14)
             self.cell(0, 10, f"Project Details", ln=True,) 
-            self.set_text_color(0, 0, 0)
+            
+            page_height = self.h
+            top_margin = self.t_margin
+            bottom_margin = self.b_margin
+
+            
+            lines = [
+                ("Project Name: ", "", 14, (0, 0, 0)),
+                (projectname, "", 14, (0, 0, 0)),
+                ("Client Name: ", "", 14, (0, 0, 0)),
+                (clientname, "", 14, (0, 0, 0)),
+                ("Capacity: ", "", 14, (0, 0, 0)),
+                (capacity, "", 14, (0, 0, 0)),
+            ]
+
+            
+            line_height = 16
+            total_content_height = line_height * len(lines)
+
+            
+            y_position = (page_height - total_content_height) / 2
+            self.set_y(y_position)
+
+            
+            for text, style, size, color in lines:
+                self.set_font("DejaVu", style, size)
+                self.set_text_color(*color)
+                self.cell(0, line_height, text, ln=True, align="C")
+            """ self.set_text_color(0, 0, 0)
             self.set_font("DejaVu", "", 12)
             self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
             self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
-            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+            self.cell(0, 10, f"Capacity: {capacity}", ln=True,)  """
 
         def header(self):
             # Logo
@@ -2298,11 +2507,35 @@ def save_calculation_report_AAA(request, project_id):
         # Add project details
         doc.add_heading("Project Details", level=2)     
 
-        doc.add_paragraph("\n")
+        for _ in range(7):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        """ doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
         doc.add_paragraph("Client Name: " + project.client_name)
         doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
+        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -2536,11 +2769,39 @@ def save_calculation_report_BBB(request, project_id):
             self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
             self.set_font("DejaVu", "B", 14)
             self.cell(0, 10, f"Project Details", ln=True,) 
-            self.set_text_color(0, 0, 0)
+            
+            page_height = self.h
+            top_margin = self.t_margin
+            bottom_margin = self.b_margin
+
+            
+            lines = [
+                ("Project Name: ", "", 14, (0, 0, 0)),
+                (projectname, "", 14, (0, 0, 0)),
+                ("Client Name: ", "", 14, (0, 0, 0)),
+                (clientname, "", 14, (0, 0, 0)),
+                ("Capacity: ", "", 14, (0, 0, 0)),
+                (capacity, "", 14, (0, 0, 0)),
+            ]
+
+            
+            line_height = 16
+            total_content_height = line_height * len(lines)
+
+            
+            y_position = (page_height - total_content_height) / 2
+            self.set_y(y_position)
+
+            
+            for text, style, size, color in lines:
+                self.set_font("DejaVu", style, size)
+                self.set_text_color(*color)
+                self.cell(0, line_height, text, ln=True, align="C")
+            """ self.set_text_color(0, 0, 0)
             self.set_font("DejaVu", "", 12)
             self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
             self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
-            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+            self.cell(0, 10, f"Capacity: {capacity}", ln=True,)  """
 
         def header(self):
             # Logo
@@ -2576,15 +2837,15 @@ def save_calculation_report_BBB(request, project_id):
 
         def add_table(self, data):
             self.set_font("DejaVu", "B", 10)
-            self.set_fill_color(255, 153, 0)
+            self.set_fill_color(173, 216, 230)
             self.set_text_color(0)
-            self.cell(80, 8, "Field", border=1, fill=True)
-            self.cell(110, 8, "Value", border=1, ln=True, fill=True)
+            self.cell(80, 8, "Field", border=0, fill=True)
+            self.cell(110, 8, "Value", border=0, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
-                self.cell(80, 8, field, border=1)
-                self.cell(110, 8, value, border=1, ln=True)
+                self.cell(80, 8, field, border=0)
+                self.cell(110, 8, value, border=0, ln=True)
     
     
     try:
@@ -2629,11 +2890,35 @@ def save_calculation_report_BBB(request, project_id):
         # Add project details
         doc.add_heading("Project Details", level=2)     
 
-        doc.add_paragraph("\n")
+        for _ in range(4):  # Adjust this number based on how centered you want it
+            para = doc.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Centered content
+        lines = [
+            "Project Name: ",
+            project.name,
+            "Client Name: ",
+            project.client_name,
+            "Capacity: ",
+            project.capacity,
+        ]
+
+        for line in lines:
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.size = Pt(25) 
+            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add spacing after if needed
+        para = doc.add_paragraph("\n")
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        """ doc.add_paragraph("\n")
         doc.add_paragraph("Name: " + project.name)
         doc.add_paragraph("Client Name: " + project.client_name)
         doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n")
+        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -3382,11 +3667,39 @@ def save_pdf_report_AAA(request, project_id):
             self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
             self.set_font("DejaVu", "B", 14)
             self.cell(0, 10, f"Project Details", ln=True,) 
-            self.set_text_color(0, 0, 0)
+            
+            page_height = self.h
+            top_margin = self.t_margin
+            bottom_margin = self.b_margin
+
+            
+            lines = [
+                ("Project Name: ", "", 14, (0, 0, 0)),
+                (projectname, "", 14, (0, 0, 0)),
+                ("Client Name: ", "", 14, (0, 0, 0)),
+                (clientname, "", 14, (0, 0, 0)),
+                ("Capacity: ", "", 14, (0, 0, 0)),
+                (capacity, "", 14, (0, 0, 0)),
+            ]
+
+            
+            line_height = 16
+            total_content_height = line_height * len(lines)
+
+            
+            y_position = (page_height - total_content_height) / 2
+            self.set_y(y_position)
+
+            
+            for text, style, size, color in lines:
+                self.set_font("DejaVu", style, size)
+                self.set_text_color(*color)
+                self.cell(0, line_height, text, ln=True, align="C")
+            """ self.set_text_color(0, 0, 0)
             self.set_font("DejaVu", "", 12)
             self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
             self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
-            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+            self.cell(0, 10, f"Capacity: {capacity}", ln=True,)  """
 
         def header(self):
             # Logo
@@ -3648,11 +3961,39 @@ def save_pdf_report_BBB(request, project_id):
             self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
             self.set_font("DejaVu", "B", 14)
             self.cell(0, 10, f"Project Details", ln=True,) 
-            self.set_text_color(0, 0, 0)
+            
+            page_height = self.h
+            top_margin = self.t_margin
+            bottom_margin = self.b_margin
+
+            
+            lines = [
+                ("Project Name: ", "", 14, (0, 0, 0)),
+                (projectname, "", 14, (0, 0, 0)),
+                ("Client Name: ", "", 14, (0, 0, 0)),
+                (clientname, "", 14, (0, 0, 0)),
+                ("Capacity: ", "", 14, (0, 0, 0)),
+                (capacity, "", 14, (0, 0, 0)),
+            ]
+
+            
+            line_height = 16
+            total_content_height = line_height * len(lines)
+
+            
+            y_position = (page_height - total_content_height) / 2
+            self.set_y(y_position)
+
+            
+            for text, style, size, color in lines:
+                self.set_font("DejaVu", style, size)
+                self.set_text_color(*color)
+                self.cell(0, line_height, text, ln=True, align="C")
+            """ self.set_text_color(0, 0, 0)
             self.set_font("DejaVu", "", 12)
             self.cell(0, 10, f"Name:  {projectname}", ln=True,) 
             self.cell(0, 10, f"Client Name:  {clientname}", ln=True,) 
-            self.cell(0, 10, f"Capacity: {capacity}", ln=True,) 
+            self.cell(0, 10, f"Capacity: {capacity}", ln=True,)  """
 
         def header(self):
             # Logo
@@ -3702,15 +4043,15 @@ def save_pdf_report_BBB(request, project_id):
 
         def add_table(self, data):
             self.set_font("DejaVu", "B", 10)
-            self.set_fill_color(255, 153, 0)
+            self.set_fill_color(173, 216, 230)
             self.set_text_color(0)
-            self.cell(80, 8, "Field", border=1, fill=True)
-            self.cell(110, 8, "Value", border=1, ln=True, fill=True)
+            self.cell(80, 8, "Field", border=0, fill=True)
+            self.cell(110, 8, "Value", border=0, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
-                self.cell(80, 8, field, border=1)
-                self.cell(110, 8, value, border=1, ln=True)
+                self.cell(80, 8, field, border=0)
+                self.cell(110, 8, value, border=0, ln=True)
     
     
     try:
@@ -3892,3 +4233,27 @@ def save_pdf_report_BBB(request, project_id):
     except APP_Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
 
+
+
+def download_project_reports(request, project_id):
+
+    project = APP_Project.objects.get(id=project_id)
+    company_name = slugify(project.company.nameCompanies)
+    project_name = slugify(project.name)
+    folder_name = slugify(f"{project_id}_{company_name}_{project_name}")
+
+    folder_path = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_name, folder_name)
+
+    # In-memory zip
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                abs_path = os.path.join(root, file)
+                rel_path = os.path.relpath(abs_path, folder_path)
+                zip_file.write(abs_path, arcname=rel_path)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="{folder_name}_reports.zip"'
+    return response
