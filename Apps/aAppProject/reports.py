@@ -421,6 +421,8 @@ def word_calculation_report(request, project_id, logo, color):
         ###LOG
 
         aCompany = UserCompany.objects.get(user=request.user)
+        companyname=aCompany.company.nameCompanies
+        firstletter = companyname[0]
         project = APP_Project.objects.get(id=project_id)
         machines = modelcalc.objects.filter(project=project)
         
@@ -475,50 +477,67 @@ def word_calculation_report(request, project_id, logo, color):
             machine_name = machine.oSec00Field03
             section_titles = []
 
-            if machine_name == "NS":
+            if machine_name == f"NS_{firstletter}":
                 machine_name = "Manual Screen" 
-                section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == "MS":
+            if machine_name == f"MS_{firstletter}":
                 machine_name = "Mechanical Screen" 
-                section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == "BC":
+            if machine_name == f"BC_{firstletter}":
                 machine_name = "Belt Conveyor"
-                section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == "CO":
-                machine_name = "Container"
-                section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
+            if machine_name == f"CT_{firstletter}":
+                machine_name = "Circular Tanks	"
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == "GR":
+            if machine_name == f"GR_{firstletter}":
                 machine_name = "Gritremoval"
-                section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == "SS":
-                machine_name = "Sand Silo"
+            if machine_name == f"SC_{firstletter}":
+                machine_name = "Screw Conveyor"
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == "PS":
+            if machine_name == f"PS_{firstletter}":
                 machine_name = "Primary Sedimentation"
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == "QV":
-                machine_name = "Quick Valve"
+            if machine_name == f"MX_{firstletter}":
+                machine_name = "Rectangular Mixers"
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == "TV":
-                machine_name = "Telescopic Valve"
+            if machine_name == f"RT_{firstletter}":
+                machine_name = "Rectangular Tanks"
+                section_titles = ["Inputs", "Outputs"]
                 
-            if machine_name == "TH":
+            if machine_name == f"TH_{firstletter}":
                 machine_name = "Sludge Thickener"
+                section_titles = ["Inputs", "Outputs"]
+                
+            if machine_name == f"BS_{firstletter}":
+                machine_name = "Basket screens"
+                section_titles = ["Inputs", "Outputs"]
+                
+            if machine_name == f"PNch_{firstletter}":
+                machine_name = "Channel Penstocks"
+                section_titles = ["Inputs", "Outputs"]
+                
+            if machine_name == f"PNwa_{firstletter}":
+                machine_name = "Wall Penstocks"
+                section_titles = ["Inputs", "Outputs"]
 
             # Add machine title with font size 14 and numbering
             machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
             machine_title.runs[0].font.size = Pt(14)
 
-            for i in range(1, 11):  # Loop from Sec01 to Sec10
+            for i in range(1, 3):  # Loop from Sec01 to Sec02
                 section_name = f"Sec{i:02d}"
                 section_data = [("Field", "Value")]
 
-                for j in range(1, 21, 2):  # Step by 2 to avoid duplication
+                for j in range(1, 31, 2):  # Step by 2 to avoid duplication
                     key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
                     value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
 
@@ -822,12 +841,6 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
         # Add spacing after if needed
         para = doc.add_paragraph("\n")
         para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-        """ doc.add_paragraph("\n")
-        doc.add_paragraph("Name: " + project.name)
-        doc.add_paragraph("Client Name: " + project.client_name)
-        doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -1817,39 +1830,56 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
 
             if machine_name == f"NS_{firstletter}":
                 machine_name = "Manual Screen" 
-                section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
+                section_titles = ["Inputs", "Outputs"]
 
             if machine_name == f"MS_{firstletter}":
                 machine_name = "Mechanical Screen" 
-                section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
+                section_titles = ["Inputs", "Outputs"]
 
             if machine_name == f"BC_{firstletter}":
                 machine_name = "Belt Conveyor"
-                section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"CO_{firstletter}":
-                machine_name = "Container"
-                section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
+            if machine_name == f"CT_{firstletter}":
+                machine_name = "Circular Tanks	"
+                section_titles = ["Inputs", "Outputs"]
 
             if machine_name == f"GR_{firstletter}":
                 machine_name = "Gritremoval"
-                section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"SS_{firstletter}":
-                machine_name = "Sand Silo"
+            if machine_name == f"SC_{firstletter}":
+                machine_name = "Screw Conveyor"
+                section_titles = ["Inputs", "Outputs"]
 
             if machine_name == f"PS_{firstletter}":
                 machine_name = "Primary Sedimentation"
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"QV_{firstletter}":
-                machine_name = "Quick Valve"
+            if machine_name == f"MX_{firstletter}":
+                machine_name = "Rectangular Mixers"
+                section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"TV_{firstletter}":
-                machine_name = "Telescopic Valve"
+            if machine_name == f"RT_{firstletter}":
+                machine_name = "Rectangular Tanks"
+                section_titles = ["Inputs", "Outputs"]
                 
             if machine_name == f"TH_{firstletter}":
                 machine_name = "Sludge Thickener"
-
+                section_titles = ["Inputs", "Outputs"]
+                
+            if machine_name == f"BS_{firstletter}":
+                machine_name = "Basket screens"
+                section_titles = ["Inputs", "Outputs"]
+                
+            if machine_name == f"PNch_{firstletter}":
+                machine_name = "Channel Penstocks"
+                section_titles = ["Inputs", "Outputs"]
+                
+            if machine_name == f"PNwa_{firstletter}":
+                machine_name = "Wall Penstocks"
+                section_titles = ["Inputs", "Outputs"]
+            
             # Add machine title with font size 14 and numbering
             machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
             machine_title.runs[0].font.size = Pt(14)
@@ -1858,12 +1888,12 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
             pdf.add_page()
             pdf.colored_header(index, machine_name)
 
-            for i in range(1, 11):  # Loop from Sec01 to Sec10
+            for i in range(1, 3):  # Loop from Sec01 to Sec02
                 section_name = f"Sec{i:02d}"
                 section_data = [("Field", "Value")]
                 pdf_section_data = []
 
-                for j in range(1, 21, 2):  # Step by 2 to avoid duplication
+                for j in range(1, 31, 2):  # Step by 2 to avoid duplication
                     key = getattr(machine, f"o{section_name}Field{j:02d}", "").strip()
                     value = getattr(machine, f"o{section_name}Field{j+1:02d}", "").strip()
 
