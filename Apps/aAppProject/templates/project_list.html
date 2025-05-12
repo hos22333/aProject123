@@ -22,6 +22,9 @@
                             <div class="col-md-4 mb-3">
                                 {{ form.capacity }}
                             </div>
+                            <div class="col-md-12 mb-3">
+                                {{ form.cover_page_text }}
+                            </div>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary mt-2">Save</button>
@@ -46,7 +49,7 @@
                     <td>{{ project.client_name }}</td>
                     <td>
                         {% if project.last_saved_time %}
-                          {{ project.last_saved_time|date:"Y-m-d H:i:s" }}
+                          {{ project.last_saved_time|date:"Y-m-d H:i:s a" }}
                         {% else %}
                           Never
                         {% endif %}
@@ -67,7 +70,7 @@
                                     {% csrf_token %}
                                     <button type="submit" class="dropdown-item text-danger">Delete</button>
                                 </form>                    
-                                <button class="dropdown-item text-info" onclick="showDetails('{{ project.name }}', '{{ project.client_name }}', '{{ project.capacity }}')">Show All</button>
+                                <button class="dropdown-item text-info" onclick="showDetails('{{ project.name }}', '{{ project.client_name }}', '{{ project.capacity }}', '{{ project.cover_page_text }}')">Show All</button>
                                 <button class="dropdown-item text-success" onclick="reviewSubmittalMachines('{{ project.id }}')">Review Submittal Machines</button>
                                 <button class="dropdown-item text-success" onclick="reviewCalculationMachines('{{ project.id }}')">Review Calculation Machines</button>
                                 <a href="{% url 'generate_report' project.id %}" class="dropdown-item">Generate Submittal (Word file)</a>
@@ -117,6 +120,7 @@
                 <p><strong>Name:</strong> <span id="modalName"></span></p>
                 <p><strong>Client Name:</strong> <span id="modalClient"></span></p>
                 <p><strong>Capacity:</strong> <span id="modalCapacity"></span></p>
+                <p><strong>Cover Page Text:</strong> <span id="modalCoverPageText"></span></p>
             </div>
         </div>
     </div>
@@ -434,10 +438,11 @@
 
 
 <script>
-function showDetails(name, client, capacity) {
+function showDetails(name, client, capacity, coverpagetext) {
     document.getElementById('modalName').textContent = name;
     document.getElementById('modalClient').textContent = client;
     document.getElementById('modalCapacity').textContent = capacity;
+    document.getElementById('modalCoverPageText').textContent = coverpagetext;
     $('#detailsModal').modal('show');
 }
 </script>

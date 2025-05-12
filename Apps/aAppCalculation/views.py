@@ -377,7 +377,7 @@ def LoadPageCalculationSheet(request):
         aSection02Field12Show = "Hide"
     if form.fields['oSec02Field13'].initial in ["oooo", None , ""]:
         aSection02Field13Show = "Hide"
-    if form.fields['oSec01Field14'].initial in ["oooo", None , ""]:
+    if form.fields['oSec02Field14'].initial in ["oooo", None , ""]:
         aSection02Field14Show = "Hide"
     if form.fields['oSec02Field15'].initial in ["oooo", None , ""]:
         aSection02Field15Show = "Hide"
@@ -397,7 +397,7 @@ def LoadPageCalculationSheet(request):
         aSection02Field22Show = "Hide"
     if form.fields['oSec02Field23'].initial in ["oooo", None , ""]:
         aSection02Field23Show = "Hide"
-    if form.fields['oSec01Field24'].initial in ["oooo", None , ""]:
+    if form.fields['oSec02Field24'].initial in ["oooo", None , ""]:
         aSection02Field24Show = "Hide"
     if form.fields['oSec02Field25'].initial in ["oooo", None , ""]:
         aSection02Field25Show = "Hide"
@@ -623,6 +623,7 @@ def HandleCalculationSheetForm(request):
                 "BC_Friction": 'oSec01Field08',
                 "BC_Velocity": 'oSec01Field10',
                 "BC_FOS": 'oSec01Field12',
+                "BC_WPM": 'oSec01Field14',
             },
             "output_fields": {
                 "oSec02Field02": "BC_w",
@@ -1009,12 +1010,13 @@ def HandleCalculationSheetForm(request):
             
 
             # Initialize visibility dictionaries
-            aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Hide" for i in range(1, 21)}
+            aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
             aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Hide" for i in range(1, 21)}
             
             # Update visibility based on field counts
-            for i in range(1, len(input_fields)*2 + 1):
-                aSection01FieldShow[f"aSection01Field{str(i).zfill(2)}Show"] = "Yes"
+            for i in range(1, 31):
+                if form1.fields[f"oSec01Field{str(i).zfill(2)}"].initial in ["oooo", None , ""]:
+                    aSection01FieldShow[f"aSection01Field{str(i).zfill(2)}Show"] = "Hide"
             
             for i in range(1, len(output_fields)*2 + 1):
                 aSection02FieldShow[f"aSection02Field{str(i).zfill(2)}Show"] = "Yes"
@@ -1055,11 +1057,17 @@ def generate_report(request):
         # Determine the company and generate the corresponding report
         if aCompany.company.nameCompanies == "AAAA":
             print("Company 1")
-            return generate_report_AAA(request, project_id, sheet_key)
+            if project_id:
+                return generate_report_AAA(request, project_id, sheet_key)
+            else:
+                return generate_report_AAA(request, " ", sheet_key)
 
         elif aCompany.company.nameCompanies == "BBBB":
             print("Company 2")
-            return generate_report_BBB(request, project_id, sheet_key)
+            if project_id:
+                return generate_report_BBB(request, project_id, sheet_key)
+            else:
+                return generate_report_BBB(request, " ", sheet_key)
 
         else:
             return HttpResponse("Invalid company ID", status=400)
@@ -1206,12 +1214,18 @@ def generate_report_AAA(request, project_id, sheet_key):
             print(f"Warning: Unknown sheet_key '{sheet_key}'")
 
         aCompany = UserCompany.objects.get(user=request.user)
-        project = APP_Project.objects.get(id=project_id)
+        if project_id != " ":
+            project = APP_Project.objects.get(id=project_id)
+        else:
+            project = None
         form1 = FormCalculationSheet(form_type=form_type)
         
         
         print(aCompany.id)
-        print(project.id)
+        if project_id != " ":
+            print(project.id)
+        else:
+            print("No Project ID")
     
         print("Company 1")
     
@@ -1223,7 +1237,10 @@ def generate_report_AAA(request, project_id, sheet_key):
         add_header_footer(doc)
 
         # Add project title
-        doc.add_heading(f'Project Report: {project.name}', level=1)
+        if project != None:
+            doc.add_heading(f'Project Report: {project.name}', level=1)
+        else:
+            doc.add_heading(f'Project Report: None', level=1)
 
         # Add project details
         doc.add_heading("Project Details", level=2)     
@@ -1233,14 +1250,24 @@ def generate_report_AAA(request, project_id, sheet_key):
             para.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Centered content
-        lines = [
-            "Project Name: ",
-            project.name,
-            "Client Name: ",
-            project.client_name,
-            "Capacity: ",
-            project.capacity,
-        ]
+        if project != None:
+            lines = [
+                "Project Name: ",
+                project.name,
+                "Client Name: ",
+                project.client_name,
+                "Capacity: ",
+                project.capacity,
+            ]
+        else:
+            lines = [
+                "Project Name: ",
+                "None",
+                "Client Name: ",
+                "None",
+                "Capacity: ",
+                "None",
+            ]
 
         for line in lines:
             para = doc.add_paragraph()
@@ -1338,7 +1365,10 @@ def generate_report_AAA(request, project_id, sheet_key):
         
         # Save the document to a response
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+        if project != None:
+            response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+        else:
+            response['Content-Disposition'] = f'attachment; filename=None_report.docx'
         doc.save(response)
         return response
 
@@ -1495,12 +1525,18 @@ def generate_report_BBB(request, project_id, sheet_key):
             print(f"Warning: Unknown sheet_key '{sheet_key}'")
 
         aCompany = UserCompany.objects.get(user=request.user)
-        project = APP_Project.objects.get(id=project_id)
+        if project_id != " ":
+            project = APP_Project.objects.get(id=project_id)
+        else:
+            project = None
         form1 = FormCalculationSheet(form_type=form_type)
         
         
         print(aCompany.id)
-        print(project.id)
+        if project_id != " ":
+            print(project.id)
+        else:
+            print("No Project ID")
     
         print("Company 2")
     
@@ -1512,7 +1548,10 @@ def generate_report_BBB(request, project_id, sheet_key):
         add_header_footer(doc)
 
         # Add project title
-        doc.add_heading(f'Project Report: {project.name}', level=1)
+        if project != None:
+            doc.add_heading(f'Project Report: {project.name}', level=1)
+        else:
+            doc.add_heading(f'Project Report: None', level=1)
 
         # Add project details
         doc.add_heading("Project Details", level=2)     
@@ -1522,14 +1561,24 @@ def generate_report_BBB(request, project_id, sheet_key):
             para.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Centered content
-        lines = [
-            "Project Name: ",
-            project.name,
-            "Client Name: ",
-            project.client_name,
-            "Capacity: ",
-            project.capacity,
-        ]
+        if project != None:
+            lines = [
+                "Project Name: ",
+                project.name,
+                "Client Name: ",
+                project.client_name,
+                "Capacity: ",
+                project.capacity,
+            ]
+        else:
+            lines = [
+                "Project Name: ",
+                "None",
+                "Client Name: ",
+                "None",
+                "Capacity: ",
+                "None",
+            ]
 
         for line in lines:
             para = doc.add_paragraph()
@@ -1540,12 +1589,6 @@ def generate_report_BBB(request, project_id, sheet_key):
         # Add spacing after if needed
         para = doc.add_paragraph("\n")
         para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-        """ doc.add_paragraph("\n")
-        doc.add_paragraph("Name: " + project.name)
-        doc.add_paragraph("Client Name: " + project.client_name)
-        doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -1616,7 +1659,10 @@ def generate_report_BBB(request, project_id, sheet_key):
 
         # Save the document to a response
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+        if project != None:
+            response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+        else:
+            response['Content-Disposition'] = f'attachment; filename=None_report.docx'
         doc.save(response)
         return response
 
@@ -1895,7 +1941,7 @@ def DeleteCalcMachine(request, machine_id):
         aSection02Field12Show = "Hide"
     if form.fields['oSec02Field13'].initial in ["oooo", None , ""]:
         aSection02Field13Show = "Hide"
-    if form.fields['oSec01Field14'].initial in ["oooo", None , ""]:
+    if form.fields['oSec02Field14'].initial in ["oooo", None , ""]:
         aSection02Field14Show = "Hide"
     if form.fields['oSec02Field15'].initial in ["oooo", None , ""]:
         aSection02Field15Show = "Hide"
@@ -1915,7 +1961,7 @@ def DeleteCalcMachine(request, machine_id):
         aSection02Field22Show = "Hide"
     if form.fields['oSec02Field23'].initial in ["oooo", None , ""]:
         aSection02Field23Show = "Hide"
-    if form.fields['oSec01Field24'].initial in ["oooo", None , ""]:
+    if form.fields['oSec02Field24'].initial in ["oooo", None , ""]:
         aSection02Field24Show = "Hide"
     if form.fields['oSec02Field25'].initial in ["oooo", None , ""]:
         aSection02Field25Show = "Hide"
@@ -2302,10 +2348,16 @@ def generate_saved_report_AAA(request, machine_id):
 
         aCompany = UserCompany.objects.get(user=request.user)
         machine = get_object_or_404(modelcalc, id=machine_id)
-        project = APP_Project.objects.get(name=machine.project.name)
+        if machine.project:
+            project = APP_Project.objects.get(name=machine.project.name)
+        else:
+            project = None
         
         print(aCompany.id)
-        print(project.id)
+        if project != None:
+            print(project.id)
+        else:
+            print("No Project ID")
     
         print("Company 1")
 
@@ -2332,7 +2384,10 @@ def generate_saved_report_AAA(request, machine_id):
         add_header_footer(doc)
 
         # Add project title
-        doc.add_heading(f'Project Report: {project.name}', level=1)
+        if project != None:
+            doc.add_heading(f'Project Report: {project.name}', level=1)
+        else:
+            doc.add_heading(f'Project Report: None', level=1)
 
         # Add project details
         doc.add_heading("Project Details", level=2)     
@@ -2342,14 +2397,24 @@ def generate_saved_report_AAA(request, machine_id):
             para.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Centered content
-        lines = [
-            "Project Name: ",
-            project.name,
-            "Client Name: ",
-            project.client_name,
-            "Capacity: ",
-            project.capacity,
-        ]
+        if project != None:
+            lines = [
+                "Project Name: ",
+                project.name,
+                "Client Name: ",
+                project.client_name,
+                "Capacity: ",
+                project.capacity,
+            ]
+        else:
+            lines = [
+                "Project Name: ",
+                "None",
+                "Client Name: ",
+                "None",
+                "Capacity: ",
+                "None",
+            ]
 
         for line in lines:
             para = doc.add_paragraph()
@@ -2360,12 +2425,6 @@ def generate_saved_report_AAA(request, machine_id):
         # Add spacing after if needed
         para = doc.add_paragraph("\n")
         para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-        """  doc.add_paragraph("\n")
-        doc.add_paragraph("Name: " + project.name)
-        doc.add_paragraph("Client Name: " + project.client_name)
-        doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -2436,7 +2495,10 @@ def generate_saved_report_AAA(request, machine_id):
         
         # Save the document to a response
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+        if project != None:
+            response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+        else:
+            response['Content-Disposition'] = f'attachment; filename=None_report.docx'
         doc.save(response)
         return response
 
@@ -2581,11 +2643,17 @@ def generate_saved_report_BBB(request, machine_id):
 
         aCompany = UserCompany.objects.get(user=request.user)
         machine = get_object_or_404(modelcalc, id=machine_id)
-        project = APP_Project.objects.get(name=machine.project.name)
+        if machine.project:
+            project = APP_Project.objects.get(name=machine.project.name)
+        else:
+            project = None
         
         
         print(aCompany.id)
-        print(project.id)
+        if project != None:
+            print(project.id)
+        else:
+            print("No Project ID")
     
         print("Company 2")
 
@@ -2612,7 +2680,10 @@ def generate_saved_report_BBB(request, machine_id):
         add_header_footer(doc)
 
         # Add project title
-        doc.add_heading(f'Project Report: {project.name}', level=1)
+        if project != None:
+            doc.add_heading(f'Project Report: {project.name}', level=1)
+        else:
+            doc.add_heading(f'Project Report: None', level=1)
 
         # Add project details
         doc.add_heading("Project Details", level=2)     
@@ -2622,14 +2693,24 @@ def generate_saved_report_BBB(request, machine_id):
             para.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Centered content
-        lines = [
-            "Project Name: ",
-            project.name,
-            "Client Name: ",
-            project.client_name,
-            "Capacity: ",
-            project.capacity,
-        ]
+        if project != None:
+            lines = [
+                "Project Name: ",
+                project.name,
+                "Client Name: ",
+                project.client_name,
+                "Capacity: ",
+                project.capacity,
+            ]
+        else:
+            lines = [
+                "Project Name: ",
+                "None",
+                "Client Name: ",
+                "None",
+                "Capacity: ",
+                "None",
+            ]
 
         for line in lines:
             para = doc.add_paragraph()
@@ -2640,12 +2721,6 @@ def generate_saved_report_BBB(request, machine_id):
         # Add spacing after if needed
         para = doc.add_paragraph("\n")
         para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-        """ doc.add_paragraph("\n")
-        doc.add_paragraph("Name: " + project.name)
-        doc.add_paragraph("Client Name: " + project.client_name)
-        doc.add_paragraph("Capacity: " + project.capacity)
-        doc.add_paragraph("\n") """
         
         doc.add_page_break()     
         doc.add_paragraph("\n")
@@ -2716,7 +2791,10 @@ def generate_saved_report_BBB(request, machine_id):
 
         # Save the document to a response
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+        if project != None:
+            response['Content-Disposition'] = f'attachment; filename={project.name}_report.docx'
+        else:
+            response['Content-Disposition'] = f'attachment; filename=None_report.docx'
         doc.save(response)
         return response
 
