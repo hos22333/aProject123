@@ -34,10 +34,13 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 {{ form.nameDXF }}
-                            </div>  
+                            </div>   
                             <div class="col-md-4 mb-3">
                                 {{ form.nameFullDrawing }}
                             </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.order }}
+                            </div> 
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary mt-2">Save Machine</button>
@@ -52,6 +55,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>Order</th>
                         <th>key Value</th>
                         <th>Form Name</th>
                         <th>Calculation Form Name</th>
@@ -67,6 +71,7 @@
                     {% for machine in machines %}
                         <tr>
                             <td>{{ forloop.counter }}</td>
+                            <td>{{ machine.order }}</td>
                             <td>{{ machine.keyValue }}</td>
                             <td>{{ machine.nameForm }}</td>
                             <td>{{ machine.nameFormCalcXX }}</td>

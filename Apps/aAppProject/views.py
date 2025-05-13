@@ -77,7 +77,7 @@ def project_list(request):
             
             
             try:
-                theproject = APP_Project.objects.get(name = instance.name)
+                theproject = APP_Project.objects.get(id = instance.id)
             except APP_Project.DoesNotExist:
                 print(f"Skipping project '{project_name}' : not found in APP_Project.")
             

@@ -106,7 +106,7 @@ def LoadPageCalculationSheet(request):
 
     print(user_company)
 
-    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company).order_by('nameMachine')
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company).order_by('order')
 
     sheet_key = None
 
@@ -569,7 +569,7 @@ def HandleCalculationSheetForm(request):
 
     print(user_company)
 
-    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company).order_by('nameMachine')
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company).order_by('order')
     
 
 
@@ -1680,7 +1680,7 @@ def DeleteCalcMachine(request, machine_id):
 
     print(user_company)
 
-    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company).order_by('nameMachine')
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company).order_by('order')
 
     #Define Retrieve values from AddMachine model
     try:

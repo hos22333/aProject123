@@ -472,7 +472,7 @@ def add_machine(request):
         form = MachineForm()
 
     # Fetch all current roles
-    machines = AddMachine.objects.filter(company=user_company)
+    machines = AddMachine.objects.filter(company=user_company).order_by('order')
 
     return render(request, 'machine_list.html', {'form': form, 'machines': machines})
 
