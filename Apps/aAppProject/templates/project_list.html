@@ -33,6 +33,7 @@
         </form>
         
         <h3 class="mt-4">Projects List</h3>
+        <div id="saveStatus" style="margin-top:10px; font-weight:bold;"></div>
         <table class="table table-bordered mt-2">
             <thead>
                 <tr>
@@ -70,12 +71,13 @@
                                     {% csrf_token %}
                                     <button type="submit" class="dropdown-item text-danger">Delete</button>
                                 </form>                    
-                                <button class="dropdown-item text-info" onclick="showDetails('{{ project.name }}', '{{ project.client_name }}', '{{ project.capacity }}', '{{ project.cover_page_text }}')">Show All</button>
+                                <button class="dropdown-item text-info" onclick="showDetails('{{ project.name|escapejs }}', '{{ project.client_name|escapejs }}', '{{ project.capacity|escapejs }}', '{{ project.cover_page_text|escapejs }}')">Show All</button>
                                 <button class="dropdown-item text-success" onclick="reviewSubmittalMachines('{{ project.id }}')">Review Submittal Machines</button>
                                 <button class="dropdown-item text-success" onclick="reviewCalculationMachines('{{ project.id }}')">Review Calculation Machines</button>
                                 <a href="{% url 'generate_report' project.id %}" class="dropdown-item">Generate Submittal (Word file)</a>
                                 <a href="{% url 'generate_calculation_report' project.id %}" class="dropdown-item">Generate Calcualtion (Word file)</a>
-                                <a href="{% url 'save_reports' project.id %}" class="dropdown-item">Save Reports</a>
+                                <!-- <a href="{% url 'save_reports' project.id %}" class="dropdown-item">Save Reports</a> -->
+                                <button class="saveReportsBtn dropdown-item" data-url="{% url 'save_reports' project.id %}">Save Reports</button>
                                 <a href="{% url 'download_project_reports' project.id %}" class="dropdown-item"> Download All Reports (ZIP) </a>
                               </li>
                             </ul>
@@ -442,7 +444,7 @@ function showDetails(name, client, capacity, coverpagetext) {
     document.getElementById('modalName').textContent = name;
     document.getElementById('modalClient').textContent = client;
     document.getElementById('modalCapacity').textContent = capacity;
-    document.getElementById('modalCoverPageText').textContent = coverpagetext;
+    document.getElementById('modalCoverPageText').innerHTML = coverpagetext.replace(/\n/g, "<br>");
     $('#detailsModal').modal('show');
 }
 </script>
@@ -2320,6 +2322,28 @@ function showDetails(name, client, capacity, coverpagetext) {
 
 
 
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.saveReportsBtn').on('click', function (e) {
+            e.preventDefault();
+            let url = $(this).data('url');
+            $('#saveStatus').text('Saving reports... Please wait.');
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function () {
+                    $('#saveStatus').text('Reports saved successfully!');
+                },
+                error: function () {
+                    $('#saveStatus').text('An error occurred while saving reports.');
+                }
+            });
+        });
+    });
 </script>
 
 {% endblock %}

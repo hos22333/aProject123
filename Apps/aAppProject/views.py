@@ -410,18 +410,22 @@ def save_reports(request, project_id):
             save_pdf_report(request, project_id)
             project.last_saved_time = now()
             project.save()
-            return HttpResponse(status=204)
+            return JsonResponse({'message': 'Reports saved successfully!'}, status=200)
+            #return HttpResponse(status=204)
 
         else:
-            return HttpResponse("Invalid company ID", status=400)
+            return JsonResponse({'error': 'Invalid company ID'}, status=400)
+            #return HttpResponse("Invalid company ID", status=400)
         
         
 
     except UserCompany.DoesNotExist:
-        return HttpResponse("User does not belong to a company", status=403)
+        return JsonResponse({'error': 'User does not belong to a company'}, status=403)
+        #return HttpResponse("User does not belong to a company", status=403)
 
     except APP_Project.DoesNotExist:
-        return HttpResponse("Project not found", status=404)
+        return JsonResponse({'error': 'Project not found'}, status=404)
+        #return HttpResponse("Project not found", status=404)
 
 
 def save_submittal_report(request, project_id):

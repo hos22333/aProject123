@@ -52,7 +52,7 @@ def LoadPageDataSheet(request):
 
     print(user_company)
 
-    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None").filter(company=user_company)
+    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None").exclude(nameForm__exact="No").filter(company=user_company).order_by('nameMachine')
 
     sheet_key = None
     
@@ -301,7 +301,7 @@ def SavePageDataSheet(request):
         except UserCompany.DoesNotExist:
             user_company = None
 
-    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None").filter(company=user_company)
+    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None").exclude(nameForm__exact="No").filter(company=user_company).order_by('nameMachine')
 
     #Define Retrieve values from AddMachine model
     try:
@@ -602,7 +602,7 @@ def DeleteMachine(request, machine_id):
 
     print(user_company)
 
-    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None").filter(company=user_company)
+    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None").exclude(nameForm__exact="No").filter(company=user_company).order_by('nameMachine')
 
     #Define Retrieve values from AddMachine model
     try:

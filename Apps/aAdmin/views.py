@@ -97,15 +97,15 @@ def delete_role(request, role_id):
 # Edit Role
 def edit_role(request, role_id):
     role = get_object_or_404(Role, id=role_id)
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Editing the Role >>> {role.name} "
-    )
-
+    old_name = role.name
     if request.method == 'POST':
         form = RoleForm(request.POST, instance=role)
         if form.is_valid():
             form.save()
+            aLogEntry.objects.create(
+                user=request.user,
+                message=f"{request.user} Editing the Role >>> {old_name} to >>> {request.POST.get("name")} "
+            )
             return redirect('create_role')  # Redirect back to the main page
     else:
         form = RoleForm(instance=role)
@@ -398,15 +398,16 @@ def delete_company(request, company_id):
 # Edit Company
 def edit_company(request, company_id):
     company = get_object_or_404(Companies, id=company_id)
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Edited the Company>>> {company.nameCompanies} "
-    )
+    old_company = company.nameCompanies
 
     if request.method == 'POST':
         form = CompanyForm(request.POST, instance=company)
         if form.is_valid():
             form.save()
+            aLogEntry.objects.create(
+                user=request.user,
+                message=f"{request.user} Edited the Company>>> {old_company} to >>> {request.POST.get("nameCompanies")} "
+            )
             return redirect('add_company')  # Redirect back to the main page
     else:
         form = CompanyForm(instance=company)

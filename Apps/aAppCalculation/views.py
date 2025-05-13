@@ -106,7 +106,7 @@ def LoadPageCalculationSheet(request):
 
     print(user_company)
 
-    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company)
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company).order_by('nameMachine')
 
     sheet_key = None
 
@@ -569,7 +569,7 @@ def HandleCalculationSheetForm(request):
 
     print(user_company)
 
-    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company)
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company).order_by('nameMachine')
     
 
 
@@ -1279,23 +1279,6 @@ def generate_report_AAA(request, project_id, sheet_key):
         para = doc.add_paragraph("\n")
         para.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        """ para = doc.add_paragraph("\n")
-        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
-        para = doc.add_paragraph("Project Name: ")
-        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
-        para = doc.add_paragraph(project.name)
-        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
-        para = doc.add_paragraph("Client Name: ")
-        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
-        para = doc.add_paragraph(project.client_name)
-        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
-        para = doc.add_paragraph("Capacity: ")
-        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
-        para = doc.add_paragraph(project.capacity)
-        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
-        para = doc.add_paragraph("\n")
-        para .alignment = WD_ALIGN_PARAGRAPH.CENTER
-         """
         doc.add_page_break()     
         doc.add_paragraph("\n")
 
@@ -1697,7 +1680,7 @@ def DeleteCalcMachine(request, machine_id):
 
     print(user_company)
 
-    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").filter(company=user_company)
+    sheet_keys = AddMachine.objects.exclude(nameFormCalcXX__isnull=True).exclude(nameFormCalcXX__exact="None").exclude(nameFormCalcXX__exact="No").filter(company=user_company).order_by('nameMachine')
 
     #Define Retrieve values from AddMachine model
     try:
