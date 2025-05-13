@@ -33,7 +33,7 @@
         </form>
         
         <h3 class="mt-4">Projects List</h3>
-        <div id="saveStatus" style="margin-top:10px; font-weight:bold;"></div>
+        <div id="saveStatus" style="margin-top:10px; font-weight:bold; "></div>
         <table class="table table-bordered mt-2">
             <thead>
                 <tr>
@@ -2330,16 +2330,19 @@ function showDetails(name, client, capacity, coverpagetext) {
         $('.saveReportsBtn').on('click', function (e) {
             e.preventDefault();
             let url = $(this).data('url');
-            $('#saveStatus').text('Saving reports... Please wait.');
+            $('#saveStatus').html(`
+                <span class="spinner-border spinner-border-sm text-primary me-2" role="status" aria-hidden="true"></span>
+                Saving reports... Please wait.
+            `);
 
             $.ajax({
                 url: url,
                 method: 'GET',
                 success: function () {
-                    $('#saveStatus').text('Reports saved successfully!');
+                    $('#saveStatus').html('<span class="text-success">Reports saved successfully</span>');
                 },
                 error: function () {
-                    $('#saveStatus').text('An error occurred while saving reports.');
+                    $('#saveStatus').html('<span class="text-danger">An error occurred while saving reports.</span>');
                 }
             });
         });
