@@ -13,7 +13,7 @@ class AddMachine(models.Model):
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
     nameDXF     = models.CharField(max_length=255, null=True, blank=True)
     nameFullDrawing     = models.CharField(max_length=255, null=True, blank=True)
-    order = models.CharField(max_length=255, null=True, blank=True)
+    order = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.nameMachine

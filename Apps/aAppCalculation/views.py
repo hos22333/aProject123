@@ -412,6 +412,7 @@ def LoadPageCalculationSheet(request):
     if form.fields['oSec02Field30'].initial in ["oooo", None , ""]:
         aSection02Field30Show = "Hide"
     
+
     print(aSection01Field01Show)
     print(aSection01Field02Show)
     print(aSection01Field03Show)
@@ -1010,16 +1011,17 @@ def HandleCalculationSheetForm(request):
             
 
             # Initialize visibility dictionaries
-            aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-            aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Hide" for i in range(1, 21)}
+            aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 31)}
+            aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 31)}
             
             # Update visibility based on field counts
             for i in range(1, 31):
                 if form1.fields[f"oSec01Field{str(i).zfill(2)}"].initial in ["oooo", None , ""]:
                     aSection01FieldShow[f"aSection01Field{str(i).zfill(2)}Show"] = "Hide"
             
-            for i in range(1, len(output_fields)*2 + 1):
-                aSection02FieldShow[f"aSection02Field{str(i).zfill(2)}Show"] = "Yes"
+            for i in range(1, 31):
+                if form1.fields[f"oSec02Field{str(i).zfill(2)}"].initial in ["oooo", None , ""]:
+                    aSection02FieldShow[f"aSection02Field{str(i).zfill(2)}Show"] = "Hide"
             
             
             
@@ -1236,14 +1238,6 @@ def generate_report_AAA(request, project_id, sheet_key):
         # Add header and footer with page numbers
         add_header_footer(doc)
 
-        # Add project title
-        if project != None:
-            doc.add_heading(f'Project Report: {project.name}', level=1)
-        else:
-            doc.add_heading(f'Project Report: None', level=1)
-
-        # Add project details
-        doc.add_heading("Project Details", level=2)     
 
         for _ in range(7):  # Adjust this number based on how centered you want it
             para = doc.add_paragraph()
@@ -1530,14 +1524,6 @@ def generate_report_BBB(request, project_id, sheet_key):
         # Add header and footer with page numbers
         add_header_footer(doc)
 
-        # Add project title
-        if project != None:
-            doc.add_heading(f'Project Report: {project.name}', level=1)
-        else:
-            doc.add_heading(f'Project Report: None', level=1)
-
-        # Add project details
-        doc.add_heading("Project Details", level=2)     
 
         for _ in range(7):  # Adjust this number based on how centered you want it
             para = doc.add_paragraph()
@@ -2366,14 +2352,6 @@ def generate_saved_report_AAA(request, machine_id):
         # Add header and footer with page numbers
         add_header_footer(doc)
 
-        # Add project title
-        if project != None:
-            doc.add_heading(f'Project Report: {project.name}', level=1)
-        else:
-            doc.add_heading(f'Project Report: None', level=1)
-
-        # Add project details
-        doc.add_heading("Project Details", level=2)     
 
         for _ in range(7):  # Adjust this number based on how centered you want it
             para = doc.add_paragraph()
@@ -2662,14 +2640,6 @@ def generate_saved_report_BBB(request, machine_id):
         # Add header and footer with page numbers
         add_header_footer(doc)
 
-        # Add project title
-        if project != None:
-            doc.add_heading(f'Project Report: {project.name}', level=1)
-        else:
-            doc.add_heading(f'Project Report: None', level=1)
-
-        # Add project details
-        doc.add_heading("Project Details", level=2)     
 
         for _ in range(7):  # Adjust this number based on how centered you want it
             para = doc.add_paragraph()

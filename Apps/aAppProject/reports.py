@@ -189,12 +189,6 @@ def word_submittal_report(request, project_id, logo, color):
         # Add header and footer with page numbers
         add_header_footer(doc)
 
-        # Add project title
-        doc.add_heading(f'Project Report: {project.name}', level=1)
-
-        # Add project details
-        doc.add_heading("Project Details", level=2)     
-
         for _ in range(3):  # Adjust this number based on how centered you want it
             para = doc.add_paragraph()
             para.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -438,12 +432,6 @@ def word_calculation_report(request, project_id, logo, color):
 
         # Add header and footer with page numbers
         add_header_footer(doc)
-
-        # Add project title
-        doc.add_heading(f'Project Report: {project.name}', level=1)
-
-        # Add project details
-        doc.add_heading("Project Details", level=2)     
 
         for _ in range(4):  # Adjust this number based on how centered you want it
             para = doc.add_paragraph()
@@ -692,11 +680,7 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
 
         def header_footer(self, projectname, clientname, capacity):
             self.set_y(50)
-            self.set_font("DejaVu", "B", 16)
-            self.set_text_color(33, 66, 133)
-            self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
-            self.set_font("DejaVu", "B", 14)
-            self.cell(0, 10, f"Project Details", ln=True,) 
+            
             
             page_height = self.h
             top_margin = self.t_margin
@@ -810,13 +794,7 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
         pdf.alias_nb_pages()  # Important for "of {nb}" to work
         pdf.add_page()
 
-        # Add project title
-        doc.add_heading(f'Project Report: {project.name}', level=1)
-
-        pdf.header_footer(project.name,  project.client_name, project.capacity)
-
-        # Add project details
-        doc.add_heading("Project Details", level=2)     
+        pdf.header_footer(project.name,  project.client_name, project.capacity) 
 
         for _ in range(4):  # Adjust this number based on how centered you want it
             para = doc.add_paragraph()
@@ -956,7 +934,7 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
         return HttpResponse("Project not found", status=404)
 
 
-def convert_dxf_to_pdf_cloudconvert(input_path, output_path):
+""" def convert_dxf_to_pdf_cloudconvert(input_path, output_path):
     cloudconvert.configure(api_key="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZGViYWJiNGMzMjI3ZTA5YjgyYTUyZDI2NWY3ZTAxNmNhZjg2NWQ5MDRjYWIyMGEzMDYxN2I3MTlmYmYwMjZjYTZiODgxMmM5MDlkZmI4NzYiLCJpYXQiOjE3NDU2NzI2MTIuMjg2MTI2LCJuYmYiOjE3NDU2NzI2MTIuMjg2MTI3LCJleHAiOjQ5MDEzNDYyMTIuMjgxMjYxLCJzdWIiOiI3MTc0ODg5NyIsInNjb3BlcyI6WyJ1c2VyLnJlYWQiLCJ1c2VyLndyaXRlIiwidGFzay5yZWFkIiwidGFzay53cml0ZSIsIndlYmhvb2sucmVhZCIsIndlYmhvb2sud3JpdGUiLCJwcmVzZXQucmVhZCIsInByZXNldC53cml0ZSJdfQ.DGh70qP2W1ofilMBqzP_IkmqGvHpfiIn0jQou3w2gRpU2-gjz6CPlsxhhx6qLQ8EaYrQXHr_PCIwHR-m4sBbfNhKQ7N_gQ8j-dyZchk9GAj5I_uIHVLOwR-zQsmV-fNKVA55YG2n8Wy-PeV8rw7lP92a01vdgoK-sfyc-i4OjuhtlID7HuxB7p-yf6jya6EHY_gp_9NzeR_4RVRbIJkgejTXKVrTErs-6rTy-YruFzIkZev_w8ekryRzNv1Q0qm8rTAyTw-Pi3cmwFw4bbuLoiAxxOVG1K5JPqbPO2QVMn4-sgll3VIZwWvAQq-XhvMlf3AF5qMcDsCE-I1RcBcAg-Hr-_D-HjyHUB3Y63GYt2FRCw1OnwQ6ug4t9xrNcwiZOOdPrASpRlK0KN3S6pRG77lVM9rPCTu-khjG9B6b20ws8K0FmmiZBS7XxhPR94F1srD3K47LLPBW8OaAZFmiRdexa-cELxhPj1_VVYbNS5AazpjOCGkhiRbSO4KJEGr5fNFezUFqcLilyIM7TXBuwa5Oykoetx5McmCSJ8XgRwca1fCSmHXmY0VN8aczAwoKes4N8j5BMscJ1qq4v3FesXLP7hZunc08DFnYZAk3jZjddzfZPzzS84xQIVLsVGDw-Ig9T4LZdiJpDi5vaxv7m10nTan_IAOMhjGmIEw0FrQ", sandbox=False)
 
     job = cloudconvert.Job.create(payload={
@@ -1005,7 +983,50 @@ def convert_dxf_to_pdf_cloudconvert(input_path, output_path):
 
     response = requests.get(file_url)
     with open(output_path, 'wb') as f:
-        f.write(response.content)
+        f.write(response.content) """
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+from ezdxf import recover
+from ezdxf.addons.drawing import matplotlib as ezdxf_matplotlib
+from ezdxf.addons.drawing import Frontend, RenderContext
+
+def convert_dxf_to_pdf_ezdxf(input_path, output_path):
+    try:
+        # Recover document safely
+        doc, auditor = recover.readfile(input_path)
+        if auditor.has_errors:
+            print("Warning: The DXF file has some errors.")
+
+        # Create matplotlib figure and axis
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.add_axes([0, 0, 1, 1])
+        ax.set_axis_off()
+
+        # Set up drawing context and backend
+        ctx = RenderContext(doc)
+        backend = ezdxf_matplotlib.MatplotlibBackend(ax)
+        frontend = Frontend(ctx, backend)
+
+        # Draw modelspace
+        frontend.draw_layout(doc.modelspace())
+        # Autoscale to fit the drawing
+        ax.autoscale()
+
+        # Save figure
+        fig.savefig(output_path, dpi=300, bbox_inches='tight', pad_inches=0)
+        plt.close(fig)
+
+        print(f"PDF successfully saved to {output_path}")
+
+    except Exception as e:
+        print(f"Error converting DXF to PDF: {e}")
+        raise
+
+
+
 
 
 # Helper function to define DXF paths
@@ -1086,13 +1107,20 @@ def process_saved_dxf(request, aMachine_ID, category, project_id, modifications,
     pdf_output_path = modified_path.replace(".dxf", ".pdf")
 
     try:
+        convert_dxf_to_pdf_ezdxf(modified_path, pdf_output_path)
+        print(f"PDF saved to {pdf_output_path}")
+    except Exception as e:
+        print("DXF to PDF conversion failed:", e)
+        return HttpResponse("DXF to PDF conversion failed", status=500)
+
+    """ try:
         convert_dxf_to_pdf_cloudconvert(modified_path, pdf_output_path)
         print(f"PDF saved to {pdf_output_path}")
     except Exception as e:
         print("DXF to PDF conversion failed:", e)
         return HttpResponse("DXF to PDF conversion failed", status=500)
 
-    return FileResponse(open(pdf_output_path, 'rb'), as_attachment=True, filename=os.path.basename(pdf_output_path))
+    return FileResponse(open(pdf_output_path, 'rb'), as_attachment=True, filename=os.path.basename(pdf_output_path)) """
 
 
 # DXF Download Views
@@ -1670,11 +1698,6 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
 
         def header_footer(self, projectname, clientname, capacity):
             self.set_y(50)
-            self.set_font("DejaVu", "B", 16)
-            self.set_text_color(33, 66, 133)
-            self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
-            self.set_font("DejaVu", "B", 14)
-            self.cell(0, 10, f"Project Details", ln=True,) 
             
             page_height = self.h
             top_margin = self.t_margin
@@ -1788,13 +1811,7 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
         pdf.alias_nb_pages()  # Important for "of {nb}" to work
         pdf.add_page()
 
-        # Add project title
-        doc.add_heading(f'Project Report: {project.name}', level=1)
-
         pdf.header_footer(project.name,  project.client_name, project.capacity)
-
-        # Add project details
-        doc.add_heading("Project Details", level=2)     
 
         for _ in range(4):  # Adjust this number based on how centered you want it
             para = doc.add_paragraph()
@@ -1952,11 +1969,6 @@ def save_all_pdf_report(request, project_id, logo):
 
         def header_page(self, projectname, clientname, capacity):
             self.set_y(50)
-            self.set_font("DejaVu", "B", 16)
-            self.set_text_color(33, 66, 133)
-            self.cell(0, 20, f"Project Report: {projectname}", ln=True,) 
-            self.set_font("DejaVu", "B", 14)
-            self.cell(0, 10, f"Project Details", ln=True,) 
             
             page_height = self.h
             top_margin = self.t_margin
