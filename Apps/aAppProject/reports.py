@@ -29,6 +29,15 @@ from io import BytesIO
 import os
 import ezdxf
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+from ezdxf import recover
+from ezdxf.addons.drawing import Frontend, RenderContext
+from ezdxf.addons.drawing import matplotlib as ezdxf_matplotlib
+
+
 from docx import Document
 from docx.shared import Pt, RGBColor
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT,  WD_ALIGN_PARAGRAPH
@@ -173,6 +182,7 @@ def word_submittal_report(request, project_id, logo, color):
         ###LOG
 
         aCompany = UserCompany.objects.get(user=request.user)
+        company_id = aCompany.company
         project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
         
@@ -219,6 +229,15 @@ def word_submittal_report(request, project_id, logo, color):
         # Add machine details
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
+            machine_DB = machine.oSec00Field03
+            
+            try:
+                themachines = AddMachine.objects.get(nameDB=machine_DB, company=company_id)
+            except AddMachine.DoesNotExist:
+                print(f"Skipping machine '{machine_DB}' for company ID {company_id}: not found in AddMachine.")
+                continue  # Skip this machine and continue with the rest
+            
+            themachinename = themachines.nameMachine
             section_titles = []
 
             if machine_name == "DataSheetNS":
@@ -257,7 +276,7 @@ def word_submittal_report(request, project_id, logo, color):
                 machine_name = "Sludge Thickener"
 
             # Add machine title with font size 14 and numbering
-            machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
+            machine_title = doc.add_paragraph(f"{index}. {themachinename}", style="Heading3")
             machine_title.runs[0].font.size = Pt(14)
 
             for i in range(1, 11):  # Loop from Sec01 to Sec10
@@ -836,6 +855,7 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
                 continue  # Skip this machine and continue with the rest
             
             sheet_key = themachines.keyValue
+            themachinename = themachines.nameMachine
             General_saved_DXF_ALL(request, machine_ID, sheet_key, project_id)
             SavedFullDrawing(request, machine_ID, sheet_key)
 
@@ -879,12 +899,12 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
                 machine_name = "Sludge Thickener"
 
             # Add machine title with font size 14 and numbering
-            machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
+            machine_title = doc.add_paragraph(f"{index}. {themachinename}", style="Heading3")
             machine_title.runs[0].font.size = Pt(14)
             
             pdf.alias_nb_pages()  # Important for "of {nb}" to work
             pdf.add_page()
-            pdf.colored_header(index, machine_name)
+            pdf.colored_header(index, themachinename)
 
             for i in range(1, 11):  # Loop from Sec01 to Sec10
                 section_name = f"Sec{i:02d}"
@@ -934,99 +954,22 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
         return HttpResponse("Project not found", status=404)
 
 
-""" def convert_dxf_to_pdf_cloudconvert(input_path, output_path):
-    cloudconvert.configure(api_key="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZGViYWJiNGMzMjI3ZTA5YjgyYTUyZDI2NWY3ZTAxNmNhZjg2NWQ5MDRjYWIyMGEzMDYxN2I3MTlmYmYwMjZjYTZiODgxMmM5MDlkZmI4NzYiLCJpYXQiOjE3NDU2NzI2MTIuMjg2MTI2LCJuYmYiOjE3NDU2NzI2MTIuMjg2MTI3LCJleHAiOjQ5MDEzNDYyMTIuMjgxMjYxLCJzdWIiOiI3MTc0ODg5NyIsInNjb3BlcyI6WyJ1c2VyLnJlYWQiLCJ1c2VyLndyaXRlIiwidGFzay5yZWFkIiwidGFzay53cml0ZSIsIndlYmhvb2sucmVhZCIsIndlYmhvb2sud3JpdGUiLCJwcmVzZXQucmVhZCIsInByZXNldC53cml0ZSJdfQ.DGh70qP2W1ofilMBqzP_IkmqGvHpfiIn0jQou3w2gRpU2-gjz6CPlsxhhx6qLQ8EaYrQXHr_PCIwHR-m4sBbfNhKQ7N_gQ8j-dyZchk9GAj5I_uIHVLOwR-zQsmV-fNKVA55YG2n8Wy-PeV8rw7lP92a01vdgoK-sfyc-i4OjuhtlID7HuxB7p-yf6jya6EHY_gp_9NzeR_4RVRbIJkgejTXKVrTErs-6rTy-YruFzIkZev_w8ekryRzNv1Q0qm8rTAyTw-Pi3cmwFw4bbuLoiAxxOVG1K5JPqbPO2QVMn4-sgll3VIZwWvAQq-XhvMlf3AF5qMcDsCE-I1RcBcAg-Hr-_D-HjyHUB3Y63GYt2FRCw1OnwQ6ug4t9xrNcwiZOOdPrASpRlK0KN3S6pRG77lVM9rPCTu-khjG9B6b20ws8K0FmmiZBS7XxhPR94F1srD3K47LLPBW8OaAZFmiRdexa-cELxhPj1_VVYbNS5AazpjOCGkhiRbSO4KJEGr5fNFezUFqcLilyIM7TXBuwa5Oykoetx5McmCSJ8XgRwca1fCSmHXmY0VN8aczAwoKes4N8j5BMscJ1qq4v3FesXLP7hZunc08DFnYZAk3jZjddzfZPzzS84xQIVLsVGDw-Ig9T4LZdiJpDi5vaxv7m10nTan_IAOMhjGmIEw0FrQ", sandbox=False)
-
-    job = cloudconvert.Job.create(payload={
-        "tasks": {
-            'import-my-file': {
-                'operation': 'import/upload'
-            },
-            'convert-my-file': {
-                'operation': 'convert',
-                'input': 'import-my-file',
-                'input_format': 'dxf',
-                'output_format': 'pdf'
-            },
-            'export-my-file': {
-                'operation': 'export/url',
-                'input': 'convert-my-file'
-            }
-        }
-    })
-
-    job = cloudconvert.Job.find(id=job['id'])
-    upload_task = [task for task in job['tasks'] if task['name'] == 'import-my-file'][0]
-    upload_url = upload_task['result']['form']['url']
-    parameters = upload_task['result']['form']['parameters']
-
-    with open(input_path, 'rb') as file:
-        response = requests.post(
-            upload_url,
-            data=parameters,
-            files={'file': file}
-        )
-
-    if response.status_code not in [200, 201, 204]:
-        raise Exception(f"Upload failed: {response.text}")
-
-    while True:
-        job = cloudconvert.Job.find(id=job['id'])
-        if job['status'] == 'finished':
-            break
-        elif job['status'] == 'error':
-            raise Exception("CloudConvert job failed.")
-        time.sleep(2)
-
-    export_task = [task for task in job['tasks'] if task['name'] == 'export-my-file'][0]
-    file_url = export_task['result']['files'][0]['url']
-
-    response = requests.get(file_url)
-    with open(output_path, 'wb') as f:
-        f.write(response.content) """
-
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-from ezdxf import recover
-from ezdxf.addons.drawing import matplotlib as ezdxf_matplotlib
-from ezdxf.addons.drawing import Frontend, RenderContext
-
 def convert_dxf_to_pdf_ezdxf(input_path, output_path):
     try:
-        # Recover document safely
-        doc, auditor = recover.readfile(input_path)
-        if auditor.has_errors:
-            print("Warning: The DXF file has some errors.")
-
-        # Create matplotlib figure and axis
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_axes([0, 0, 1, 1])
-        ax.set_axis_off()
-
-        # Set up drawing context and backend
-        ctx = RenderContext(doc)
-        backend = ezdxf_matplotlib.MatplotlibBackend(ax)
-        frontend = Frontend(ctx, backend)
-
-        # Draw modelspace
-        frontend.draw_layout(doc.modelspace())
-        # Autoscale to fit the drawing
-        ax.autoscale()
-
-        # Save figure
-        fig.savefig(output_path, dpi=300, bbox_inches='tight', pad_inches=0)
-        plt.close(fig)
+        doc = ezdxf.recover.readfile(input_path)[0]
+        ezdxf_matplotlib.qsave(
+            doc.modelspace(),
+            output_path,
+            dpi=300,
+            size_inches=(36, 24),  # Custom paper size
+            bg='#FFFFFF'
+        )
 
         print(f"PDF successfully saved to {output_path}")
 
     except Exception as e:
         print(f"Error converting DXF to PDF: {e}")
         raise
-
-
-
 
 
 # Helper function to define DXF paths
@@ -1045,7 +988,8 @@ def get_saved_dxf_paths(user_company, category, project_id, output_filename):
     }
     static_path = company_dxf_path.get(user_company.id)
     if not static_path or not os.path.exists(static_path):
-        raise FileNotFoundError(f"DXF not found: {static_path}")
+        #raise FileNotFoundError(f"DXF not found: {static_path}")
+        print(f"DXF not found: {static_path}")
 
     # Target output path for modified DXF
     target_dir = os.path.join(
@@ -1112,15 +1056,6 @@ def process_saved_dxf(request, aMachine_ID, category, project_id, modifications,
     except Exception as e:
         print("DXF to PDF conversion failed:", e)
         return HttpResponse("DXF to PDF conversion failed", status=500)
-
-    """ try:
-        convert_dxf_to_pdf_cloudconvert(modified_path, pdf_output_path)
-        print(f"PDF saved to {pdf_output_path}")
-    except Exception as e:
-        print("DXF to PDF conversion failed:", e)
-        return HttpResponse("DXF to PDF conversion failed", status=500)
-
-    return FileResponse(open(pdf_output_path, 'rb'), as_attachment=True, filename=os.path.basename(pdf_output_path)) """
 
 
 # DXF Download Views
@@ -2124,66 +2059,71 @@ def save_all_pdf_report(request, project_id, logo):
         # Add machine details
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
+            machine_DB = machine.oSec00Field03
+            
             try:
-                themachines = AddMachine.objects.get(nameDB=machine_name, company=company_id)
-                file_name = themachines.nameDXF
+                themachines = AddMachine.objects.get(nameDB=machine_DB, company=company_id)
                 
             except AddMachine.DoesNotExist:
                 print(f"Skipping machine '{machine_name}' for company ID {company_id}: not found in AddMachine.")
                 continue  # Skip this machine and continue with the rest
+            
+            themachinename = themachines.nameMachine
+            file_name = themachines.nameDXF
 
-            section_titles = []
+            section_titles = [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
             if machine_name == "DataSheetNS":
                 machine_name = "Manual Screen" 
                 sheet_key = "NS"
                 section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetMS":
+            elif machine_name == "DataSheetMS":
                 machine_name = "Mechanical Screen"
                 sheet_key = "MS" 
                 section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetBC":
+            elif machine_name == "DataSheetBC":
                 machine_name = "Belt Conveyor"
                 sheet_key = "BC"
                 section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetCO":
+            elif machine_name == "DataSheetCO":
                 machine_name = "Container"
                 sheet_key = "CO"
                 section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetGR":
+            elif machine_name == "DataSheetGR":
                 machine_name = "Gritremoval"
                 sheet_key = "GR"
                 section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
 
-            if machine_name == "DataSheetSS":
+            elif machine_name == "DataSheetSS":
                 machine_name = "Sand Silo"
                 sheet_key = "SS"
 
-            if machine_name == "DataSheetPS":
+            elif machine_name == "DataSheetPS":
                 machine_name = "Primary Sedimentation"
                 sheet_key = "PS"
 
-            if machine_name == "DataSheetQV":
+            elif machine_name == "DataSheetQV":
                 machine_name = "Quick Valve"
                 sheet_key = "QV"
 
-            if machine_name == "DataSheetTV":
+            elif machine_name == "DataSheetTV":
                 machine_name = "Telescopic Valve"
                 sheet_key = "TV"
                 
-            if machine_name == "DataSheetTH":
+            elif machine_name == "DataSheetTH":
                 machine_name = "Sludge Thickener"
                 sheet_key = "TH"
 
 
+            sheet_key = themachines.keyValue[0:-2]
             # Add machine name 
             pdf = PDF()
             pdf.alias_nb_pages()  
             pdf.add_page()
-            pdf.colored_header(index, machine_name)
+            pdf.colored_header(index, themachinename)
 
             
             pdf.alias_nb_pages()  

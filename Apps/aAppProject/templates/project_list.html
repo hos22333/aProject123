@@ -50,7 +50,7 @@
                     <td>{{ project.client_name }}</td>
                     <td>
                         {% if project.last_saved_time %}
-                          {{ project.last_saved_time|date:"Y-m-d H:i:s a" }}
+                          {{ project.last_saved_time|date:"Y-m-d h:i:s a" }}
                         {% else %}
                           Never
                         {% endif %}
