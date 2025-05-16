@@ -1276,6 +1276,9 @@ def get_user_company(request):
             return None
     return None
 
+
+
+
 # Helper function to define DXF paths
 def get_dxf_paths(user_company, category):
     company_paths = {
@@ -1319,6 +1322,7 @@ def process_dxf(request, aMachine_ID, category, modifications, output_filename):
         return HttpResponse("Unauthorized", status=403)
 
     static_path, modified_path = get_dxf_paths(user_company, category)
+    
     if not os.path.exists(static_path):
         return HttpResponse("File not found", status=404)
 
@@ -1334,6 +1338,8 @@ def process_dxf(request, aMachine_ID, category, modifications, output_filename):
             return response
 
     return HttpResponse("Invalid request", status=400)
+
+
 
 # DXF Download Views
 
@@ -1533,6 +1539,18 @@ def General_DXF_ALL(request, aMachine_ID, aType):
 # DXF Download Views
 def FullDrawing(request, aMachine_ID, aType):
     
+    # Helper function to define DXF paths
+    def get_dxf_paths(user_company, category):
+        company_paths = {
+            1: os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", f"Full Drawing {category}.dxf"),
+            2: os.path.join(settings.BASE_DIR, "static", "aDxfs", "BBB", "FullDrawing", f"Full Drawing {category}.dxf"),
+        }
+
+        static_path = company_paths.get(user_company.id, "")
+        modified_path = static_path.replace(".dxf", "_new.dxf")
+
+        return static_path, modified_path
+    
     # Helper function to modify DXF files
     def FullDrawing_modify_dxf_file(static_path, modified_path, modifications):
         doc = ezdxf.readfile(static_path)
@@ -1559,8 +1577,10 @@ def FullDrawing(request, aMachine_ID, aType):
         if not user_company:
             return HttpResponse("Unauthorized", status=403)
 
-        static_path  = os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", f"Full Drawing {category}.dxf")
-        modified_path = static_path.replace(".dxf", "_newFullDrawing.dxf")
+        #static_path  = os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", f"Full Drawing {category}.dxf")
+        #modified_path = static_path.replace(".dxf", "_newFullDrawing.dxf")
+                
+        static_path, modified_path = get_dxf_paths(user_company, category)
         
         if not os.path.exists(static_path):
             return HttpResponse("File not found", status=404)

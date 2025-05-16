@@ -89,47 +89,56 @@ def project_list(request):
             company_folder = os.path.join(base_static_path, company_name)
             project_folder = os.path.join(company_folder, folder_name)
             print("project_folder_path : ", project_folder)
-            excel_file_path1 = os.path.join(project_folder, 'Cost1_excel.xlsx')
-            excel_file_path2 = os.path.join(project_folder, 'Cost2_excel.xlsx')
-            excel_file_path3 = os.path.join(project_folder, 'Cost3_excel.xlsx')
-            excel_file_path4 = os.path.join(project_folder, 'Cost4_excel.xlsx')
-            excel_file_path5 = os.path.join(project_folder, 'Cost5_excel.xlsx')
-
-            pdf_file_path1 = os.path.join(project_folder, 'Cost1_pdf.pdf')
-            pdf_file_path2 = os.path.join(project_folder, 'Cost2_pdf.pdf')
-            pdf_file_path3 = os.path.join(project_folder, 'Cost3_pdf.pdf')
-            pdf_file_path4 = os.path.join(project_folder, 'Cost4_pdf.pdf')
-            pdf_file_path5 = os.path.join(project_folder, 'Cost5_pdf.pdf')
-
-            # Create the folders if they don't exist
-            os.makedirs(project_folder, exist_ok=True)
-
-            ef = Workbook()  # Creates a new workbook with one empty sheet
-            ef.save(excel_file_path1)
-            ef.save(excel_file_path2)
-            ef.save(excel_file_path3)
-            ef.save(excel_file_path4)
-            ef.save(excel_file_path5)
-
-            pf1 = canvas.Canvas(pdf_file_path1)
-            pf1.showPage()  # Add a blank page
-            pf1.save()
             
-            pf2 = canvas.Canvas(pdf_file_path2)
-            pf2.showPage()  # Add a blank page
-            pf2.save()
             
-            pf3 = canvas.Canvas(pdf_file_path3)
-            pf3.showPage()  # Add a blank page
-            pf3.save()
             
-            pf4 = canvas.Canvas(pdf_file_path4)
-            pf4.showPage()  # Add a blank page
-            pf4.save()
+            print("#######################")
+            print("company_name : ", company_name)
+            print("#######################")
             
-            pf5 = canvas.Canvas(pdf_file_path5)
-            pf5.showPage()  # Add a blank page
-            pf5.save()
+            
+            if company_name == "aaaa":
+                excel_file_path1 = os.path.join(project_folder, 'Cost1_excel.xlsx')
+                excel_file_path2 = os.path.join(project_folder, 'Cost2_excel.xlsx')
+                excel_file_path3 = os.path.join(project_folder, 'Cost3_excel.xlsx')
+                excel_file_path4 = os.path.join(project_folder, 'Cost4_excel.xlsx')
+                excel_file_path5 = os.path.join(project_folder, 'Cost5_excel.xlsx')
+
+                pdf_file_path1 = os.path.join(project_folder, 'Cost1_pdf.pdf')
+                pdf_file_path2 = os.path.join(project_folder, 'Cost2_pdf.pdf')
+                pdf_file_path3 = os.path.join(project_folder, 'Cost3_pdf.pdf')
+                pdf_file_path4 = os.path.join(project_folder, 'Cost4_pdf.pdf')
+                pdf_file_path5 = os.path.join(project_folder, 'Cost5_pdf.pdf')
+
+                # Create the folders if they don't exist
+                os.makedirs(project_folder, exist_ok=True)
+
+                ef = Workbook()  # Creates a new workbook with one empty sheet
+                ef.save(excel_file_path1)
+                ef.save(excel_file_path2)
+                ef.save(excel_file_path3)
+                ef.save(excel_file_path4)
+                ef.save(excel_file_path5)
+
+                pf1 = canvas.Canvas(pdf_file_path1)
+                pf1.showPage()  # Add a blank page
+                pf1.save()
+                
+                pf2 = canvas.Canvas(pdf_file_path2)
+                pf2.showPage()  # Add a blank page
+                pf2.save()
+                
+                pf3 = canvas.Canvas(pdf_file_path3)
+                pf3.showPage()  # Add a blank page
+                pf3.save()
+                
+                pf4 = canvas.Canvas(pdf_file_path4)
+                pf4.showPage()  # Add a blank page
+                pf4.save()
+                
+                pf5 = canvas.Canvas(pdf_file_path5)
+                pf5.showPage()  # Add a blank page
+                pf5.save()
 
 
 
@@ -159,6 +168,7 @@ def project_list(request):
     
     #projects = Project.objects.all()
     return render(request, 'project_list.html', {'form': form, 'projects': projects})
+ 
     
 def edit_project(request, project_id):
     project = get_object_or_404(APP_Project, id=project_id)
@@ -185,7 +195,6 @@ def edit_project(request, project_id):
     return render(request, 'edit_project.html', {'form': form})
 
 
-
 def delete_project(request, project_id):
     if request.method == "POST":
         project = get_object_or_404(APP_Project, id=project_id)
@@ -199,7 +208,6 @@ def delete_project(request, project_id):
         return redirect('project_list')
 
     return JsonResponse({'success': False, 'error': 'Invalid request'})
-
 
 
 def get_machines(request, project_id):
@@ -289,8 +297,8 @@ def get_machines(request, project_id):
         return JsonResponse(data)
     except APP_Project.DoesNotExist:
         return JsonResponse({"error": "Project not found"}, status=404)
+   
     
-
 def get_calc_machines(request, project_id):
     try:
         project = APP_Project.objects.get(id=project_id)
@@ -392,17 +400,22 @@ def generate_calculation_report(request, project_id):
 
 
 def save_reports(request, project_id):
+    print("###############################")
+    print("###############################")
+    print("###############################")
+    print("###############################")
+    print("###############################")    
+    print("start, save_reports, project_id : ", project_id)
+    
+    
     project = get_object_or_404(APP_Project, pk=project_id)
-    try:
-        #pdb.set_trace()
+    try:        
         # Log the action
         aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
-        
-        #pdb.set_trace()
+                
         # Get the user’s company and project
         aCompany = UserCompany.objects.get(user=request.user)
-
-        #pdb.set_trace()
+        
         # Determine the company and generate the corresponding report
         if aCompany:
             save_submittal_report(request, project_id)
@@ -421,24 +434,26 @@ def save_reports(request, project_id):
 
     except UserCompany.DoesNotExist:
         return JsonResponse({'error': 'User does not belong to a company'}, status=403)
-        #return HttpResponse("User does not belong to a company", status=403)
+        
 
     except APP_Project.DoesNotExist:
         return JsonResponse({'error': 'Project not found'}, status=404)
-        #return HttpResponse("Project not found", status=404)
+        
 
 
-def save_submittal_report(request, project_id):
+def save_submittal_report(request, project_id):    
+    print("start, save_submittal_report, project_id : ", project_id)
+    
     try:
-        #pdb.set_trace()
+        
         # Log the action
         aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
         
-        #pdb.set_trace()
+        
         # Get the user’s company and project
         aCompany = UserCompany.objects.get(user=request.user)
 
-        #pdb.set_trace()
+        
         # Determine the company and generate the corresponding report
         if aCompany.company.nameCompanies == "AAAA":
             print("Company 1")
@@ -458,7 +473,9 @@ def save_submittal_report(request, project_id):
         return HttpResponse("Project not found", status=404)
 
 
-def save_calculation_report(request, project_id):
+def save_calculation_report(request, project_id):    
+    print("start, save_calculation_report, project_id : ", project_id)
+    
     try:
         #pdb.set_trace()
         # Log the action
@@ -488,17 +505,16 @@ def save_calculation_report(request, project_id):
         return HttpResponse("Project not found", status=404)
 
 
-def save_pdf_report(request, project_id):
+def save_pdf_report(request, project_id):    
+    print("start, save_pdf_report, project_id : ", project_id)
+    
     try:
-        #pdb.set_trace()
         # Log the action
         aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Pdf Report")
         
-        #pdb.set_trace()
         # Get the user’s company and project
         aCompany = UserCompany.objects.get(user=request.user)
 
-        #pdb.set_trace()
         # Determine the company and generate the corresponding report
         if aCompany.company.nameCompanies == "AAAA":
             print("Company 1")

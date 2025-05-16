@@ -1,5 +1,14 @@
-from django.shortcuts import render
+import requests
+import cloudconvert
+import time
+import os
+import ezdxf
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
+
+from django.shortcuts import render
 from config import settings
 from .models import APP_Project
 from Apps.aAppMechanical.models import UserCompany
@@ -8,31 +17,12 @@ from Apps.aAppSubmittal.models import AddMachine
 from Apps.aAppMechanical.models import aLogEntry
 from Apps.aAppCalculation.models import modelcalc
 from Apps.aAppSubmittal.views import get_user_company
-
-import requests
-import cloudconvert
-import time
-
-
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.utils.timezone import now 
 from django.contrib.auth.models import User
-
-
-
-
 from django.utils.text import slugify
 from io import BytesIO
-
-
-import os
-import ezdxf
-
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
 from ezdxf import recover
 from ezdxf.addons.drawing import Frontend, RenderContext
 from ezdxf.addons.drawing import matplotlib as ezdxf_matplotlib
@@ -49,9 +39,6 @@ from fpdf import FPDF
 from PyPDF2 import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 from openpyxl import Workbook
-
-
-
 
 
 
@@ -569,9 +556,8 @@ def word_calculation_report(request, project_id, logo, color):
         return HttpResponse("Project not found", status=404)
 
 
-
-
-def save_word_pdf_submittal_report(request, project_id, logo, color):
+def save_word_pdf_submittal_report(request, project_id, logo, color):  
+    print("start, save_word_pdf_submittal_report, project_id : ", project_id)
     
     def add_table(doc, data, title=None):
         """Creates a borderless table and applies a background color to the header."""
@@ -795,13 +781,6 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
         project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
         
-        
-        print(aCompany.id)
-        print(project.id)
-    
-        print("Company 2")
-    
-    
         # Create a Word document
         doc = Document()
 
@@ -857,7 +836,8 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
             sheet_key = themachines.keyValue
             themachinename = themachines.nameMachine
             General_saved_DXF_ALL(request, machine_ID, sheet_key, project_id)
-            SavedFullDrawing(request, machine_ID, sheet_key)
+            
+            #SavedFullDrawing(request, machine_ID, sheet_key)
 
 
             
@@ -954,7 +934,10 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
         return HttpResponse("Project not found", status=404)
 
 
+
 def convert_dxf_to_pdf_ezdxf(input_path, output_path):
+    print("start, convert_dxf_to_pdf_ezdxf")
+    
     try:
         doc = ezdxf.recover.readfile(input_path)[0]
         ezdxf_matplotlib.qsave(
@@ -965,105 +948,124 @@ def convert_dxf_to_pdf_ezdxf(input_path, output_path):
             bg='#FFFFFF'
         )
 
-        print(f"PDF successfully saved to {output_path}")
+        print("PDF successfully saved")
 
     except Exception as e:
         print(f"Error converting DXF to PDF: {e}")
         raise
 
 
-# Helper function to define DXF paths
-def get_saved_dxf_paths(user_company, category, project_id, output_filename):
-    # Get project info
-    project = APP_Project.objects.get(id=project_id)
-    company_slug = slugify(user_company.nameCompanies)
-    project_slug = slugify(project.name)
-    folder_name = f"{project_id}_{company_slug}_{project_slug}"
 
 
-    # Load original path (base DXF)
-    company_dxf_path = {
-        1: os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", f"AAA_{category}.dxf"),
-        2: os.path.join(settings.BASE_DIR, "static", "aDxfs", "BBB", f"{category}.dxf"),
-    }
-    static_path = company_dxf_path.get(user_company.id)
-    if not static_path or not os.path.exists(static_path):
-        #raise FileNotFoundError(f"DXF not found: {static_path}")
-        print(f"DXF not found: {static_path}")
-
-    # Target output path for modified DXF
-    target_dir = os.path.join(
-        settings.BASE_DIR,
-        "static",
-        "aReports",
-        company_slug.upper(),
-        folder_name
-    )
-    os.makedirs(target_dir, exist_ok=True)
-
-    
-    modified_path = os.path.join(target_dir, output_filename)
-
-    return static_path, modified_path
-    
-
-# Helper function to modify DXF files
-def modify_saved_dxf_file(static_path, modified_path, modifications):
-    doc = ezdxf.readfile(static_path)
-
-    for entity in doc.modelspace().query("DIMENSION"):
-        if entity.dxf.text in modifications:
-            entity.dxf.text = modifications[entity.dxf.text]
-
-        # Update text height and arrow size
-        dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)
-        if dimstyle:
-            dimstyle.dxf.dimtxt = 0.1  # Set text height
-            dimstyle.dxf.dimasz = 0.1  # Set arrow size
-
-        entity.render()
-
-    doc.saveas(modified_path)
-
-# Main DXF Processing Function
-def process_saved_dxf(request, aMachine_ID, category, project_id, modifications, output_filename):
-    # Log the request
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"at {now()} {request.user} Download DXF {category} {aMachine_ID}"
-    )
-
-    user_company = get_user_company(request)
-    if not user_company:
-        return HttpResponse("Unauthorized", status=403)
-
-    static_path, modified_path = get_saved_dxf_paths(user_company, category, project_id, output_filename)
-    if not os.path.exists(static_path):
-        return HttpResponse("File not found", status=404)
-
-    machine = Machine.objects.get(id=aMachine_ID)
-
-    
-    modify_saved_dxf_file(static_path, modified_path, modifications(machine))
 
 
-    # Define PDF output path
-    pdf_output_path = modified_path.replace(".dxf", ".pdf")
 
-    try:
-        convert_dxf_to_pdf_ezdxf(modified_path, pdf_output_path)
-        print(f"PDF saved to {pdf_output_path}")
-    except Exception as e:
-        print("DXF to PDF conversion failed:", e)
-        return HttpResponse("DXF to PDF conversion failed", status=500)
+
+
+
+
+
 
 
 # DXF Download Views
-
-
-def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
+def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id): 
+    print("start, General_saved_DXF_ALL", project_id, aMachine_ID, aType)
     
-    print(aType)
+    
+    
+    # Helper function to modify DXF files
+    def modify_saved_dxf_file(static_path, modified_path, modifications):
+        doc = ezdxf.readfile(static_path)
+
+        for entity in doc.modelspace().query("DIMENSION"):
+            if entity.dxf.text in modifications:
+                entity.dxf.text = modifications[entity.dxf.text]
+
+            # Update text height and arrow size
+            dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Set text height
+                dimstyle.dxf.dimasz = 0.1  # Set arrow size
+
+            entity.render()
+
+        doc.saveas(modified_path)
+
+
+    
+    # Helper function to define DXF paths
+    def get_saved_dxf_paths(user_company, category, project_id, output_filename):
+        print("start, get_saved_dxf_paths", user_company, category, project_id, output_filename)
+        
+        
+        # Get project info
+        project = APP_Project.objects.get(id=project_id)
+        company_slug = slugify(user_company.nameCompanies)
+        project_slug = slugify(project.name)
+        folder_name = f"{project_id}_{company_slug}_{project_slug}"
+
+
+        # Load original path (base DXF)
+        company_dxf_path = {
+            1: os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", f"AAA_{category}.dxf"),
+            2: os.path.join(settings.BASE_DIR, "static", "aDxfs", "BBB", f"{category}.dxf"),
+        }
+        static_path = company_dxf_path.get(user_company.id)
+        if not static_path or not os.path.exists(static_path):
+            #raise FileNotFoundError(f"DXF not found: {static_path}")
+            print(f"DXF not found: {static_path}")
+
+        # Target output path for modified DXF
+        target_dir = os.path.join(
+            settings.BASE_DIR,
+            "static",
+            "aReports",
+            company_slug.upper(),
+            folder_name
+        )
+        os.makedirs(target_dir, exist_ok=True)
+
+        
+        modified_path = os.path.join(target_dir, output_filename)
+
+        return static_path, modified_path
+        
+
+        
+    # Main DXF Processing Function
+    def process_saved_dxf(request, aMachine_ID, category, project_id, modifications, output_filename):
+        
+        # Log the request
+        aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} Download DXF {category} {aMachine_ID}"
+        )
+
+        user_company = get_user_company(request)
+        if not user_company:
+            return HttpResponse("Unauthorized", status=403)
+
+        static_path, modified_path = get_saved_dxf_paths(user_company, category, project_id, output_filename)
+        if not os.path.exists(static_path):
+            return HttpResponse("File not found", status=404)
+
+        machine = Machine.objects.get(id=aMachine_ID)
+
+        
+        modify_saved_dxf_file(static_path, modified_path, modifications(machine))
+
+
+        # Define PDF output path
+        pdf_output_path = modified_path.replace(".dxf", ".pdf")
+
+        try:
+            convert_dxf_to_pdf_ezdxf(modified_path, pdf_output_path)
+            print(f"PDF saved to {pdf_output_path}")
+        except Exception as e:
+            print("DXF to PDF conversion failed:", e)
+            return HttpResponse("DXF to PDF conversion failed", status=500)
+
+
     
     # Redirect unauthenticated users
     if not request.user.is_authenticated:
@@ -1258,9 +1260,26 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
         )
         
     
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
     
 # DXF Download Views
-def SavedFullDrawing(request, aMachine_ID, aType):
+def SavedFullDrawing(request, aMachine_ID, aType, project_id): 
+    print("start, SavedFullDrawing", aMachine_ID, aType)
     
     # Helper function to modify DXF files
     def SavedFullDrawing_modify_dxf_file(static_path, modified_path, modifications):
@@ -1280,9 +1299,49 @@ def SavedFullDrawing(request, aMachine_ID, aType):
 
         doc.saveas(modified_path)    
         
-    
+        
+    # Helper function to define DXF paths
+    def get_saved_dxf_paths(user_company, category, project_id, output_filename):
+        print("start, get_saved_dxf_paths", user_company, category, project_id, output_filename)
+        
+        
+        # Get project info
+        project = APP_Project.objects.get(id=project_id)
+        company_slug = slugify(user_company.nameCompanies)
+        project_slug = slugify(project.name)
+        folder_name = f"{project_id}_{company_slug}_{project_slug}"
+
+
+        # Load original path (base DXF)
+        company_dxf_path = {
+            1: os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", f"AAA_{category}.dxf"),
+            2: os.path.join(settings.BASE_DIR, "static", "aDxfs", "BBB", f"{category}.dxf"),
+        }
+        static_path = company_dxf_path.get(user_company.id)
+        if not static_path or not os.path.exists(static_path):
+            #raise FileNotFoundError(f"DXF not found: {static_path}")
+            print(f"DXF not found: {static_path}")
+
+        # Target output path for modified DXF
+        target_dir = os.path.join(
+            settings.BASE_DIR,
+            "static",
+            "aReports",
+            company_slug.upper(),
+            folder_name
+        )
+        os.makedirs(target_dir, exist_ok=True)
+
+        
+        modified_path = os.path.join(target_dir, output_filename)
+
+        return static_path, modified_path
+        
+        
+        
+        
     # Main DXF Processing Function
-    def SavedFullDrawing_process_dxf(request, aMachine_ID, category, modifications, output_filename):
+    def SavedFullDrawing_process_dxf(request, aMachine_ID, category, project_id, modifications, output_filename):
 
         user_company = get_user_company(request)
         if not user_company:
@@ -1295,7 +1354,11 @@ def SavedFullDrawing(request, aMachine_ID, aType):
         project_slug = slugify(project.name)
         folder_name = f"{project.id}_{company_slug}_{project_slug}"
 
+        
 
+        static_path, modified_path = get_saved_dxf_paths(user_company, category, project_id, output_filename)
+        
+        
         static_path  = os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", f"Full Drawing {category}.dxf")
         
         
@@ -1359,6 +1422,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             request,
             aMachine_ID,
             "NS",
+            project_id,
             lambda machine: {
                 "ScreenLength": machine.oSec02Field06,
                 "BarLength": "500",
@@ -1375,6 +1439,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             request,
             aMachine_ID,
             "MS",
+            project_id,
             lambda machine: {
                 "ChannelHeight": "0000",
                 "WaterLevel": "000",
@@ -1390,6 +1455,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             request,
             aMachine_ID,
             "BC",
+            project_id,
             lambda machine: {
                 "Length": machine.oSec02Field04,
                 "Width": machine.oSec02Field02,
@@ -1405,6 +1471,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             request,
             aMachine_ID,
             "CO",
+            project_id,
             lambda machine: {
                 "ScreenLength": "1000",
                 "BarLength": "500",
@@ -1420,6 +1487,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             request,
             aMachine_ID,
             "GR",
+            project_id,
             lambda machine: {
                 "ScreenLength": "1000",
                 "BarLength": "500",
@@ -1435,6 +1503,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             request,
             aMachine_ID,
             "SS",
+            project_id,
             lambda machine: {
                 "ScreenLength": "1000",
                 "BarLength": "500",
@@ -1450,6 +1519,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             request,
             aMachine_ID,
             "PS",
+            project_id,
             lambda machine: {
                 "ScreenLength": "1000",
                 "BarLength": "500",
@@ -1465,6 +1535,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             request,
             aMachine_ID,
             "QV",
+            project_id,
             lambda machine: {
                 "ScreenLength": "1000",
                 "BarLength": "500",
@@ -1480,6 +1551,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             request,
             aMachine_ID,
             "TV",
+            project_id,
             lambda machine: {
                 "ScreenLength": "1000",
                 "BarLength": "500",
@@ -1495,6 +1567,7 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             request,
             aMachine_ID,
             "TH",
+            project_id,
             lambda machine: {
                 "ScreenLength": "1000",
                 "BarLength": "500",
@@ -1504,6 +1577,20 @@ def SavedFullDrawing(request, aMachine_ID, aType):
             },
             f"{file_name}.dxf"
         )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def save_word_pdf_calculation_report(request, project_id, logo, color):
     
@@ -2024,13 +2111,9 @@ def save_all_pdf_report(request, project_id, logo):
         
         pdf_file_path = os.path.join(project_folder, f"all_{project_slug}_report.pdf")
 
-        print(aCompany.id)
-        print(project.id)
-    
-        print("Company 2")
-    
-
-        
+        print(f"Company ID: {aCompany.id}")
+        print(f"Project ID: {project.id}")
+            
         output = PdfWriter()
 
         # Create a Pdf document
@@ -2166,15 +2249,17 @@ def save_all_pdf_report(request, project_id, logo):
                 for page in appendix.pages:
                     output.add_page(page)
 
-        for i in range(1 , 6):
-            emptyappendix = None
-            cost_file_name = f"cost{i}_pdf.pdf"
-            if os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{cost_file_name}") :
-                emptyappendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{cost_file_name}")
 
-            if emptyappendix != None:
-                for page in emptyappendix.pages:
-                    output.add_page(page)
+        if aCompany.company.nameCompanies == "aaaa":
+            for i in range(1 , 6):
+                emptyappendix = None
+                cost_file_name = f"cost{i}_pdf.pdf"
+                if os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{cost_file_name}") :
+                    emptyappendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{cost_file_name}")
+
+                if emptyappendix != None:
+                    for page in emptyappendix.pages:
+                        output.add_page(page)
 
         # Save the new PDF
         with open(pdf_file_path, "wb") as f:
