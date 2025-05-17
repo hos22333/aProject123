@@ -100,7 +100,7 @@ def word_submittal_report(request, project_id, logo, color):
         # Adding logo
         run_logo = header_para.add_run()  # Corrected reference to header paragraph
         try:
-            run_logo.add_picture(f"static/aLogo/{logo}.PNG", width=Inches(7.0))  # Adjust width as needed
+            run_logo.add_picture(f"static/aLogo/{logo}.png", width=Inches(7.0))  # Adjust width as needed
         except Exception as e:
             print(f"Error adding logo: {e}")
 
@@ -352,7 +352,7 @@ def word_calculation_report(request, project_id, logo, color):
         # Adding logo
         run_logo = header_para.add_run()  # Corrected reference to header paragraph
         try:
-            run_logo.add_picture(f"static/aLogo/{logo}.PNG", width=Inches(7.0))  # Adjust width as needed
+            run_logo.add_picture(f"static/aLogo/{logo}.png", width=Inches(7.0))  # Adjust width as needed
         except Exception as e:
             print(f"Error adding logo: {e}")
 
@@ -614,7 +614,8 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
         # Adding logo
         run_logo = header_para.add_run()  # Corrected reference to header paragraph
         try:
-            run_logo.add_picture(f"static/aLogo/{logo}.PNG", width=Inches(7.0))  # Adjust width as needed
+            print(f"static/aLogo/{logo}.png")
+            run_logo.add_picture(f"static/aLogo/{logo}.png", width=Inches(7.0))  # Adjust width as needed
         except Exception as e:
             print(f"Error adding logo: {e}")
 
@@ -720,7 +721,7 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
             page_width = self.w - 2 * self.l_margin
             
             try:
-                self.image(f"static/aLogo/{logo}.PNG", x=self.l_margin, y=10, w=page_width)  
+                self.image(f"static/aLogo/{logo}.png", x=self.l_margin, y=10, w=page_width)  
 
                 # Move cursor below image to avoid overlapping next content
                 self.set_y(10 + 50)
@@ -1649,7 +1650,7 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
         # Adding logo
         run_logo = header_para.add_run()  # Corrected reference to header paragraph
         try:
-            run_logo.add_picture(f"static/aLogo/{logo}.PNG", width=Inches(7.0))  # Adjust width as needed
+            run_logo.add_picture(f"static/aLogo/{logo}.png", width=Inches(7.0))  # Adjust width as needed
         except Exception as e:
             print(f"Error adding logo: {e}")
 
@@ -1754,7 +1755,7 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
             page_width = self.w - 2 * self.l_margin
             
             try:
-                self.image(f"static/aLogo/{logo}.PNG", x=self.l_margin, y=10, w=page_width)  
+                self.image(f"static/aLogo/{logo}.png", x=self.l_margin, y=10, w=page_width)  
 
                 # Move cursor below image to avoid overlapping next content
                 self.set_y(10 + 50)
@@ -2025,7 +2026,7 @@ def save_all_pdf_report(request, project_id, logo):
             page_width = self.w - 2 * self.l_margin
             
             try:
-                self.image(f"static/aLogo/{logo}.PNG", x=self.l_margin, y=10, w=page_width)  
+                self.image(f"static/aLogo/{logo}.png", x=self.l_margin, y=10, w=page_width)  
 
                 # Move cursor below image to avoid overlapping next content
                 self.set_y(10 + 50)
