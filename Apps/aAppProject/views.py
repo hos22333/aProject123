@@ -12,7 +12,6 @@ from Apps.aAppCalculation.models import modelcalc
 from Apps.aAppSubmittal.views import get_user_company
 
 import requests
-import cloudconvert
 import time
 
 
@@ -51,10 +50,7 @@ from openpyxl import Workbook
 
 def project_list(request):
     if request.method == "POST":
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Entered the project list "
-        )
+        
         form = ProjectForm(request.POST)
         if form.is_valid():
             
@@ -142,10 +138,7 @@ def project_list(request):
 
 
 
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Created a project {request.POST.get("name")} "
-            )
+            
             return redirect('project_list')
     else:
         form = ProjectForm()
@@ -174,10 +167,7 @@ def edit_project(request, project_id):
     project = get_object_or_404(APP_Project, id=project_id)
     
     if request.method == "POST":
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Edited >>> {project.name} "
-        )
+        
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
             form.save()
@@ -198,10 +188,7 @@ def edit_project(request, project_id):
 def delete_project(request, project_id):
     if request.method == "POST":
         project = get_object_or_404(APP_Project, id=project_id)
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Deleted >>> {project.name} "
-        )
+        
         project.delete()
 
         # Otherwise, redirect to the project list page
@@ -215,10 +202,7 @@ def get_machines(request, project_id):
         project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
 
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Get Data for >>>{project.name} "
-        )
+        
         
         data = {
             "project_name": project.name,
@@ -304,10 +288,7 @@ def get_calc_machines(request, project_id):
         project = APP_Project.objects.get(id=project_id)
         machines = modelcalc.objects.filter(project=project)
         
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Get Data for >>> {project.name} "
-        )
+        
         
         data = {
             "project_name": project.name,
@@ -343,7 +324,6 @@ def generate_report(request, project_id):
     try:
         #pdb.set_trace()
         # Log the action
-        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
         
         #pdb.set_trace()
         # Get the user’s company and project
@@ -373,7 +353,6 @@ def generate_calculation_report(request, project_id):
     try:
         #pdb.set_trace()
         # Log the action
-        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
         
         #pdb.set_trace()
         # Get the user’s company and project
@@ -411,8 +390,7 @@ def save_reports(request, project_id):
     project = get_object_or_404(APP_Project, pk=project_id)
     try:        
         # Log the action
-        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
-                
+              
         # Get the user’s company and project
         aCompany = UserCompany.objects.get(user=request.user)
         
@@ -446,8 +424,6 @@ def save_submittal_report(request, project_id):
     
     try:
         
-        # Log the action
-        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
         
         
         # Get the user’s company and project
@@ -478,8 +454,6 @@ def save_calculation_report(request, project_id):
     
     try:
         #pdb.set_trace()
-        # Log the action
-        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
         
         #pdb.set_trace()
         # Get the user’s company and project
@@ -510,8 +484,7 @@ def save_pdf_report(request, project_id):
     
     try:
         # Log the action
-        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Pdf Report")
-        
+       
         # Get the user’s company and project
         aCompany = UserCompany.objects.get(user=request.user)
 

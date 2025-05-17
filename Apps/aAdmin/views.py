@@ -67,10 +67,7 @@ def user_login(request):
 def create_role(request):
     if request.method == 'POST':
         form = RoleForm(request.POST)
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Created the Role>>> {request.POST.get("name")} "
-        )
+        
         if form.is_valid():
             form.save()
     else:
@@ -85,10 +82,7 @@ def create_role(request):
 # Delete Role
 def delete_role(request, role_id):
     role = get_object_or_404(Role, id=role_id)
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Deleted the Role >>> {role.name} "
-    )
+    
     role.delete()
     return redirect('create_role')  # Redirect back to the list
 
@@ -102,10 +96,7 @@ def edit_role(request, role_id):
         form = RoleForm(request.POST, instance=role)
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Editing the Role >>> {old_name} to >>> {request.POST.get("name")} "
-            )
+            
             return redirect('create_role')  # Redirect back to the main page
     else:
         form = RoleForm(instance=role)
@@ -118,10 +109,7 @@ def edit_role(request, role_id):
 def create_autho(request):
     if request.method == 'POST':
         form = AuthoForm(request.POST)
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Created the Autho >>> {request.POST.get("name")} "
-        )
+       
         if form.is_valid():
             form.save()
     else:
@@ -136,10 +124,7 @@ def create_autho(request):
 # Delete Autho
 def delete_autho(request, autho_id):
     autho = get_object_or_404(Autho, id=autho_id)
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Deleted the Autho >>> {autho.name} "
-    )
+    
     autho.delete()
     return redirect('create_autho')  # Redirect back to the list
 
@@ -152,10 +137,7 @@ def delete_autho(request, autho_id):
 def assign_role_autho(request):
     if request.method == 'POST':
         form = RoleAuthoForm(request.POST)
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Assigned >>> {request.POST.get("role")} to Autho {request.POST.get("autho")} "
-        )
+        
         if form.is_valid():
             form.save()
             #return redirect('role_autho_list')
@@ -169,10 +151,7 @@ def assign_role_autho(request):
 def delete_role_autho(request, role_autho_id):
     role_autho = get_object_or_404(RoleAutho, id=role_autho_id)
     if request.method == 'POST':
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Deleted >>> {role_autho.role.name} from Autho {role_autho.autho.name} "
-        )
+        
         role_autho.delete()
     return redirect('assign_role_autho')  # Redirect back to the assign page
 
@@ -183,10 +162,7 @@ def delete_role_autho(request, role_autho_id):
 def assign_user_role(request):
     if request.method == 'POST':
         form = UserRoleForm(request.POST)
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Assigned >>> {request.POST.get("user")} to Role {request.POST.get("role")} "
-        )
+        
         if form.is_valid():
             form.save()
             #return redirect('assign_user_role')  # Redirect to the same page after saving
@@ -201,10 +177,7 @@ def assign_user_role(request):
 def delete_user_role(request, user_role_id):
     user_role = get_object_or_404(UserRole, id=user_role_id)
     if request.method == 'POST':
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Deleted >>> {user_role.user.username} from Role {user_role.role.name} "
-        )
+        
         user_role.delete()
     return redirect('assign_user_role')  # Redirect back to the assign page
 
@@ -315,10 +288,7 @@ def change_username(request):
         if User.objects.filter(username=new_username).exists():
             messages.error(request, 'Username already taken.')
         else:
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Changed his username from >>> {request.user.username} to {new_username} "
-            )
+            
             request.user.username = new_username
             request.user.save()
             messages.success(request, 'Your username has been updated successfully.')
@@ -334,10 +304,7 @@ def change_email(request):
         if User.objects.filter(email=new_email).exists():
             messages.error(request, 'Email already taken.')
         else:
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Changed his Email from >>> {request.user.email} to {new_email} "
-            )
+            
             request.user.email = new_email
             request.user.save()
             messages.success(request, 'Your email has been updated successfully.')
@@ -371,10 +338,7 @@ def add_company(request):
             company_folder = os.path.join(base_static_path, company_name)
             # Create the folders if they don't exist
             os.makedirs(company_folder, exist_ok=True)
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Added a Company >>> {request.POST.get("nameCompanies")} "
-            )
+            
     else:
         form = CompanyForm()
 
@@ -386,10 +350,7 @@ def add_company(request):
 # Delete Company
 def delete_company(request, company_id):
     company = get_object_or_404(Companies, id=company_id)
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Deleted the Company>>> {company.nameCompanies} "
-    )
+    
     company.delete()
     return redirect('add_company')  # Redirect back to the list
 
@@ -404,10 +365,7 @@ def edit_company(request, company_id):
         form = CompanyForm(request.POST, instance=company)
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Edited the Company>>> {old_company} to >>> {request.POST.get("nameCompanies")} "
-            )
+            
             return redirect('add_company')  # Redirect back to the main page
     else:
         form = CompanyForm(instance=company)
@@ -421,10 +379,7 @@ def companies_list(request):
 def assign_user_to_company(request):
     if request.method == "POST":
         form = UserCompanyForm(request.POST)
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Assigned >>>{request.POST.get("user")} to the Company {request.POST.get("company")} "
-        )
+        
         if form.is_valid():
             form.save()
             return redirect("assign_user")  # Redirect to a success page
@@ -438,10 +393,7 @@ def assign_user_to_company(request):
 def delete_user_company(request, user_company_id):
     user_company = get_object_or_404(UserCompany, id=user_company_id)
     if request.method == 'POST':
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Deleted >>> {user_company.user.username} from the Company {user_company.company.nameCompanies} "
-        )
+        
         user_company.delete()
     return redirect('assign_user')  # Redirect back to the assign page
 
@@ -462,10 +414,7 @@ def add_machine(request):
 
     if request.method == 'POST':
         form = MachineForm(request.POST)
-        aLogEntry.objects.create(
-            user=request.user,
-            message=f"{request.user} Added a Machine >>> {request.POST.get("nameMachine")} "
-        )
+        
         if form.is_valid():
             form.save()
     else:
@@ -479,10 +428,7 @@ def add_machine(request):
 # Delete Machine
 def delete_machine(request, machine_id):
     machine = get_object_or_404(AddMachine, id=machine_id)
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Deleted Machine>>> {machine.nameMachine} "
-    )
+    
     machine.delete()
     return redirect('add_machine')  # Redirect back to the list
 
@@ -492,10 +438,7 @@ def delete_machine(request, machine_id):
 def edit_amachine(request, machine_id):
     machine = get_object_or_404(AddMachine, id=machine_id)
 
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Edited >>> {machine.nameMachine} "
-    )
+    
 
     if request.method == 'POST':
         form = MachineForm(request.POST, instance=machine)
@@ -557,10 +500,7 @@ def add_config(request):
         form = FormFieldConfigForm(request.POST)
         if form.is_valid():
             form.save()
-            aLogEntry.objects.create(
-                user=request.user,
-                message=f"{request.user} Add Configrations >>> {request.POST.get("form_name")}_{request.POST.get("field_name")}"
-            )
+            
             return redirect('list_configs')
     else:
         form = FormFieldConfigForm()
@@ -568,10 +508,7 @@ def add_config(request):
 
 def edit_config(request, config_id):
     config = get_object_or_404(FormFieldConfig, id=config_id)
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} edited >>> {config.form_name}_{config.field_name}"
-    )
+    
     if request.method == "POST":
         form = FormFieldConfigForm(request.POST, instance=config)
         if form.is_valid():
@@ -583,10 +520,7 @@ def edit_config(request, config_id):
 
 def delete_config(request, config_id):
     config = get_object_or_404(FormFieldConfig, id=config_id)
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Deleted >>> {config.form_name}_{config.field_name}"
-    )
+    
     config.delete()
     return redirect('list_configs')
 

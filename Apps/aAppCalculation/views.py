@@ -129,10 +129,7 @@ def LoadPageCalculationSheet(request):
     print(f"{request.user} accessed Load {sheet_key}")
     ###LOG
     
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} >>> {sheet_key}"
-    )
+    
     
 
     #Define Retrieve values from AddMachine model
@@ -878,10 +875,7 @@ def HandleCalculationSheetForm(request):
 
     ###LOG
     
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Calculated >>> {sheet_key} "
-    )
+    
 
     if request.method == 'POST' and 'form1_submit' in request.POST:
         form = FormCalculationSheet(form_type=form_type, data=request.POST)
@@ -1047,7 +1041,6 @@ def generate_report(request):
     try:
         #pdb.set_trace()
         # Log the action
-        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
         
         #pdb.set_trace()
         # Get the user’s company and project
@@ -1185,10 +1178,7 @@ def generate_report_AAA(request, project_id, sheet_key):
     try:
         
         ###LOG
-        aLogEntry.objects.create(
-                user=request.user,
-                message=f"at {now()} {request.user} accessed Load  "
-            )
+        
         print(f"at {now()} {User} accessed Download Report")
         ###LOG
 
@@ -1471,10 +1461,7 @@ def generate_report_BBB(request, project_id, sheet_key):
     try:
         
         ###LOG
-        aLogEntry.objects.create(
-                user=request.user,
-                message=f"at {now()} {request.user} accessed Load  "
-            )
+        
         print(f"at {now()} {User} accessed Download Report")
         ###LOG
 
@@ -1648,10 +1635,7 @@ def DeleteCalcMachine(request, machine_id):
     
 
     machine = get_object_or_404(modelcalc, id=machine_id)
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} deleted >>> {sheet_key} >>> {machine.project.name if machine.project else "No Project"}"
-    )
+    
     machine.delete()
 
     
@@ -2085,10 +2069,7 @@ def CalculationSheet_get_data(request, machine_id):
     sheet_key = machine.oSec00Field03
     print(sheet_key)
 
-    aLogEntry.objects.create(
-        user=request.user,
-        message=f"{request.user} Get data of >>> {sheet_key} >>> {machine.project.name if machine.project else "No Project"}"
-    )
+    
     
     
     data = {
@@ -2166,7 +2147,6 @@ def generate_saved_report(request, machine_id):
     try:
         #pdb.set_trace()
         # Log the action
-        aLogEntry.objects.create(user=request.user, message=f"at {now()} {request.user} accessed Word Report")
         
         #pdb.set_trace()
         # Get the user’s company and project
@@ -2298,10 +2278,10 @@ def generate_saved_report_AAA(request, machine_id):
     try:
         
         ###LOG
-        aLogEntry.objects.create(
-                user=request.user,
-                message=f"at {now()} {request.user} accessed Load  "
-            )
+        # aLogEntry.objects.create(
+        #         user=request.user,
+        #         message=f"at {now()} {request.user} accessed Load  "
+        #     )
         print(f"at {now()} {User} accessed Download Report")
         ###LOG
 
@@ -2585,10 +2565,7 @@ def generate_saved_report_BBB(request, machine_id):
     try:
         
         ###LOG
-        aLogEntry.objects.create(
-                user=request.user,
-                message=f"at {now()} {request.user} accessed Load  "
-            )
+        
         print(f"at {now()} {User} accessed Download Report")
         ###LOG
 

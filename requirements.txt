@@ -12,3 +12,7 @@ openpyxl
 requests
 psycopg2-binary
 ezdxf
+matplotlib
+fpdf
+PyPDF2
+reportlab
