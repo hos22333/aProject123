@@ -1280,13 +1280,35 @@ def get_user_company(request):
 
 
 # Helper function to define DXF paths
-def get_dxf_paths(user_company, category):
-    company_paths = {
-        1: os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", f"AAA_{category}.dxf"),
-        2: os.path.join(settings.BASE_DIR, "static", "aDxfs", "BBB", f"{category}.dxf"),
-    }
+def get_dxf_paths(user_company, category, aType):
+    
+    company_slug = slugify(user_company.nameCompanies)
 
-    static_path = company_paths.get(user_company.id, "")
+        
+    dxf_name = None
+    if company_slug == "aaaa":
+        dxf_name = f"AAA_{category}"
+    elif company_slug == "bbbb":
+        dxf_name = category
+
+    machine = AddMachine.objects.get(keyValue = aType)
+    dxffile_model_name = machine.primarynameDXF
+        
+    if dxffile_model_name not in ["", None] :
+        input_filename = f"{dxffile_model_name}.dxf"
+    else :
+        input_filename = f"{dxf_name}.dxf"
+        
+    # Load original path (base DXF)
+    company_dxf_path = {
+        1: os.path.join(settings.BASE_DIR, "static", "aDxfs", input_filename),
+        2: os.path.join(settings.BASE_DIR, "static", "aDxfs", input_filename),
+    }
+    static_path = company_dxf_path.get(user_company.id)
+    if not static_path or not os.path.exists(static_path):
+        #raise FileNotFoundError(f"DXF not found: {static_path}")
+        print(f"DXF not found: {static_path}")
+    
     modified_path = static_path.replace(".dxf", "_new.dxf")
 
     return static_path, modified_path
@@ -1310,7 +1332,7 @@ def modify_dxf_file(static_path, modified_path, modifications):
     doc.saveas(modified_path)
 
 # Main DXF Processing Function
-def process_dxf(request, aMachine_ID, category, modifications, output_filename):
+def process_dxf(request, aMachine_ID, category, modifications, output_filename, aType):
     # Log the request
     aLogEntry.objects.create(
         user=request.user,
@@ -1321,7 +1343,7 @@ def process_dxf(request, aMachine_ID, category, modifications, output_filename):
     if not user_company:
         return HttpResponse("Unauthorized", status=403)
 
-    static_path, modified_path = get_dxf_paths(user_company, category)
+    static_path, modified_path = get_dxf_paths(user_company, category, aType)
     
     if not os.path.exists(static_path):
         return HttpResponse("File not found", status=404)
@@ -1391,7 +1413,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": machine.oSec02Field10,
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     
@@ -1407,7 +1430,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "Length": machine.oSec02Field10,
                 "Angle": machine.oSec02Field20,
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"BC_{firstletter}":
@@ -1422,7 +1446,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"CO_{firstletter}":
@@ -1437,7 +1462,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"GR_{firstletter}":
@@ -1452,7 +1478,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"SS_{firstletter}":
@@ -1467,7 +1494,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"PS_{firstletter}":
@@ -1482,7 +1510,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"QV_{firstletter}":
@@ -1497,7 +1526,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"TV_{firstletter}":
@@ -1512,7 +1542,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"TH_{firstletter}":
@@ -1527,7 +1558,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     
@@ -1540,13 +1572,32 @@ def General_DXF_ALL(request, aMachine_ID, aType):
 def FullDrawing(request, aMachine_ID, aType):
     
     # Helper function to define DXF paths
-    def get_dxf_paths(user_company, category):
-        company_paths = {
-            1: os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", f"Full Drawing {category}.dxf"),
-            2: os.path.join(settings.BASE_DIR, "static", "aDxfs", "BBB", "FullDrawing", f"Full Drawing {category}.dxf"),
-        }
+    def get_dxf_paths(user_company, category, aType):
+        company_slug = slugify(user_company.nameCompanies)
+        fulldrawing_dxf_name = None
+        if company_slug == "aaaa":
+            fulldrawing_dxf_name = f"Full Drawing {category}"
+        elif company_slug == "bbbb":
+            fulldrawing_dxf_name = f"BBB_Full Drawing {category}"
 
-        static_path = company_paths.get(user_company.id, "")
+        machine = AddMachine.objects.get(keyValue = aType)
+        fulldrawingdxffile_model_name = machine.primarynameFullDrawing
+        
+        if fulldrawingdxffile_model_name not in ["", None] :
+            input_filename = f"{fulldrawingdxffile_model_name}.dxf"
+        else :
+            input_filename = f"{fulldrawing_dxf_name}.dxf"
+
+        # Load original path (base DXF)
+        company_dxf_path = {
+            1: os.path.join(settings.BASE_DIR, "static", "aDxfs", input_filename),
+            2: os.path.join(settings.BASE_DIR, "static", "aDxfs", input_filename),
+        }
+        static_path = company_dxf_path.get(user_company.id)
+        if not static_path or not os.path.exists(static_path):
+            #raise FileNotFoundError(f"DXF not found: {static_path}")
+            print(f"Full Drawing DXF not found: {static_path}")
+
         modified_path = static_path.replace(".dxf", "_new.dxf")
 
         return static_path, modified_path
@@ -1571,7 +1622,7 @@ def FullDrawing(request, aMachine_ID, aType):
         
     
     # Main DXF Processing Function
-    def FullDrawing_process_dxf(request, aMachine_ID, category, modifications, output_filename):
+    def FullDrawing_process_dxf(request, aMachine_ID, category, modifications, output_filename, aType):
 
         user_company = get_user_company(request)
         if not user_company:
@@ -1580,7 +1631,7 @@ def FullDrawing(request, aMachine_ID, aType):
         #static_path  = os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", f"Full Drawing {category}.dxf")
         #modified_path = static_path.replace(".dxf", "_newFullDrawing.dxf")
                 
-        static_path, modified_path = get_dxf_paths(user_company, category)
+        static_path, modified_path = get_dxf_paths(user_company, category, aType)
         
         if not os.path.exists(static_path):
             return HttpResponse("File not found", status=404)
@@ -1642,7 +1693,8 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": machine.oSec02Field10,
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     
@@ -1658,7 +1710,8 @@ def FullDrawing(request, aMachine_ID, aType):
                 "Length": machine.oSec02Field10,
                 "Angle": machine.oSec02Field20,
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"BC_{firstletter}":
@@ -1673,7 +1726,8 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"CO_{firstletter}":
@@ -1688,7 +1742,8 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"GR_{firstletter}":
@@ -1703,7 +1758,8 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"SS_{firstletter}":
@@ -1718,7 +1774,8 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"PS_{firstletter}":
@@ -1733,7 +1790,8 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"QV_{firstletter}":
@@ -1748,7 +1806,8 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"TV_{firstletter}":
@@ -1763,7 +1822,8 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"TH_{firstletter}":
@@ -1778,7 +1838,8 @@ def FullDrawing(request, aMachine_ID, aType):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
 

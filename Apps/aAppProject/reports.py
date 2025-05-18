@@ -231,35 +231,35 @@ def word_submittal_report(request, project_id, logo, color):
                 machine_name = "Manual Screen" 
                 section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetMS":
+            elif machine_name == "DataSheetMS":
                 machine_name = "Mechanical Screen" 
                 section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetBC":
+            elif machine_name == "DataSheetBC":
                 machine_name = "Belt Conveyor"
                 section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetCO":
+            elif machine_name == "DataSheetCO":
                 machine_name = "Container"
                 section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetGR":
+            elif machine_name == "DataSheetGR":
                 machine_name = "Gritremoval"
                 section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
 
-            if machine_name == "DataSheetSS":
+            elif machine_name == "DataSheetSS":
                 machine_name = "Sand Silo"
 
-            if machine_name == "DataSheetPS":
+            elif machine_name == "DataSheetPS":
                 machine_name = "Primary Sedimentation"
 
-            if machine_name == "DataSheetQV":
+            elif machine_name == "DataSheetQV":
                 machine_name = "Quick Valve"
 
-            if machine_name == "DataSheetTV":
+            elif machine_name == "DataSheetTV":
                 machine_name = "Telescopic Valve"
                 
-            if machine_name == "DataSheetTH":
+            elif machine_name == "DataSheetTH":
                 machine_name = "Sludge Thickener"
 
             # Add machine title with font size 14 and numbering
@@ -475,51 +475,51 @@ def word_calculation_report(request, project_id, logo, color):
                 machine_name = "Manual Screen" 
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"MS_{firstletter}":
+            elif machine_name == f"MS_{firstletter}":
                 machine_name = "Mechanical Screen" 
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"BC_{firstletter}":
+            elif machine_name == f"BC_{firstletter}":
                 machine_name = "Belt Conveyor"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"CT_{firstletter}":
+            elif machine_name == f"CT_{firstletter}":
                 machine_name = "Circular Tanks	"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"GR_{firstletter}":
+            elif machine_name == f"GR_{firstletter}":
                 machine_name = "Gritremoval"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"SC_{firstletter}":
+            elif machine_name == f"SC_{firstletter}":
                 machine_name = "Screw Conveyor"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"PS_{firstletter}":
+            elif machine_name == f"PS_{firstletter}":
                 machine_name = "Primary Sedimentation"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"MX_{firstletter}":
+            elif machine_name == f"MX_{firstletter}":
                 machine_name = "Rectangular Mixers"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"RT_{firstletter}":
+            elif machine_name == f"RT_{firstletter}":
                 machine_name = "Rectangular Tanks"
                 section_titles = ["Inputs", "Outputs"]
                 
-            if machine_name == f"TH_{firstletter}":
+            elif machine_name == f"TH_{firstletter}":
                 machine_name = "Sludge Thickener"
                 section_titles = ["Inputs", "Outputs"]
                 
-            if machine_name == f"BS_{firstletter}":
+            elif machine_name == f"BS_{firstletter}":
                 machine_name = "Basket screens"
                 section_titles = ["Inputs", "Outputs"]
                 
-            if machine_name == f"PNch_{firstletter}":
+            elif machine_name == f"PNch_{firstletter}":
                 machine_name = "Channel Penstocks"
                 section_titles = ["Inputs", "Outputs"]
                 
-            if machine_name == f"PNwa_{firstletter}":
+            elif machine_name == f"PNwa_{firstletter}":
                 machine_name = "Wall Penstocks"
                 section_titles = ["Inputs", "Outputs"]
 
@@ -837,6 +837,7 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
             sheet_key = themachines.keyValue
             themachinename = themachines.nameMachine
             General_saved_DXF_ALL(request, machine_ID, sheet_key, project_id)
+            SavedFullDrawing(request, machine_ID, sheet_key, project_id)
             
             #SavedFullDrawing(request, machine_ID, sheet_key)
 
@@ -848,35 +849,35 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
                 machine_name = "Manual Screen" 
                 section_titles = ["General Data", "Design Data", "Material Data", "Channel Data", " ", " ", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetMS":
+            elif machine_name == "DataSheetMS":
                 machine_name = "Mechanical Screen" 
                 section_titles = ["General Data", "Design Data", "Gearmotor Data", "Control panel Data", "Material Data", "Other Data", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetBC":
+            elif machine_name == "DataSheetBC":
                 machine_name = "Belt Conveyor"
                 section_titles = ["General Data", "Design Data", "Gearbox Data", "Motor Data", "Material Data", " ", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetCO":
+            elif machine_name == "DataSheetCO":
                 machine_name = "Container"
                 section_titles = ["General Data", "Design Data", "Material Data", " ", " ", " ", " ", " ", " ", " "]
 
-            if machine_name == "DataSheetGR":
+            elif machine_name == "DataSheetGR":
                 machine_name = "Gritremoval"
                 section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
 
-            if machine_name == "DataSheetSS":
+            elif machine_name == "DataSheetSS":
                 machine_name = "Sand Silo"
 
-            if machine_name == "DataSheetPS":
+            elif machine_name == "DataSheetPS":
                 machine_name = "Primary Sedimentation"
 
-            if machine_name == "DataSheetQV":
+            elif machine_name == "DataSheetQV":
                 machine_name = "Quick Valve"
 
-            if machine_name == "DataSheetTV":
+            elif machine_name == "DataSheetTV":
                 machine_name = "Telescopic Valve"
                 
-            if machine_name == "DataSheetTH":
+            elif machine_name == "DataSheetTH":
                 machine_name = "Sludge Thickener"
 
             # Add machine title with font size 14 and numbering
@@ -995,7 +996,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
 
     
     # Helper function to define DXF paths
-    def get_saved_dxf_paths(user_company, category, project_id, output_filename):
+    def get_saved_dxf_paths(user_company, category, project_id, output_filename, aType):
         print("start, get_saved_dxf_paths", user_company, category, project_id, output_filename)
         
         
@@ -1005,11 +1006,25 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
         project_slug = slugify(project.name)
         folder_name = f"{project_id}_{company_slug}_{project_slug}"
 
+        
+        dxf_name = None
+        if company_slug == "aaaa":
+            dxf_name = f"AAA_{category}"
+        elif company_slug == "bbbb":
+            dxf_name = category
 
+        machine = AddMachine.objects.get(keyValue = aType)
+        dxffile_model_name = machine.primarynameDXF
+        
+        if dxffile_model_name not in ["", None] :
+            input_filename = f"{dxffile_model_name}.dxf"
+        else :
+            input_filename = f"{dxf_name}.dxf"
+        
         # Load original path (base DXF)
         company_dxf_path = {
-            1: os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", f"AAA_{category}.dxf"),
-            2: os.path.join(settings.BASE_DIR, "static", "aDxfs", "BBB", f"{category}.dxf"),
+            1: os.path.join(settings.BASE_DIR, "static", "aDxfs", input_filename),
+            2: os.path.join(settings.BASE_DIR, "static", "aDxfs", input_filename),
         }
         static_path = company_dxf_path.get(user_company.id)
         if not static_path or not os.path.exists(static_path):
@@ -1034,7 +1049,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
 
         
     # Main DXF Processing Function
-    def process_saved_dxf(request, aMachine_ID, category, project_id, modifications, output_filename):
+    def process_saved_dxf(request, aMachine_ID, category, project_id, modifications, output_filename, aType):
         
         # Log the request
         aLogEntry.objects.create(
@@ -1046,7 +1061,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
         if not user_company:
             return HttpResponse("Unauthorized", status=403)
 
-        static_path, modified_path = get_saved_dxf_paths(user_company, category, project_id, output_filename)
+        static_path, modified_path = get_saved_dxf_paths(user_company, category, project_id, output_filename, aType)
         if not os.path.exists(static_path):
             return HttpResponse("File not found", status=404)
 
@@ -1112,7 +1127,8 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": machine.oSec02Field10,
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     
@@ -1129,7 +1145,8 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "Length": machine.oSec02Field10,
                 "Angle": machine.oSec02Field20,
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"BC_{firstletter}":
@@ -1145,7 +1162,8 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"CO_{firstletter}":
@@ -1177,7 +1195,8 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"SS_{firstletter}":
@@ -1193,7 +1212,8 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"PS_{firstletter}":
@@ -1209,7 +1229,8 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"QV_{firstletter}":
@@ -1225,7 +1246,8 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"TV_{firstletter}":
@@ -1241,7 +1263,8 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"TH_{firstletter}":
@@ -1257,7 +1280,8 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     
@@ -1302,7 +1326,7 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
         
         
     # Helper function to define DXF paths
-    def get_saved_dxf_paths(user_company, category, project_id, output_filename):
+    def get_saved_dxf_paths(user_company, category, project_id, output_filename, aType):
         print("start, get_saved_dxf_paths", user_company, category, project_id, output_filename)
         
         
@@ -1312,16 +1336,29 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
         project_slug = slugify(project.name)
         folder_name = f"{project_id}_{company_slug}_{project_slug}"
 
+        fulldrawing_dxf_name = None
+        if company_slug == "aaaa":
+            fulldrawing_dxf_name = f"Full Drawing {category}"
+        elif company_slug == "bbbb":
+            fulldrawing_dxf_name = f"BBB_Full Drawing {category}"
+
+        machine = AddMachine.objects.get(keyValue = aType)
+        fulldrawingdxffile_model_name = machine.primarynameFullDrawing
+        
+        if fulldrawingdxffile_model_name not in ["", None] :
+            input_filename = f"{fulldrawingdxffile_model_name}.dxf"
+        else :
+            input_filename = f"{fulldrawing_dxf_name}.dxf"
 
         # Load original path (base DXF)
         company_dxf_path = {
-            1: os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", f"AAA_{category}.dxf"),
-            2: os.path.join(settings.BASE_DIR, "static", "aDxfs", "BBB", f"{category}.dxf"),
+            1: os.path.join(settings.BASE_DIR, "static", "aDxfs", input_filename),
+            2: os.path.join(settings.BASE_DIR, "static", "aDxfs", input_filename),
         }
         static_path = company_dxf_path.get(user_company.id)
         if not static_path or not os.path.exists(static_path):
             #raise FileNotFoundError(f"DXF not found: {static_path}")
-            print(f"DXF not found: {static_path}")
+            print(f"Full Drawing DXF not found: {static_path}")
 
         # Target output path for modified DXF
         target_dir = os.path.join(
@@ -1342,7 +1379,7 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
         
         
     # Main DXF Processing Function
-    def SavedFullDrawing_process_dxf(request, aMachine_ID, category, project_id, modifications, output_filename):
+    def SavedFullDrawing_process_dxf(request, aMachine_ID, category, project_id, modifications, output_filename, aType):
 
         user_company = get_user_company(request)
         if not user_company:
@@ -1357,10 +1394,10 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
 
         
 
-        static_path, modified_path = get_saved_dxf_paths(user_company, category, project_id, output_filename)
+        static_path, modified_path = get_saved_dxf_paths(user_company, category, project_id, output_filename, aType)
         
         
-        static_path  = os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", f"Full Drawing {category}.dxf")
+        #static_path  = os.path.join(settings.BASE_DIR, "static", "aDxfs", "AAA", "FullDrawing", f"Full Drawing {category}.dxf")
         
         
         if not os.path.exists(static_path):
@@ -1431,7 +1468,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": machine.oSec02Field10,
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     
@@ -1448,7 +1486,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
                 "Length": machine.oSec02Field10,
                 "Angle": machine.oSec02Field20,
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"BC_{firstletter}":
@@ -1464,7 +1503,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"CO_{firstletter}":
@@ -1480,7 +1520,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"GR_{firstletter}":
@@ -1496,7 +1537,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"SS_{firstletter}":
@@ -1512,7 +1554,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"PS_{firstletter}":
@@ -1528,7 +1571,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"QV_{firstletter}":
@@ -1544,7 +1588,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"TV_{firstletter}":
@@ -1560,7 +1605,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
         
     if aType == f"TH_{firstletter}":
@@ -1576,7 +1622,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
                 "BarTh": "10",
                 "BarSpacing": "25",
             },
-            f"{file_name}.dxf"
+            f"{file_name}.dxf",
+            aType
         )
 
 
@@ -1872,51 +1919,51 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
                 machine_name = "Manual Screen" 
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"MS_{firstletter}":
+            elif machine_name == f"MS_{firstletter}":
                 machine_name = "Mechanical Screen" 
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"BC_{firstletter}":
+            elif machine_name == f"BC_{firstletter}":
                 machine_name = "Belt Conveyor"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"CT_{firstletter}":
+            elif machine_name == f"CT_{firstletter}":
                 machine_name = "Circular Tanks	"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"GR_{firstletter}":
+            elif machine_name == f"GR_{firstletter}":
                 machine_name = "Gritremoval"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"SC_{firstletter}":
+            elif machine_name == f"SC_{firstletter}":
                 machine_name = "Screw Conveyor"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"PS_{firstletter}":
+            elif machine_name == f"PS_{firstletter}":
                 machine_name = "Primary Sedimentation"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"MX_{firstletter}":
+            elif machine_name == f"MX_{firstletter}":
                 machine_name = "Rectangular Mixers"
                 section_titles = ["Inputs", "Outputs"]
 
-            if machine_name == f"RT_{firstletter}":
+            elif machine_name == f"RT_{firstletter}":
                 machine_name = "Rectangular Tanks"
                 section_titles = ["Inputs", "Outputs"]
                 
-            if machine_name == f"TH_{firstletter}":
+            elif machine_name == f"TH_{firstletter}":
                 machine_name = "Sludge Thickener"
                 section_titles = ["Inputs", "Outputs"]
                 
-            if machine_name == f"BS_{firstletter}":
+            elif machine_name == f"BS_{firstletter}":
                 machine_name = "Basket screens"
                 section_titles = ["Inputs", "Outputs"]
                 
-            if machine_name == f"PNch_{firstletter}":
+            elif machine_name == f"PNch_{firstletter}":
                 machine_name = "Channel Penstocks"
                 section_titles = ["Inputs", "Outputs"]
                 
-            if machine_name == f"PNwa_{firstletter}":
+            elif machine_name == f"PNwa_{firstletter}":
                 machine_name = "Wall Penstocks"
                 section_titles = ["Inputs", "Outputs"]
             

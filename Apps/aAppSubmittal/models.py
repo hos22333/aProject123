@@ -14,6 +14,8 @@ class AddMachine(models.Model):
     nameDXF     = models.CharField(max_length=255, null=True, blank=True)
     nameFullDrawing     = models.CharField(max_length=255, null=True, blank=True)
     order = models.IntegerField(null=True, blank=True)
+    primarynameDXF     = models.CharField(max_length=255, null=True, blank=True)
+    primarynameFullDrawing     = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.nameMachine

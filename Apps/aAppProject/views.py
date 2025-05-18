@@ -84,6 +84,8 @@ def project_list(request):
             base_static_path = os.path.join(settings.BASE_DIR, 'static', 'aReports')
             company_folder = os.path.join(base_static_path, company_name)
             project_folder = os.path.join(company_folder, folder_name)
+            # Create the folders if they don't exist
+            os.makedirs(project_folder, exist_ok=True)
             print("project_folder_path : ", project_folder)
             
             

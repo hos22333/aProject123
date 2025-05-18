@@ -33,6 +33,12 @@
                                 {{ form.company }}
                             </div>
                             <div class="col-md-4 mb-3">
+                                {{ form.primarynameDXF }}
+                            </div>   
+                            <div class="col-md-4 mb-3">
+                                {{ form.primarynameFullDrawing }}
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 {{ form.nameDXF }}
                             </div>   
                             <div class="col-md-4 mb-3">
@@ -62,8 +68,10 @@
                         <th>DB Name</th>
                         <th>Machine Name</th>
                         <th>Company Name</th>
-                        <th>DXF Name</th>
-                        <th>Full Drawing Name</th>
+                        <th>DXF Primary Name</th>
+                        <th>Full Drawing Primary Name</th>
+                        <th>DXF Save Name</th>
+                        <th>Full Drawing Save Name</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -78,6 +86,8 @@
                             <td>{{ machine.nameDB }}</td>
                             <td>{{ machine.nameMachine }}</td>
                             <td>{{ machine.company }}</td>
+                            <td>{{ machine.primarynameDXF }}</td>
+                            <td>{{ machine.primarynameFullDrawing }}</td>
                             <td>{{ machine.nameDXF }}</td>
                             <td>{{ machine.nameFullDrawing }}</td>
                             <td>
