@@ -14,6 +14,7 @@ from .models import APP_Project
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppSubmittal.models import Machine
 from Apps.aAppSubmittal.models import AddMachine
+from Apps.aAppSubmittal.models import DXF_data
 from Apps.aAppMechanical.models import aLogEntry
 from Apps.aAppCalculation.models import modelcalc
 from Apps.aAppSubmittal.views import get_user_company
@@ -959,13 +960,27 @@ def convert_dxf_to_pdf_ezdxf(input_path, output_path):
 
 
 
+def is_number(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+    
+def resolve_fieldvalue(machine, fieldvalue):
+    if is_number(fieldvalue):
+        return fieldvalue
 
+    # Loop through sections 1 to 10, and odd fields 01–19
+    for sec in range(1, 11):
+        for i in range(1, 21, 2):
+            odd_field = f"oSec{str(sec).zfill(2)}Field{str(i).zfill(2)}"
+            even_field = f"oSec{str(sec).zfill(2)}Field{str(i+1).zfill(2)}"
+            if fieldvalue == getattr(machine, odd_field, None):
+                return getattr(machine, even_field, fieldvalue)
 
-
-
-
-
-
+    # If not found, return as-is
+    return fieldvalue
 
 
 
@@ -1094,8 +1109,8 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
             message=f"at {now()} {request.user} DXF download {aType} "
         )
     
-    machine = AddMachine.objects.get(keyValue = aType)
-    file_model_name = machine.nameDXF
+    themachine = AddMachine.objects.get(keyValue = aType)
+    file_model_name = themachine.nameDXF
     sheetkey = aType[0:-2]
 
     if file_model_name not in ["", None] :
@@ -1113,8 +1128,23 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
         except UserCompany.DoesNotExist:
             user_company = None
 
-    
-    if aType == f"NS_{firstletter}":
+    datas = DXF_data.objects.filter(sheetkey = sheetkey)
+
+
+    return process_saved_dxf(
+        request,
+        aMachine_ID,
+        sheetkey,
+        project_id,
+        lambda machine: {
+            data.fieldname : resolve_fieldvalue(machine, data.fieldvalue)
+            for data in datas
+        },
+        f"{file_name}.dxf",
+        aType
+    )
+
+    """ if aType == f"NS_{firstletter}":
         return process_saved_dxf(
             request,
             aMachine_ID,
@@ -1282,7 +1312,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
             },
             f"{file_name}.dxf",
             aType
-        )
+        ) """
         
     
    
@@ -1429,8 +1459,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
         return redirect("login") 
     
     
-    machine = AddMachine.objects.get(keyValue = aType)
-    file_model_name = machine.nameFullDrawing
+    themachine = AddMachine.objects.get(keyValue = aType)
+    file_model_name = themachine.nameFullDrawing
     sheetkey = aType[0:-2]
 
     if file_model_name not in ["", None] :
@@ -1454,8 +1484,24 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
             message=f"at {now()} {request.user} DXF download {aType} "
         )
 
-    
-    if aType == f"NS_{firstletter}":
+    datas = DXF_data.objects.filter(sheetkey = sheetkey)
+
+
+    return SavedFullDrawing_process_dxf(
+        request,
+        aMachine_ID,
+        sheetkey,
+        project_id,
+        lambda machine: {
+            data.fieldname : resolve_fieldvalue(machine, data.fieldvalue)
+            for data in datas
+        },
+        f"{file_name}.dxf",
+        aType
+    )
+
+
+    """ if aType == f"NS_{firstletter}":
         return SavedFullDrawing_process_dxf(
             request,
             aMachine_ID,
@@ -1624,7 +1670,7 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
             },
             f"{file_name}.dxf",
             aType
-        )
+        ) """
 
 
 
@@ -2255,10 +2301,6 @@ def save_all_pdf_report(request, project_id, logo):
             pdf.alias_nb_pages()  
             pdf.add_page()
             pdf.colored_header(index, themachinename)
-
-            
-            pdf.alias_nb_pages()  
-            pdf.add_page()
 
             for i in range(1, 11):  # Loop from Sec01 to Sec10
                 section_name = f"Sec{i:02d}"

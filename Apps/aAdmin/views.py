@@ -10,6 +10,7 @@ from .models import RoleAutho
 from django.contrib.auth.models import User
 from Apps.aAppCalculation.models import modelcalc_log
 from Apps.aAppSubmittal.models import Machine_log
+from Apps.aAppSubmittal.models import DXF_data
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppMechanical.models import aLogEntry
 from Apps.aAppMechanical.models import Companies
@@ -22,6 +23,7 @@ from Apps.aAppMechanical.forms import UserCompanyForm
 from Apps.aAppMechanical.forms import CompanyForm
 from Apps.aAppMechanical.forms import FormFieldConfigForm
 from Apps.aAppSubmittal.forms import MachineForm  
+from Apps.aAppSubmittal.forms import DXFdataForm  
 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -525,3 +527,49 @@ def delete_config(request, config_id):
     return redirect('list_configs')
 
 #######################################
+
+
+def DXFdata_list(request):
+    if request.method == "POST":
+        
+        form = DXFdataForm(request.POST)
+        if form.is_valid():
+            
+            form.save() 
+
+            
+            return redirect('DXFdata_list')
+    else:
+        form = DXFdataForm()
+        
+    
+    datas = DXF_data.objects.all()
+    
+    return render(request, 'DXFdata_list.html', {'form': form, 'datas': datas})
+
+
+# Edit Machine
+def edit_DXFdata(request, data_id):
+    data = get_object_or_404(DXF_data, id=data_id)
+
+    if request.method == 'POST':
+        form = DXFdataForm(request.POST, instance=data)
+        if form.is_valid():
+            form.save()
+            return redirect('DXFdata_list')  # Redirect back to the main page
+    else:
+        form = DXFdataForm(instance=data)
+
+    return render(request, 'edit_DXFdata.html', {'form': form, 'data': data})
+
+
+# Delete DXF data
+def delete_DXFdata(request, data_id):
+    data = get_object_or_404(DXF_data, id=data_id)
+    
+    data.delete()
+    return redirect('DXFdata_list')  # Redirect back to the list
+
+
+#######################################
+

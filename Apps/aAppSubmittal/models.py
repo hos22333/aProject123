@@ -473,3 +473,11 @@ class Machine_log(models.Model):
     def __str__(self):
         return f"{self.project.name} ({self.oSec00Field03})"
 
+
+class DXF_data(models.Model):
+    sheetkey = models.CharField(max_length=255)
+    fieldname = models.CharField(max_length=255)
+    fieldvalue = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.sheetkey}__{self.fieldname}"

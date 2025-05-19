@@ -76,4 +76,10 @@ urlpatterns = [
     path('delete/<int:config_id>/', views.delete_config, name='delete_config'),
     
     #############################
+    
+    path('dxf-data/', views.DXFdata_list, name='DXFdata_list'),
+    path('delete-dxf-data/<int:data_id>/', views.delete_DXFdata, name='delete_DXFdata'),
+    path('edit-dxf-data/<int:data_id>/', views.edit_DXFdata, name='edit_DXFdata'),
+
+    #############################
 ]

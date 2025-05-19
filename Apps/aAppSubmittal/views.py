@@ -3,6 +3,7 @@ import pdb
 from Apps.aAppProject.models import APP_Project
 from .models import AddMachine
 from .models import Machine
+from .models import DXF_data
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppMechanical.models import aLogEntry
 
@@ -1277,7 +1278,27 @@ def get_user_company(request):
     return None
 
 
+def is_number(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+    
+def resolve_fieldvalue(machine, fieldvalue):
+    if is_number(fieldvalue):
+        return fieldvalue
 
+    # Loop through sections 1 to 10, and odd fields 01–19
+    for sec in range(1, 11):
+        for i in range(1, 21, 2):
+            odd_field = f"oSec{str(sec).zfill(2)}Field{str(i).zfill(2)}"
+            even_field = f"oSec{str(sec).zfill(2)}Field{str(i+1).zfill(2)}"
+            if fieldvalue == getattr(machine, odd_field, None):
+                return getattr(machine, even_field, fieldvalue)
+
+    # If not found, return as-is
+    return fieldvalue
 
 # Helper function to define DXF paths
 def get_dxf_paths(user_company, category, aType):
@@ -1381,8 +1402,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             message=f"at {now()} {request.user} DXF download {aType} "
         )
     
-    machine = AddMachine.objects.get(keyValue = aType)
-    file_model_name = machine.nameDXF
+    themachine = AddMachine.objects.get(keyValue = aType)
+    file_model_name = themachine.nameDXF
     sheetkey = aType[0:-2]
 
     if file_model_name not in ["", None] :
@@ -1400,8 +1421,22 @@ def General_DXF_ALL(request, aMachine_ID, aType):
         except UserCompany.DoesNotExist:
             user_company = None
 
-    
-    if aType == f"NS_{firstletter}":
+    datas = DXF_data.objects.filter(sheetkey = sheetkey)
+
+
+    return process_dxf(
+        request,
+        aMachine_ID,
+        sheetkey,
+        lambda machine: {
+            data.fieldname : resolve_fieldvalue(machine, data.fieldvalue)
+            for data in datas
+        },
+        f"{file_name}.dxf",
+        aType
+    )
+
+    """ if aType == f"NS_{firstletter}":
         return process_dxf(
             request,
             aMachine_ID,
@@ -1560,7 +1595,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             },
             f"{file_name}.dxf",
             aType
-        )
+        ) """
         
     
     
@@ -1665,8 +1700,8 @@ def FullDrawing(request, aMachine_ID, aType):
         except UserCompany.DoesNotExist:
             user_company = None 
 
-    machine = AddMachine.objects.get(keyValue = aType)
-    file_model_name = machine.nameFullDrawing
+    themachine = AddMachine.objects.get(keyValue = aType)
+    file_model_name = themachine.nameFullDrawing
     sheetkey = aType[0:-2]
 
     if file_model_name not in ["", None] :
@@ -1679,9 +1714,24 @@ def FullDrawing(request, aMachine_ID, aType):
             user=request.user,
             message=f"at {now()} {request.user} DXF download {aType} "
         )
+    
+    datas = DXF_data.objects.filter(sheetkey = sheetkey)
+
+
+    return FullDrawing_process_dxf(
+        request,
+        aMachine_ID,
+        sheetkey,
+        lambda machine: {
+            data.fieldname : resolve_fieldvalue(machine, data.fieldvalue)
+            for data in datas
+        },
+        f"{file_name}.dxf",
+        aType
+    )
 
     
-    if aType == f"NS_{firstletter}":
+    """ if aType == f"NS_{firstletter}":
         return FullDrawing_process_dxf(
             request,
             aMachine_ID,
@@ -1840,7 +1890,7 @@ def FullDrawing(request, aMachine_ID, aType):
             },
             f"{file_name}.dxf",
             aType
-        )
+        ) """
         
 
 

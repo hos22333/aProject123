@@ -2,6 +2,7 @@ from django import forms
 from Apps.aAppProject.models import APP_Project
 from .models import AddMachine
 from .models import Machine, Machine_log
+from .models import DXF_data
 from Apps.aAppMechanical.models import FormFieldConfig
 from Apps.aAppMechanical.models import UserCompany
 
@@ -1014,3 +1015,13 @@ class FormDataSheet_log(forms.Form):
             instance.save()
         return instance
 
+
+class DXFdataForm(forms.ModelForm):
+    class Meta:
+        model = DXF_data
+        fields = ['sheetkey', 'fieldname', 'fieldvalue']
+        widgets = {
+            'sheetkey': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the machine sheetkey'}),
+            'fieldname': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the field name'}),
+            'fieldvalue': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the field value'}),
+        }
