@@ -2302,6 +2302,10 @@ def save_all_pdf_report(request, project_id, logo):
             pdf.add_page()
             pdf.colored_header(index, themachinename)
 
+            
+            pdf.alias_nb_pages()  
+            pdf.add_page()
+
             for i in range(1, 11):  # Loop from Sec01 to Sec10
                 section_name = f"Sec{i:02d}"
                 pdf_section_data = []
