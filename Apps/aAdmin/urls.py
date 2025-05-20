@@ -82,4 +82,10 @@ urlpatterns = [
     path('edit-dxf-data/<int:data_id>/', views.edit_DXFdata, name='edit_DXFdata'),
 
     #############################
+    
+    path('api-key/', views.APIkey_list, name='APIkey_list'),
+    path('delete-api-key/<int:data_id>/', views.delete_APIkey, name='delete_APIkey'),
+    path('edit-api-key/<int:data_id>/', views.edit_APIkey, name='edit_APIkey'),
+
+    #############################
 ]

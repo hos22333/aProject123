@@ -78,7 +78,7 @@ class modelcalc(models.Model):
           
 
     def __str__(self):
-        return f"{self.project.name if project.name else 'No Project'} ({self.oSec00Field03})"
+        return f"{self.project.name if self.project.name else 'No Project'} ({self.oSec00Field03})"
 
 
 
@@ -157,3 +157,13 @@ class modelcalc_log(models.Model):
 
     def __str__(self):
         return f"{self.project.name} ({self.oSec00Field03})"
+
+
+class API_Keys(models.Model):
+    sheetkey = models.CharField(max_length=255)
+    calctype = models.CharField(max_length=255)
+    fieldname = models.CharField(max_length=255)
+    apikey = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.sheetkey}__{self.calctype}__{self.fieldname}"

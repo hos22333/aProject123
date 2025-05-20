@@ -6,6 +6,7 @@ from Apps.aAppMechanical.models import aLogEntry
 from Apps.aAppSubmittal.models import AddMachine
 from Apps.aAppProject.models import APP_Project
 from .models import modelcalc
+from .models import API_Keys
 from Apps.aAppMechanical.models import UserCompany
 import requests
 
@@ -571,7 +572,7 @@ def HandleCalculationSheetForm(request):
     
 
 
-    form_mapping = {
+    """ form_mapping = {
         f"NS_{firstletter}": {
             "input_fields": {
                 "NS_Ch_Height":       'oSec01Field02', 
@@ -817,7 +818,7 @@ def HandleCalculationSheetForm(request):
         },
         f"PNwa_{firstletter}": {
             "input_fields": {
-                "aInput01":   'oSec01Field03', 
+                "aInput01":   'oSec01Field02', 
                 "aInput02":   'oSec01Field04', 
                 "aInput03":   'oSec01Field06', 
                 "aInput04":   'oSec01Field08',
@@ -841,7 +842,7 @@ def HandleCalculationSheetForm(request):
                 "reqType": "PNwa"
             },
         },
-    }
+    } """
     
     #Define Retrieve values from AddMachine model
     try:
@@ -854,14 +855,25 @@ def HandleCalculationSheetForm(request):
         
 
 
-    config = form_mapping.get(sheet_key)
+    """ config = form_mapping.get(sheet_key)
     if not config:
         return redirect('PageCalculationSheet.html')  # Or a 404 page
 
     
     req_type = config['req_type']
     input_fields = config['input_fields']
-    output_fields = config['output_fields']
+    output_fields = config['output_fields'] """
+
+    req_sheet_key = sheet_key[0:-2]
+    req_type = {"reqType" : req_sheet_key}
+    input_fields = {
+        data.apikey : data.fieldname
+        for data in API_Keys.objects.filter(sheetkey = req_sheet_key, calctype = "Input")
+    }
+    output_fields = {
+        data.fieldname : data.apikey
+        for data in API_Keys.objects.filter(sheetkey = req_sheet_key, calctype = "Output")
+    }
 
     # Assign company filter only if the user has a company
     if user_company:

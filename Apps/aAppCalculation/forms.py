@@ -1,5 +1,5 @@
 from django import forms
-from .models import modelcalc, modelcalc_log
+from .models import modelcalc, modelcalc_log, API_Keys
 from Apps.aAppMechanical.models import FormFieldConfig
 from Apps.aAppProject.models import APP_Project
 from Apps.aAppMechanical.models import UserCompany
@@ -376,3 +376,14 @@ class FormCalculationSheet_log(forms.Form):
         if commit:
             instance.save()
         return instance
+
+class APIkeyForm(forms.ModelForm):
+    class Meta:
+        model = API_Keys
+        fields = ['sheetkey', 'calctype', 'fieldname', 'apikey']
+        widgets = {
+            'sheetkey': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the machine sheetkey'}),
+            'calctype': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the API key type'}),
+            'fieldname': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the field name'}),
+            'apikey': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the API key'}),
+        }

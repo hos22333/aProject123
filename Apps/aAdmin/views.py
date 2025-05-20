@@ -9,6 +9,7 @@ from .models import RoleAutho
 
 from django.contrib.auth.models import User
 from Apps.aAppCalculation.models import modelcalc_log
+from Apps.aAppCalculation.models import API_Keys
 from Apps.aAppSubmittal.models import Machine_log
 from Apps.aAppSubmittal.models import DXF_data
 from Apps.aAppMechanical.models import UserCompany
@@ -24,6 +25,7 @@ from Apps.aAppMechanical.forms import CompanyForm
 from Apps.aAppMechanical.forms import FormFieldConfigForm
 from Apps.aAppSubmittal.forms import MachineForm  
 from Apps.aAppSubmittal.forms import DXFdataForm  
+from Apps.aAppCalculation.forms import APIkeyForm  
 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -573,3 +575,47 @@ def delete_DXFdata(request, data_id):
 
 #######################################
 
+
+def APIkey_list(request):
+    if request.method == "POST":
+        
+        form = APIkeyForm(request.POST)
+        if form.is_valid():
+            
+            form.save() 
+
+            
+            return redirect('APIkey_list')
+    else:
+        form = APIkeyForm()
+        
+    
+    datas = API_Keys.objects.all()
+    
+    return render(request, 'APIkey_list.html', {'form': form, 'datas': datas})
+
+
+# Edit Machine
+def edit_APIkey(request, data_id):
+    data = get_object_or_404(API_Keys, id=data_id)
+
+    if request.method == 'POST':
+        form = APIkeyForm(request.POST, instance=data)
+        if form.is_valid():
+            form.save()
+            return redirect('APIkey_list')  # Redirect back to the main page
+    else:
+        form = APIkeyForm(instance=data)
+
+    return render(request, 'edit_APIkey.html', {'form': form, 'data': data})
+
+
+# Delete DXF data
+def delete_APIkey(request, data_id):
+    data = get_object_or_404(API_Keys, id=data_id)
+    
+    data.delete()
+    return redirect('APIkey_list')  # Redirect back to the list
+
+
+#######################################
