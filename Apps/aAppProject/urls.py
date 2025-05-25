@@ -12,4 +12,5 @@ urlpatterns = [
     path('generate_calculation_report/<int:project_id>/', views.generate_calculation_report, name='generate_calculation_report'),
     path('save_reports/<int:project_id>/',      views.save_reports, name='save_reports'),
     path('download-reports/<int:project_id>/',  views.download_project_reports, name='download_project_reports'),
+    path('download-drive-reports/<int:project_id>/',  views.download_drive_project_reports, name='download_drive_project_reports'),
 ]

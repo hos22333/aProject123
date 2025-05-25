@@ -4,6 +4,7 @@ from config import settings
 from .forms import ProjectForm
 from .models import APP_Project
 from .reports import word_submittal_report, word_calculation_report, save_word_pdf_submittal_report, save_word_pdf_calculation_report, save_all_pdf_report
+from .drive import create_folder, service, check_folder_exists, get_folder_id_by_name, upload_files, get_file_ids_in_folder, download_file, download_file_as_bytes, upload_files_directly
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppSubmittal.models import Machine
 from Apps.aAppSubmittal.models import AddMachine
@@ -88,6 +89,18 @@ def project_list(request):
             os.makedirs(project_folder, exist_ok=True)
             print("project_folder_path : ", project_folder)
             
+            folder_exist, folder_data = check_folder_exists(service, company_name)
+            if folder_exist == True :
+                folder_id = get_folder_id_by_name(service, company_name)
+                create_folder(service, folder_name, folder_id)
+            else:
+                create_folder(service, company_name.upper())
+                folder_id = get_folder_id_by_name(service, company_name)
+                create_folder(service, folder_name, folder_id)
+
+            
+            project_folder_id = get_folder_id_by_name(service, folder_name, folder_id)
+            
             
             
             print("#######################")
@@ -96,47 +109,24 @@ def project_list(request):
             
             
             if company_name == "aaaa":
-                excel_file_path1 = os.path.join(project_folder, 'Cost1_excel.xlsx')
-                excel_file_path2 = os.path.join(project_folder, 'Cost2_excel.xlsx')
-                excel_file_path3 = os.path.join(project_folder, 'Cost3_excel.xlsx')
-                excel_file_path4 = os.path.join(project_folder, 'Cost4_excel.xlsx')
-                excel_file_path5 = os.path.join(project_folder, 'Cost5_excel.xlsx')
+                for i in range(1 , 6):
+                    excel_buffer = BytesIO()
+                    ef = Workbook()  # Creates a new workbook with one empty sheet
+                    ef.save(excel_buffer)
+                    excel_buffer.seek(0)
+                    excel_name = f"Cost{i}_excel.xlsx"
+                    excel_mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    upload_files_directly(service, excel_buffer, excel_name, excel_mime, project_folder_id)
 
-                pdf_file_path1 = os.path.join(project_folder, 'Cost1_pdf.pdf')
-                pdf_file_path2 = os.path.join(project_folder, 'Cost2_pdf.pdf')
-                pdf_file_path3 = os.path.join(project_folder, 'Cost3_pdf.pdf')
-                pdf_file_path4 = os.path.join(project_folder, 'Cost4_pdf.pdf')
-                pdf_file_path5 = os.path.join(project_folder, 'Cost5_pdf.pdf')
-
-                # Create the folders if they don't exist
-                os.makedirs(project_folder, exist_ok=True)
-
-                ef = Workbook()  # Creates a new workbook with one empty sheet
-                ef.save(excel_file_path1)
-                ef.save(excel_file_path2)
-                ef.save(excel_file_path3)
-                ef.save(excel_file_path4)
-                ef.save(excel_file_path5)
-
-                pf1 = canvas.Canvas(pdf_file_path1)
-                pf1.showPage()  # Add a blank page
-                pf1.save()
-                
-                pf2 = canvas.Canvas(pdf_file_path2)
-                pf2.showPage()  # Add a blank page
-                pf2.save()
-                
-                pf3 = canvas.Canvas(pdf_file_path3)
-                pf3.showPage()  # Add a blank page
-                pf3.save()
-                
-                pf4 = canvas.Canvas(pdf_file_path4)
-                pf4.showPage()  # Add a blank page
-                pf4.save()
-                
-                pf5 = canvas.Canvas(pdf_file_path5)
-                pf5.showPage()  # Add a blank page
-                pf5.save()
+                    # PDF
+                    pdf_buffer = BytesIO()
+                    pdf = canvas.Canvas(pdf_buffer)
+                    pdf.showPage()
+                    pdf.save()
+                    pdf_buffer.seek(0)
+                    pdf_name = f"Cost{i}_pdf.pdf"
+                    pdf_mime = 'application/pdf'
+                    upload_files_directly(service, pdf_buffer, pdf_name, pdf_mime, project_folder_id)
 
 
 
@@ -531,3 +521,32 @@ def download_project_reports(request, project_id):
     response = HttpResponse(buffer, content_type='application/zip')
     response['Content-Disposition'] = f'attachment; filename="{folder_name}_reports.zip"'
     return response
+
+
+def download_drive_project_reports(request, project_id):
+
+    project = APP_Project.objects.get(id=project_id)
+    company_slug = slugify(project.company.nameCompanies)
+    company_name = project.company.nameCompanies
+    project_name = slugify(project.name)
+    folder_name = slugify(f"{project_id}_{company_slug}_{project_name}")
+
+    company_folder_id = get_folder_id_by_name( service , company_name)
+    project_folder_id = get_folder_id_by_name( service , folder_name, company_folder_id )
+
+    files_in_folder = get_file_ids_in_folder(service, project_folder_id)
+
+    
+    # Create in-memory ZIP file
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for file_id, file_name in files_in_folder:
+            file_data = download_file_as_bytes(service, file_id)  # <- returns file content
+            zipf.writestr(file_name, file_data)
+
+    zip_buffer.seek(0)  # Move pointer to the beginning
+
+    response = HttpResponse(zip_buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="{folder_name}_reports.zip"'
+    return response
+

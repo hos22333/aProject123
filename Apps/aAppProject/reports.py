@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from django.shortcuts import render
 from config import settings
 from .models import APP_Project
+from .drive import create_folder, service, check_folder_exists, get_folder_id_by_name, upload_files, upload_files_directly
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppSubmittal.models import Machine
 from Apps.aAppSubmittal.models import AddMachine
@@ -23,7 +24,7 @@ from django.shortcuts import render, redirect
 from django.utils.timezone import now 
 from django.contrib.auth.models import User
 from django.utils.text import slugify
-from io import BytesIO
+from io import BytesIO, StringIO
 from ezdxf import recover
 from ezdxf.addons.drawing import Frontend, RenderContext
 from ezdxf.addons.drawing import matplotlib as ezdxf_matplotlib
@@ -916,6 +917,7 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
 
         # Define the folder path
         company_slug = slugify(project.company.nameCompanies)
+        company_name = company_slug.upper()
         project_slug = slugify(project.name)
         folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
 
@@ -926,8 +928,57 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
         file_path = os.path.join(project_folder, f"{project_slug}_report.docx")
         doc.save(file_path)
 
+        doc_buffer = BytesIO()
+        doc.save(doc_buffer)
+        doc_buffer.seek(0)
+        
+        file_name = f"{project_slug}_report.docx"
+        mime_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
+        if company_folder_exist == True:
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+            if project_folder_exist == True:
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+            else:
+                create_folder(service, folder_name, company_folder_id)
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+        else:
+            create_folder(service, company_name)
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, folder_name, company_folder_id)
+            project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+            upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+
         pdf_file_path = os.path.join(project_folder, f"{project_slug}_report.pdf")
         pdf.output(pdf_file_path)
+
+        pdf_bytes = pdf.output(dest='S').encode('latin1')  # Get PDF as bytes
+        pdf_buffer = BytesIO(pdf_bytes)
+        pdf_buffer.seek(0)
+
+
+        file_name = f"{project_slug}_report.pdf"
+        mime_type = 'application/pdf'
+        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
+        if company_folder_exist == True:
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+            if project_folder_exist == True:
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
+            else:
+                create_folder(service, folder_name, company_folder_id)
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
+        else:
+            create_folder(service, company_name)
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, folder_name, company_folder_id)
+            project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+            upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
 
         return HttpResponse(status=204)
 
@@ -1064,7 +1115,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
 
         
     # Main DXF Processing Function
-    def process_saved_dxf(request, aMachine_ID, category, project_id, modifications, output_filename, aType):
+    def process_saved_dxf(request, aMachine_ID, category, project_id, modifications, output_filename, aType, company_name, folder_name):
         
         # Log the request
         aLogEntry.objects.create(
@@ -1085,13 +1136,58 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
         
         modify_saved_dxf_file(static_path, modified_path, modifications(machine))
 
+        file_name = output_filename
+        mime_type = 'application/dxf'
+        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
+        if company_folder_exist == True:
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+            if project_folder_exist == True:
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files(service,modified_path, file_name, mime_type, project_folder_id)
+            else:
+                create_folder(service, folder_name, company_folder_id)
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files(service,modified_path, file_name, mime_type, project_folder_id)
+        else:
+            create_folder(service, company_name)
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, folder_name, company_folder_id)
+            project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+            upload_files(service,modified_path, file_name, mime_type, project_folder_id)
+
 
         # Define PDF output path
         pdf_output_path = modified_path.replace(".dxf", ".pdf")
 
         try:
             convert_dxf_to_pdf_ezdxf(modified_path, pdf_output_path)
+            
+            base, ext = os.path.splitext(output_filename)
+            new_filename = base + ".pdf"
+            file_name = new_filename
+            mime_type = 'application/pdf'
+            company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
+            if company_folder_exist == True:
+                company_folder_id = get_folder_id_by_name(service, company_name)
+                project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+                if project_folder_exist == True:
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,pdf_output_path, file_name, mime_type, project_folder_id)
+                else:
+                    create_folder(service, folder_name, company_folder_id)
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,pdf_output_path, file_name, mime_type, project_folder_id)
+            else:
+                create_folder(service, company_name)
+                company_folder_id = get_folder_id_by_name(service, company_name)
+                create_folder(service, folder_name, company_folder_id)
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files(service,pdf_output_path, file_name, mime_type, project_folder_id)
+
+                
             print(f"PDF saved to {pdf_output_path}")
+
         except Exception as e:
             print("DXF to PDF conversion failed:", e)
             return HttpResponse("DXF to PDF conversion failed", status=500)
@@ -1120,13 +1216,20 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
 
     # Get the company of the logged-in user    
     user_company = None
-    firstletter = None
+    company_name = None
     if request.user.is_authenticated:
         try:
             user_company = UserCompany.objects.get(user=request.user).company
-            firstletter = user_company.nameCompanies[0]
+            company_name = user_company.nameCompanies
         except UserCompany.DoesNotExist:
             user_company = None
+    
+    project = APP_Project.objects.get(id=project_id)
+
+    # Define the folder path
+    company_slug = slugify(company_name)
+    project_slug = slugify(project.name)
+    folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
 
     datas = DXF_data.objects.filter(sheetkey = sheetkey)
 
@@ -1141,181 +1244,10 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
             for data in datas
         },
         f"{file_name}.dxf",
-        aType
+        aType,
+        company_name,
+        folder_name
     )
-
-    """ if aType == f"NS_{firstletter}":
-        return process_saved_dxf(
-            request,
-            aMachine_ID,
-            "NS",
-            project_id,
-            lambda machine: {
-                "ScreenLength": machine.oSec02Field06,
-                "BarLength": "500",
-                "ScreenWidth": machine.oSec02Field04,
-                "BarTh": "10",
-                "BarSpacing": machine.oSec02Field10,
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    
-    if aType == f"MS_{firstletter}":
-        return process_saved_dxf(
-            request,
-            aMachine_ID,
-            "MS",
-            project_id,
-            lambda machine: {
-                "ChannelHeight": "0000",
-                "WaterLevel": "000",
-                "Width": machine.oSec02Field08,
-                "Length": machine.oSec02Field10,
-                "Angle": machine.oSec02Field20,
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"BC_{firstletter}":
-        return process_saved_dxf(
-            request,
-            aMachine_ID,
-            "BC",
-            project_id,
-            lambda machine: {
-                "Length": machine.oSec02Field04,
-                "Width": machine.oSec02Field02,
-                "WidB": "000",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"CO_{firstletter}":
-        return process_saved_dxf(
-            request,
-            aMachine_ID,
-            "CO",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf"
-        )
-        
-    if aType == f"GR_{firstletter}":
-        return process_saved_dxf(
-            request,
-            aMachine_ID,
-            "GR",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"SS_{firstletter}":
-        return process_saved_dxf(
-            request,
-            aMachine_ID,
-            "SS",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"PS_{firstletter}":
-        return process_saved_dxf(
-            request,
-            aMachine_ID,
-            "PS",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"QV_{firstletter}":
-        return process_saved_dxf(
-            request,
-            aMachine_ID,
-            "QV",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"TV_{firstletter}":
-        return process_saved_dxf(
-            request,
-            aMachine_ID,
-            "TV",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"TH_{firstletter}":
-        return process_saved_dxf(
-            request,
-            aMachine_ID,
-            "TH",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        ) """
-        
-    
-   
    
    
    
@@ -1337,8 +1269,12 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
     print("start, SavedFullDrawing", aMachine_ID, aType)
     
     # Helper function to modify DXF files
-    def SavedFullDrawing_modify_dxf_file(static_path, modified_path, modifications):
+    def SavedFullDrawing_modify_dxf_file(static_path, buffer, modifications):
         doc = ezdxf.readfile(static_path)
+        msp = doc.modelspace()
+
+        # Apply modifications here (using your `modifications` logic)
+        modifications(msp)
 
         # for entity in doc.modelspace().query("DIMENSION"):
         #     if entity.dxf.text in modifications:
@@ -1352,7 +1288,7 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
 
         #     entity.render()
 
-        doc.saveas(modified_path)    
+        doc.write(buffer)  
         
         
     # Helper function to define DXF paths
@@ -1419,6 +1355,7 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
         machine = Machine.objects.get(id=aMachine_ID)
         project = machine.project  # Assumes FK from Machine to Project
         company_slug = slugify(user_company.nameCompanies)
+        company_name = company_slug.upper()
         project_slug = slugify(project.name)
         folder_name = f"{project.id}_{company_slug}_{project_slug}"
 
@@ -1433,19 +1370,53 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
         if not os.path.exists(static_path):
             return HttpResponse("File not found", status=404)
 
+        # Use a BytesIO buffer to store the modified file in memory
+        text_buffer  = StringIO()
         # Destination path
-        target_dir = os.path.join(
+        """ target_dir = os.path.join(
             settings.BASE_DIR, "static", "aReports", company_slug.upper(), folder_name
         )
         os.makedirs(target_dir, exist_ok=True)
         if output_filename != "None.dxf" :
             modified_path = os.path.join(target_dir, output_filename)
         else :
-            modified_path = os.path.join(target_dir, f"{category}_newFullDrawing.dxf")
+            modified_path = os.path.join(target_dir, f"{category}_newFullDrawing.dxf") """
 
         machine = Machine.objects.get(id=aMachine_ID)
+
+        mod_func = modifications(machine)
+
+        # Modify the DXF and write to the buffer
+        SavedFullDrawing_modify_dxf_file(static_path, text_buffer , mod_func)
+        text_data = text_buffer.getvalue().encode("utf-8")  # Convert to bytes
+        dxf_buffer = BytesIO(text_data)  # For uploading
+        dxf_buffer.seek(0)
+
+        # Prepare upload
+        file_name = output_filename if output_filename != "None.dxf" else f"{category}_newFullDrawing.dxf"
+        mime_type = 'application/dxf'
         
-        SavedFullDrawing_modify_dxf_file(static_path, modified_path, modifications(machine))
+        """ SavedFullDrawing_modify_dxf_file(static_path, modified_path, modifications(machine)) """
+        
+        """ file_name = output_filename
+        mime_type = 'application/dxf' """
+        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
+        if company_folder_exist == True:
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+            if project_folder_exist == True:
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files_directly(service, dxf_buffer, file_name, mime_type, project_folder_id)
+            else:
+                create_folder(service, folder_name, company_folder_id)
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files_directly(service, dxf_buffer, file_name, mime_type, project_folder_id)
+        else:
+            create_folder(service, company_name)
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, folder_name, company_folder_id)
+            project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+            upload_files_directly(service, dxf_buffer, file_name, mime_type, project_folder_id)
         
 
         
@@ -1470,11 +1441,9 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
 
     # Get the company of the logged-in user    
     user_company = None
-    firstletter = None
     if request.user.is_authenticated:
         try:
             user_company = UserCompany.objects.get(user=request.user).company
-            firstletter = user_company.nameCompanies[0]
         except UserCompany.DoesNotExist:
             user_company = None 
         
@@ -1492,189 +1461,16 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
         aMachine_ID,
         sheetkey,
         project_id,
-        lambda machine: {
-            data.fieldname : resolve_fieldvalue(machine, data.fieldvalue)
+        lambda machine: lambda msp: [
+            msp.add_text(
+                str(resolve_fieldvalue(machine, data.fieldvalue)),
+                dxfattribs={"layer": data.fieldname}
+            )
             for data in datas
-        },
+        ],
         f"{file_name}.dxf",
         aType
     )
-
-
-    """ if aType == f"NS_{firstletter}":
-        return SavedFullDrawing_process_dxf(
-            request,
-            aMachine_ID,
-            "NS",
-            project_id,
-            lambda machine: {
-                "ScreenLength": machine.oSec02Field06,
-                "BarLength": "500",
-                "ScreenWidth": machine.oSec02Field04,
-                "BarTh": "10",
-                "BarSpacing": machine.oSec02Field10,
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    
-    if aType == f"MS_{firstletter}":
-        return SavedFullDrawing_process_dxf(
-            request,
-            aMachine_ID,
-            "MS",
-            project_id,
-            lambda machine: {
-                "ChannelHeight": "0000",
-                "WaterLevel": "000",
-                "Width": machine.oSec02Field08,
-                "Length": machine.oSec02Field10,
-                "Angle": machine.oSec02Field20,
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"BC_{firstletter}":
-        return SavedFullDrawing_process_dxf(
-            request,
-            aMachine_ID,
-            "BC",
-            project_id,
-            lambda machine: {
-                "Length": machine.oSec02Field04,
-                "Width": machine.oSec02Field02,
-                "WidB": "000",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"CO_{firstletter}":
-        return SavedFullDrawing_process_dxf(
-            request,
-            aMachine_ID,
-            "CO",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"GR_{firstletter}":
-        return SavedFullDrawing_process_dxf(
-            request,
-            aMachine_ID,
-            "GR",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"SS_{firstletter}":
-        return SavedFullDrawing_process_dxf(
-            request,
-            aMachine_ID,
-            "SS",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"PS_{firstletter}":
-        return SavedFullDrawing_process_dxf(
-            request,
-            aMachine_ID,
-            "PS",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"QV_{firstletter}":
-        return SavedFullDrawing_process_dxf(
-            request,
-            aMachine_ID,
-            "QV",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"TV_{firstletter}":
-        return SavedFullDrawing_process_dxf(
-            request,
-            aMachine_ID,
-            "TV",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        )
-        
-    if aType == f"TH_{firstletter}":
-        return SavedFullDrawing_process_dxf(
-            request,
-            aMachine_ID,
-            "TH",
-            project_id,
-            lambda machine: {
-                "ScreenLength": "1000",
-                "BarLength": "500",
-                "ScreenWidth": "600",
-                "BarTh": "10",
-                "BarSpacing": "25",
-            },
-            f"{file_name}.dxf",
-            aType
-        ) """
-
-
-
-
 
 
 
@@ -2048,18 +1844,67 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
 
         # Define the folder path
         company_slug = slugify(project.company.nameCompanies)
+        company_name = company_slug.upper()
         project_slug = slugify(project.name)
         folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
 
-        project_folder = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_slug, folder_name)
+        """ project_folder = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_slug, folder_name)
         os.makedirs(project_folder, exist_ok=True)  # Create folder if it doesn't exist
 
         # Save the file to that path
         file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.docx")
-        doc.save(file_path)
+        doc.save(file_path) """
+        
+        doc_buffer = BytesIO()
+        doc.save(doc_buffer)
+        doc_buffer.seek(0)
 
-        pdf_file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.pdf")
-        pdf.output(pdf_file_path)
+        file_name = f"{project_slug}_Calculation_report.docx"
+        mime_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
+        if company_folder_exist == True:
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+            if project_folder_exist == True:
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+            else:
+                create_folder(service, folder_name, company_folder_id)
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+        else:
+            create_folder(service, company_name)
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, folder_name, company_folder_id)
+            project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+            upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+
+        """ pdf_file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.pdf")
+        pdf.output(pdf_file_path) """
+
+        pdf_bytes = pdf.output(dest='S').encode('latin1')  # Get PDF as bytes
+        pdf_buffer = BytesIO(pdf_bytes)
+        pdf_buffer.seek(0)
+
+        file_name = f"{project_slug}_Calculation_report.pdf"
+        mime_type = 'application/pdf'
+        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
+        if company_folder_exist == True:
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+            if project_folder_exist == True:
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
+            else:
+                create_folder(service, folder_name, company_folder_id)
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
+        else:
+            create_folder(service, company_name)
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, folder_name, company_folder_id)
+            project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+            upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
 
         return HttpResponse(status=204)
 
@@ -2196,6 +2041,7 @@ def save_all_pdf_report(request, project_id, logo):
 
         # Define the folder path
         company_slug = slugify(project.company.nameCompanies)
+        company_name = company_slug.upper()
         project_slug = slugify(project.name)
         folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
 
@@ -2358,6 +2204,30 @@ def save_all_pdf_report(request, project_id, logo):
         # Save the new PDF
         with open(pdf_file_path, "wb") as f:
             output.write(f)
+
+        file_name = f"all_{project_slug}_report.pdf"
+        
+        mime_type = 'application/pdf'
+        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
+        if company_folder_exist == True:
+            company_folder_id = company_folder_data['id']
+            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+            
+            if project_folder_exist == True:
+                project_folder_id = project_folder_data['id']
+                upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
+            
+            else:
+                create_folder(service, folder_name, company_folder_id)
+                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
+        
+        else:
+            create_folder(service, company_name)
+            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, folder_name, company_folder_id)
+            project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+            upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
 
         return HttpResponse(status=204)
         
