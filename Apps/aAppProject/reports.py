@@ -179,7 +179,7 @@ def word_submittal_report(request, project_id, logo, color):
         print(aCompany.id)
         print(project.id)
     
-        print("Company 2")
+        print(f"Company {aCompany.id}")
     
     
         # Create a Word document
@@ -432,7 +432,7 @@ def word_calculation_report(request, project_id, logo, color):
         print(aCompany.id)
         print(project.id)
     
-        print("Company 2")
+        print(f"Company {aCompany.id}")
     
     
         # Create a Word document
@@ -558,7 +558,7 @@ def word_calculation_report(request, project_id, logo, color):
         return HttpResponse("Project not found", status=404)
 
 
-def save_word_pdf_submittal_report(request, project_id, logo, color):  
+def save_word_pdf_submittal_report(user, project_id, logo, color):  
     print("start, save_word_pdf_submittal_report, project_id : ", project_id)
     
     def add_table(doc, data, title=None):
@@ -773,13 +773,13 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
         
         ###LOG
         aLogEntry.objects.create(
-                user=request.user,
-                message=f"at {now()} {request.user} accessed Load  "
+                user=user,
+                message=f"at {now()} {user} accessed Load  "
             )
         print(f"at {now()} {User} accessed Download Report")
         ###LOG
 
-        aCompany = UserCompany.objects.get(user=request.user)
+        aCompany = UserCompany.objects.get(user=user)
         company_id = aCompany.company
         project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
@@ -838,8 +838,8 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
             
             sheet_key = themachines.keyValue
             themachinename = themachines.nameMachine
-            General_saved_DXF_ALL(request, machine_ID, sheet_key, project_id)
-            SavedFullDrawing(request, machine_ID, sheet_key, project_id)
+            General_saved_DXF_ALL(user, machine_ID, sheet_key, project_id)
+            SavedFullDrawing(user, machine_ID, sheet_key, project_id)
             
             #SavedFullDrawing(request, machine_ID, sheet_key)
 
@@ -928,57 +928,87 @@ def save_word_pdf_submittal_report(request, project_id, logo, color):
         file_path = os.path.join(project_folder, f"{project_slug}_report.docx")
         doc.save(file_path)
 
-        doc_buffer = BytesIO()
+        """ doc_buffer = BytesIO()
         doc.save(doc_buffer)
-        doc_buffer.seek(0)
+        doc_buffer.seek(0) """
         
         file_name = f"{project_slug}_report.docx"
         mime_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
-        if company_folder_exist == True:
-            company_folder_id = get_folder_id_by_name(service, company_name)
-            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
-            if project_folder_exist == True:
-                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+
+        folder_exist, folder_data = check_folder_exists(service, "aReports")
+        if folder_exist == True :
+            folder_id = folder_data['id']
+            company_folder_exist, company_folder_data = check_folder_exists(service, company_name, folder_id)
+            if company_folder_exist == True:
+                company_folder_id = get_folder_id_by_name(service, company_name)
+                project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+                if project_folder_exist == True:
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,file_path, file_name, mime_type, project_folder_id)
+                    """ upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id) """
+                else:
+                    create_folder(service, folder_name, company_folder_id)
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,file_path, file_name, mime_type, project_folder_id)
+                    """ upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id) """
             else:
+                create_folder(service, company_name, folder_id)
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
                 create_folder(service, folder_name, company_folder_id)
                 project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+                upload_files(service,file_path, file_name, mime_type, project_folder_id)
+                """ upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id) """
         else:
-            create_folder(service, company_name)
-            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, "aReports")
+            folder_id = get_folder_id_by_name(service, "aReports")
+            create_folder(service, company_name, folder_id)
+            company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
             create_folder(service, folder_name, company_folder_id)
             project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-            upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+            upload_files(service,file_path, file_name, mime_type, project_folder_id)
 
         pdf_file_path = os.path.join(project_folder, f"{project_slug}_report.pdf")
         pdf.output(pdf_file_path)
 
-        pdf_bytes = pdf.output(dest='S').encode('latin1')  # Get PDF as bytes
+        """ pdf_bytes = pdf.output(dest='S').encode('latin1')  # Get PDF as bytes
         pdf_buffer = BytesIO(pdf_bytes)
-        pdf_buffer.seek(0)
+        pdf_buffer.seek(0) """
 
 
         file_name = f"{project_slug}_report.pdf"
         mime_type = 'application/pdf'
-        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
-        if company_folder_exist == True:
-            company_folder_id = get_folder_id_by_name(service, company_name)
-            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
-            if project_folder_exist == True:
-                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
+
+        folder_exist, folder_data = check_folder_exists(service, "aReports")
+        if folder_exist == True :
+            folder_id = folder_data['id']
+            company_folder_exist, company_folder_data = check_folder_exists(service, company_name, folder_id)
+            if company_folder_exist == True:
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
+                project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+                if project_folder_exist == True:
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
+                    """ upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id) """
+                else:
+                    create_folder(service, folder_name, company_folder_id)
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
+                    """ upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id) """
             else:
+                create_folder(service, company_name, folder_id)
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
                 create_folder(service, folder_name, company_folder_id)
                 project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
+                upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
+                """ upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id) """
         else:
-            create_folder(service, company_name)
-            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, "aReports")
+            folder_id = get_folder_id_by_name(service, "aReports")
+            create_folder(service, company_name, folder_id)
+            company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
             create_folder(service, folder_name, company_folder_id)
             project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-            upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
+            upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
 
         return HttpResponse(status=204)
 
@@ -1036,7 +1066,7 @@ def resolve_fieldvalue(machine, fieldvalue):
 
 
 # DXF Download Views
-def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id): 
+def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id): 
     print("start, General_saved_DXF_ALL", project_id, aMachine_ID, aType)
     
     
@@ -1115,16 +1145,17 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
 
         
     # Main DXF Processing Function
-    def process_saved_dxf(request, aMachine_ID, category, project_id, modifications, output_filename, aType, company_name, folder_name):
+    def process_saved_dxf(user, aMachine_ID, category, project_id, modifications, output_filename, aType, company_name, folder_name):
         
         # Log the request
         aLogEntry.objects.create(
-            user=request.user,
-            message=f"at {now()} {request.user} Download DXF {category} {aMachine_ID}"
+            user=user,
+            message=f"at {now()} {user} Download DXF {category} {aMachine_ID}"
         )
 
-        user_company = get_user_company(request)
-        if not user_company:
+        try:
+            user_company = UserCompany.objects.get(user=user).company
+        except UserCompany.DoesNotExist:
             return HttpResponse("Unauthorized", status=403)
 
         static_path, modified_path = get_saved_dxf_paths(user_company, category, project_id, output_filename, aType)
@@ -1138,20 +1169,32 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
 
         file_name = output_filename
         mime_type = 'application/dxf'
-        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
-        if company_folder_exist == True:
-            company_folder_id = get_folder_id_by_name(service, company_name)
-            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
-            if project_folder_exist == True:
-                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                upload_files(service,modified_path, file_name, mime_type, project_folder_id)
+
+        folder_exist, folder_data = check_folder_exists(service, "aReports")
+        if folder_exist == True :
+            folder_id = folder_data['id']
+            company_folder_exist, company_folder_data = check_folder_exists(service, company_name, folder_id)
+            if company_folder_exist == True:
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
+                project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+                if project_folder_exist == True:
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,modified_path, file_name, mime_type, project_folder_id)
+                else:
+                    create_folder(service, folder_name, company_folder_id)
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,modified_path, file_name, mime_type, project_folder_id)
             else:
+                create_folder(service, company_name, folder_id)
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
                 create_folder(service, folder_name, company_folder_id)
                 project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
                 upload_files(service,modified_path, file_name, mime_type, project_folder_id)
         else:
-            create_folder(service, company_name)
-            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, "aReports")
+            folder_id = get_folder_id_by_name(service, "aReports")
+            create_folder(service, company_name, folder_id)
+            company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
             create_folder(service, folder_name, company_folder_id)
             project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
             upload_files(service,modified_path, file_name, mime_type, project_folder_id)
@@ -1167,20 +1210,32 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
             new_filename = base + ".pdf"
             file_name = new_filename
             mime_type = 'application/pdf'
-            company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
-            if company_folder_exist == True:
-                company_folder_id = get_folder_id_by_name(service, company_name)
-                project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
-                if project_folder_exist == True:
-                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                    upload_files(service,pdf_output_path, file_name, mime_type, project_folder_id)
+
+            folder_exist, folder_data = check_folder_exists(service, "aReports")
+            if folder_exist == True :
+                folder_id = folder_data['id']
+                company_folder_exist, company_folder_data = check_folder_exists(service, company_name, folder_id)
+                if company_folder_exist == True:
+                    company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
+                    project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+                    if project_folder_exist == True:
+                        project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                        upload_files(service,pdf_output_path, file_name, mime_type, project_folder_id)
+                    else:
+                        create_folder(service, folder_name, company_folder_id)
+                        project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                        upload_files(service,pdf_output_path, file_name, mime_type, project_folder_id)
                 else:
+                    create_folder(service, company_name, folder_id)
+                    company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
                     create_folder(service, folder_name, company_folder_id)
                     project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
                     upload_files(service,pdf_output_path, file_name, mime_type, project_folder_id)
             else:
-                create_folder(service, company_name)
-                company_folder_id = get_folder_id_by_name(service, company_name)
+                create_folder(service, "aReports")
+                folder_id = get_folder_id_by_name(service, "aReports")
+                create_folder(service, company_name, folder_id)
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
                 create_folder(service, folder_name, company_folder_id)
                 project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
                 upload_files(service,pdf_output_path, file_name, mime_type, project_folder_id)
@@ -1195,14 +1250,14 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
 
     
     # Redirect unauthenticated users
-    if not request.user.is_authenticated:
+    if not user.is_authenticated:
         return redirect("login")  
     
     
     ###LOG
     aLogEntry.objects.create(
-            user=request.user,
-            message=f"at {now()} {request.user} DXF download {aType} "
+            user=user,
+            message=f"at {now()} {user} DXF download {aType} "
         )
     
     themachine = AddMachine.objects.get(keyValue = aType)
@@ -1217,9 +1272,9 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
     # Get the company of the logged-in user    
     user_company = None
     company_name = None
-    if request.user.is_authenticated:
+    if user.is_authenticated:
         try:
-            user_company = UserCompany.objects.get(user=request.user).company
+            user_company = UserCompany.objects.get(user=user).company
             company_name = user_company.nameCompanies
         except UserCompany.DoesNotExist:
             user_company = None
@@ -1235,7 +1290,7 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
 
 
     return process_saved_dxf(
-        request,
+        user,
         aMachine_ID,
         sheetkey,
         project_id,
@@ -1265,16 +1320,16 @@ def General_saved_DXF_ALL(request, aMachine_ID, aType, project_id):
    
     
 # DXF Download Views
-def SavedFullDrawing(request, aMachine_ID, aType, project_id): 
+def SavedFullDrawing(user, aMachine_ID, aType, project_id): 
     print("start, SavedFullDrawing", aMachine_ID, aType)
     
     # Helper function to modify DXF files
-    def SavedFullDrawing_modify_dxf_file(static_path, buffer, modifications):
+    def SavedFullDrawing_modify_dxf_file(static_path, modified_path, modifications):
         doc = ezdxf.readfile(static_path)
-        msp = doc.modelspace()
+        """ msp = doc.modelspace() """
 
         # Apply modifications here (using your `modifications` logic)
-        modifications(msp)
+        """ modifications(msp) """
 
         # for entity in doc.modelspace().query("DIMENSION"):
         #     if entity.dxf.text in modifications:
@@ -1288,7 +1343,8 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
 
         #     entity.render()
 
-        doc.write(buffer)  
+        """ doc.write(buffer)   """
+        doc.saveas(modified_path)
         
         
     # Helper function to define DXF paths
@@ -1345,10 +1401,11 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
         
         
     # Main DXF Processing Function
-    def SavedFullDrawing_process_dxf(request, aMachine_ID, category, project_id, modifications, output_filename, aType):
+    def SavedFullDrawing_process_dxf(user, aMachine_ID, category, project_id, modifications, output_filename, aType):
 
-        user_company = get_user_company(request)
-        if not user_company:
+        try:
+            user_company = UserCompany.objects.get(user=user).company
+        except UserCompany.DoesNotExist:
             return HttpResponse("Unauthorized", status=403)
 
         # Get machine and project
@@ -1371,20 +1428,20 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
             return HttpResponse("File not found", status=404)
 
         # Use a BytesIO buffer to store the modified file in memory
-        text_buffer  = StringIO()
+        """ text_buffer  = StringIO() """
         # Destination path
-        """ target_dir = os.path.join(
+        target_dir = os.path.join(
             settings.BASE_DIR, "static", "aReports", company_slug.upper(), folder_name
         )
         os.makedirs(target_dir, exist_ok=True)
         if output_filename != "None.dxf" :
             modified_path = os.path.join(target_dir, output_filename)
         else :
-            modified_path = os.path.join(target_dir, f"{category}_newFullDrawing.dxf") """
+            modified_path = os.path.join(target_dir, f"{category}_newFullDrawing.dxf")
 
         machine = Machine.objects.get(id=aMachine_ID)
 
-        mod_func = modifications(machine)
+        """ mod_func = modifications(machine)
 
         # Modify the DXF and write to the buffer
         SavedFullDrawing_modify_dxf_file(static_path, text_buffer , mod_func)
@@ -1394,29 +1451,44 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
 
         # Prepare upload
         file_name = output_filename if output_filename != "None.dxf" else f"{category}_newFullDrawing.dxf"
-        mime_type = 'application/dxf'
-        
-        """ SavedFullDrawing_modify_dxf_file(static_path, modified_path, modifications(machine)) """
-        
-        """ file_name = output_filename
         mime_type = 'application/dxf' """
-        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
-        if company_folder_exist == True:
-            company_folder_id = get_folder_id_by_name(service, company_name)
-            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
-            if project_folder_exist == True:
-                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                upload_files_directly(service, dxf_buffer, file_name, mime_type, project_folder_id)
+        
+        SavedFullDrawing_modify_dxf_file(static_path, modified_path, modifications(machine))
+        
+        file_name = output_filename
+        mime_type = 'application/dxf'
+
+        folder_exist, folder_data = check_folder_exists(service, "aReports")
+        if folder_exist == True :
+            folder_id = folder_data['id']
+            company_folder_exist, company_folder_data = check_folder_exists(service, company_name, folder_id)
+            if company_folder_exist == True:
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
+                project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+                if project_folder_exist == True:
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,modified_path, file_name, mime_type, project_folder_id)
+                    """ upload_files_directly(service, dxf_buffer, file_name, mime_type, project_folder_id) """
+                else:
+                    create_folder(service, folder_name, company_folder_id)
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,modified_path, file_name, mime_type, project_folder_id)
+                    """ upload_files_directly(service, dxf_buffer, file_name, mime_type, project_folder_id) """
             else:
+                create_folder(service, company_name, folder_id)
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
                 create_folder(service, folder_name, company_folder_id)
                 project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                upload_files_directly(service, dxf_buffer, file_name, mime_type, project_folder_id)
+                upload_files(service,modified_path, file_name, mime_type, project_folder_id)
+                """ upload_files_directly(service, dxf_buffer, file_name, mime_type, project_folder_id) """
         else:
-            create_folder(service, company_name)
-            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, "aReports")
+            folder_id = get_folder_id_by_name(service, "aReports")
+            create_folder(service, company_name, folder_id)
+            company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
             create_folder(service, folder_name, company_folder_id)
             project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-            upload_files_directly(service, dxf_buffer, file_name, mime_type, project_folder_id)
+            upload_files(service,modified_path, file_name, mime_type, project_folder_id)
         
 
         
@@ -1426,7 +1498,7 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
 
     
     # Redirect unauthenticated users
-    if not request.user.is_authenticated:
+    if not user.is_authenticated:
         return redirect("login") 
     
     
@@ -1441,33 +1513,30 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
 
     # Get the company of the logged-in user    
     user_company = None
-    if request.user.is_authenticated:
+    if user.is_authenticated:
         try:
-            user_company = UserCompany.objects.get(user=request.user).company
+            user_company = UserCompany.objects.get(user=user).company
         except UserCompany.DoesNotExist:
             user_company = None 
         
     ###LOG
     aLogEntry.objects.create(
-            user=request.user,
-            message=f"at {now()} {request.user} DXF download {aType} "
+            user=user,
+            message=f"at {now()} {user} DXF download {aType} "
         )
 
     datas = DXF_data.objects.filter(sheetkey = sheetkey)
 
 
     return SavedFullDrawing_process_dxf(
-        request,
+        user,
         aMachine_ID,
         sheetkey,
         project_id,
-        lambda machine: lambda msp: [
-            msp.add_text(
-                str(resolve_fieldvalue(machine, data.fieldvalue)),
-                dxfattribs={"layer": data.fieldname}
-            )
+        lambda machine: {
+            data.fieldname : resolve_fieldvalue(machine, data.fieldvalue)
             for data in datas
-        ],
+        },
         f"{file_name}.dxf",
         aType
     )
@@ -1482,7 +1551,7 @@ def SavedFullDrawing(request, aMachine_ID, aType, project_id):
 
 
 
-def save_word_pdf_calculation_report(request, project_id, logo, color):
+def save_word_pdf_calculation_report(user, project_id, logo, color):
     
     def add_table(doc, data, title=None):
         """Creates a borderless table and applies a background color to the header."""
@@ -1693,13 +1762,13 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
         
         ###LOG
         aLogEntry.objects.create(
-                user=request.user,
-                message=f"at {now()} {request.user} accessed Load  "
+                user=user,
+                message=f"at {now()} {user} accessed Load  "
             )
         print(f"at {now()} {User} accessed Download Report")
         ###LOG
 
-        aCompany = UserCompany.objects.get(user=request.user)
+        aCompany = UserCompany.objects.get(user=user)
         companyname=aCompany.company.nameCompanies
         firstletter = companyname[0]
         project = APP_Project.objects.get(id=project_id)
@@ -1709,7 +1778,7 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
         print(aCompany.id)
         print(project.id)
     
-        print("Company 2")
+        print(f"Company {aCompany.id}")
     
     
         # Create a Word document
@@ -1848,63 +1917,93 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
         project_slug = slugify(project.name)
         folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
 
-        """ project_folder = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_slug, folder_name)
+        project_folder = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_slug, folder_name)
         os.makedirs(project_folder, exist_ok=True)  # Create folder if it doesn't exist
 
         # Save the file to that path
         file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.docx")
-        doc.save(file_path) """
+        doc.save(file_path)
         
-        doc_buffer = BytesIO()
+        """ doc_buffer = BytesIO()
         doc.save(doc_buffer)
-        doc_buffer.seek(0)
+        doc_buffer.seek(0) """
 
         file_name = f"{project_slug}_Calculation_report.docx"
         mime_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
-        if company_folder_exist == True:
-            company_folder_id = get_folder_id_by_name(service, company_name)
-            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
-            if project_folder_exist == True:
-                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+
+        folder_exist, folder_data = check_folder_exists(service, "aReports")
+        if folder_exist == True :
+            folder_id = folder_data['id']
+            company_folder_exist, company_folder_data = check_folder_exists(service, company_name, folder_id)
+            if company_folder_exist == True:
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
+                project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+                if project_folder_exist == True:
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,file_path, file_name, mime_type, project_folder_id)
+                    """ upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id) """
+                else:
+                    create_folder(service, folder_name, company_folder_id)
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,file_path, file_name, mime_type, project_folder_id)
+                    """ upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id) """
             else:
+                create_folder(service, company_name, folder_id)
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
                 create_folder(service, folder_name, company_folder_id)
                 project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+                upload_files(service,file_path, file_name, mime_type, project_folder_id)
+                """ upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id) """
         else:
-            create_folder(service, company_name)
-            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, "aReports")
+            folder_id = get_folder_id_by_name(service, "aReports")
+            create_folder(service, company_name, folder_id)
+            company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
             create_folder(service, folder_name, company_folder_id)
             project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-            upload_files_directly(service, doc_buffer, file_name, mime_type, project_folder_id)
+            upload_files(service,file_path, file_name, mime_type, project_folder_id)
 
-        """ pdf_file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.pdf")
-        pdf.output(pdf_file_path) """
+        pdf_file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.pdf")
+        pdf.output(pdf_file_path)
 
-        pdf_bytes = pdf.output(dest='S').encode('latin1')  # Get PDF as bytes
+        """ pdf_bytes = pdf.output(dest='S').encode('latin1')  # Get PDF as bytes
         pdf_buffer = BytesIO(pdf_bytes)
-        pdf_buffer.seek(0)
+        pdf_buffer.seek(0) """
 
         file_name = f"{project_slug}_Calculation_report.pdf"
         mime_type = 'application/pdf'
-        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
-        if company_folder_exist == True:
-            company_folder_id = get_folder_id_by_name(service, company_name)
-            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
-            if project_folder_exist == True:
-                project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
+
+        folder_exist, folder_data = check_folder_exists(service, "aReports")
+        if folder_exist == True :
+            folder_id = folder_data['id']
+            company_folder_exist, company_folder_data = check_folder_exists(service, company_name, folder_id)
+            if company_folder_exist == True:
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
+                project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+                if project_folder_exist == True:
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
+                    """ upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id) """
+                else:
+                    create_folder(service, folder_name, company_folder_id)
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
+                    """ upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id) """
             else:
+                create_folder(service, company_name, folder_id)
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
                 create_folder(service, folder_name, company_folder_id)
                 project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-                upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
+                upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
+                """ upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id) """
         else:
-            create_folder(service, company_name)
-            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, "aReports")
+            folder_id = get_folder_id_by_name(service, "aReports")
+            create_folder(service, company_name, folder_id)
+            company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
             create_folder(service, folder_name, company_folder_id)
             project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
-            upload_files_directly(service, pdf_buffer, file_name, mime_type, project_folder_id)
+            upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
 
         return HttpResponse(status=204)
 
@@ -1914,7 +2013,7 @@ def save_word_pdf_calculation_report(request, project_id, logo, color):
         return HttpResponse("Project not found", status=404)
 
         
-def save_all_pdf_report(request, project_id, logo):
+def save_all_pdf_report(user, project_id, logo):
     
     # Define a custom class for the PDF layout
     class PDF(FPDF):
@@ -2027,13 +2126,13 @@ def save_all_pdf_report(request, project_id, logo):
         
         ###LOG
         aLogEntry.objects.create(
-                user=request.user,
-                message=f"at {now()} {request.user} accessed Load  "
+                user=user,
+                message=f"at {now()} {user} accessed Load  "
             )
         print(f"at {now()} {User} accessed Save Report")
         ###LOG
 
-        aCompany = UserCompany.objects.get(user=request.user)
+        aCompany = UserCompany.objects.get(user=user)
         company_id = aCompany.company
         project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
@@ -2190,7 +2289,7 @@ def save_all_pdf_report(request, project_id, logo):
                     output.add_page(page)
 
 
-        if aCompany.company.nameCompanies == "aaaa":
+        if company_slug == "aaaa":
             for i in range(1 , 6):
                 emptyappendix = None
                 cost_file_name = f"cost{i}_pdf.pdf"
@@ -2208,23 +2307,36 @@ def save_all_pdf_report(request, project_id, logo):
         file_name = f"all_{project_slug}_report.pdf"
         
         mime_type = 'application/pdf'
-        company_folder_exist, company_folder_data = check_folder_exists(service, company_name)
-        if company_folder_exist == True:
-            company_folder_id = company_folder_data['id']
-            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
-            
-            if project_folder_exist == True:
-                project_folder_id = project_folder_data['id']
-                upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
-            
+
+        folder_exist, folder_data = check_folder_exists(service, "aReports")
+        if folder_exist == True :
+            folder_id = folder_data['id']
+            company_folder_exist, company_folder_data = check_folder_exists(service, company_name, folder_id)
+            if company_folder_exist == True:
+                company_folder_id = company_folder_data['id']
+                project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+
+                if project_folder_exist == True:
+                    project_folder_id = project_folder_data['id']
+                    upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
+
+                else:
+                    create_folder(service, folder_name, company_folder_id)
+                    project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+                    upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
+
             else:
+                create_folder(service, company_name, folder_id)
+                company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
                 create_folder(service, folder_name, company_folder_id)
                 project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
                 upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
         
         else:
-            create_folder(service, company_name)
-            company_folder_id = get_folder_id_by_name(service, company_name)
+            create_folder(service, "aReports")
+            folder_id = get_folder_id_by_name(service, "aReports")
+            create_folder(service, company_name, folder_id)
+            company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
             create_folder(service, folder_name, company_folder_id)
             project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
             upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)

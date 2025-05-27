@@ -2340,7 +2340,7 @@ function showDetails(name, client, capacity, coverpagetext) {
                 url: url,
                 method: 'GET',
                 success: function () {
-                    $('#saveStatus').html('<span class="text-success">Reports saved successfully</span>');
+                    $('#saveStatus').html('<span class="text-success">Reports started saving successfully, now you can leave the page</span>');
                 },
                 error: function () {
                     $('#saveStatus').html('<span class="text-danger">An error occurred while saving reports.</span>');

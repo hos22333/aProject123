@@ -43,7 +43,30 @@ INSTALLED_APPS = [
     'Apps.aAppProject',
     'Apps.aAppSubmittal',
     'Apps.aAppCalculation',
+    'django_q'
 ]
+
+Q_CLUSTER = {
+    'name': 'aAppCluster',
+    'workers': 4,
+    'recycle': 500,
+    'timeout': 1800,
+    'retry': 1820,
+    'queue_limit': 50,
+    'bulk': 10,
+    'orm': 'default',
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'dataentry8374@gmail.com'
+EMAIL_HOST_PASSWORD = 'mnmj lmwl ckkb ikcm'  # The App Password, not the Gmail password
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

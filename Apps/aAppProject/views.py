@@ -1,6 +1,8 @@
 from django.shortcuts import render
 
 from config import settings
+from django_q.tasks import async_task
+from .tasks import save_reports_task
 from .forms import ProjectForm
 from .models import APP_Project
 from .reports import word_submittal_report, word_calculation_report, save_word_pdf_submittal_report, save_word_pdf_calculation_report, save_all_pdf_report
@@ -69,7 +71,8 @@ def project_list(request):
             instance.save()  # Save the instance (now with company info)
 
             # Create folder inside the company's directory in the static folder
-            company_name = slugify(instance.company.nameCompanies)  
+            company_slug = slugify(instance.company.nameCompanies)  
+            company_name = instance.company.nameCompanies
             project_name = slugify(instance.name)       
             
             
@@ -79,27 +82,37 @@ def project_list(request):
                 print(f"Skipping project '{project_name}' : not found in APP_Project.")
             
             project_id = theproject.id
-            folder_name = f"{project_id}_{company_name}_{project_name}"
+            folder_name = f"{project_id}_{company_slug}_{project_name}"
 
             
             base_static_path = os.path.join(settings.BASE_DIR, 'static', 'aReports')
-            company_folder = os.path.join(base_static_path, company_name)
+            company_folder = os.path.join(base_static_path, company_slug)
             project_folder = os.path.join(company_folder, folder_name)
             # Create the folders if they don't exist
             os.makedirs(project_folder, exist_ok=True)
             print("project_folder_path : ", project_folder)
-            
-            folder_exist, folder_data = check_folder_exists(service, company_name)
+
+
+            folder_exist, folder_data = check_folder_exists(service, "aReports")
             if folder_exist == True :
-                folder_id = get_folder_id_by_name(service, company_name)
-                create_folder(service, folder_name, folder_id)
+                folder_id = folder_data['id']
+                company_folder_exist, folder_data = check_folder_exists(service, company_name, folder_id)
+                if company_folder_exist == True:
+                    company_folder_id = get_folder_id_by_name(service, company_name)
+                    create_folder(service, folder_name, company_folder_id)
+                else:
+                    create_folder(service, company_name, folder_id)
+                    company_folder_id = get_folder_id_by_name(service, company_name)
+                    create_folder(service, folder_name, company_folder_id)
             else:
-                create_folder(service, company_name.upper())
-                folder_id = get_folder_id_by_name(service, company_name)
-                create_folder(service, folder_name, folder_id)
+                create_folder(service, "aReports")
+                folder_id = get_folder_id_by_name(service, "aReports")
+                create_folder(service, company_name, folder_id)
+                company_folder_id = get_folder_id_by_name(service, company_name)
+                create_folder(service, folder_name, company_folder_id)
 
             
-            project_folder_id = get_folder_id_by_name(service, folder_name, folder_id)
+            project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
             
             
             
@@ -108,7 +121,22 @@ def project_list(request):
             print("#######################")
             
             
-            if company_name == "aaaa":
+            if company_slug == "aaaa":
+                for i in range(1 , 6):
+                    excel_file_path = os.path.join(project_folder, f'Cost{i}_excel.xlsx')
+                    pdf_file_path = os.path.join(project_folder, f'Cost{i}_pdf.pdf')
+                    # Create the folders if they don't exist
+                    os.makedirs(project_folder, exist_ok=True)
+
+                    ef = Workbook()  # Creates a new workbook with one empty sheet
+                    ef.save(excel_file_path)
+
+                    pf = canvas.Canvas(pdf_file_path)
+                    pf.showPage()  # Add a blank page
+                    pf.save()
+
+
+
                 for i in range(1 , 6):
                     excel_buffer = BytesIO()
                     ef = Workbook()  # Creates a new workbook with one empty sheet
@@ -127,6 +155,8 @@ def project_list(request):
                     pdf_name = f"Cost{i}_pdf.pdf"
                     pdf_mime = 'application/pdf'
                     upload_files_directly(service, pdf_buffer, pdf_name, pdf_mime, project_folder_id)
+
+
 
 
 
@@ -369,8 +399,27 @@ def generate_calculation_report(request, project_id):
     except APP_Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
 
-
+from django_q.models import Task
 def save_reports(request, project_id):
+    print("###############################")
+    print("###############################")
+    print("###############################")
+    print("###############################")
+    print("###############################")    
+    print("start, save_reports, project_id : ", project_id)
+    user_id = request.user.id
+    group_id = f"user-{user_id}-project-{project_id}"
+
+    # Check if a task with this group is still pending or running
+    existing_task = Task.objects.filter(group=group_id, success__isnull=True).first()
+    if existing_task:
+        return JsonResponse({'message': 'Report generation is already in progress. Please wait.'}, status=429)
+    
+    async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 1800 })
+    
+    return JsonResponse({'message': 'Report generation started.'}, status=202)
+
+""" def save_reports(request, project_id):
     print("###############################")
     print("###############################")
     print("###############################")
@@ -496,7 +545,7 @@ def save_pdf_report(request, project_id):
         return HttpResponse("User does not belong to a company", status=403)
 
     except APP_Project.DoesNotExist:
-        return HttpResponse("Project not found", status=404)
+        return HttpResponse("Project not found", status=404) """
 
 
 def download_project_reports(request, project_id):
@@ -531,7 +580,9 @@ def download_drive_project_reports(request, project_id):
     project_name = slugify(project.name)
     folder_name = slugify(f"{project_id}_{company_slug}_{project_name}")
 
-    company_folder_id = get_folder_id_by_name( service , company_name)
+
+    folder_id = get_folder_id_by_name( service , "aReports")
+    company_folder_id = get_folder_id_by_name( service , company_name, folder_id)
     project_folder_id = get_folder_id_by_name( service , folder_name, company_folder_id )
 
     files_in_folder = get_file_ids_in_folder(service, project_folder_id)
