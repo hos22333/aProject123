@@ -416,7 +416,7 @@ def save_reports(request, project_id):
     if existing_task:
         return JsonResponse({'message': 'Report generation is already in progress. Please wait.'}, status=429)
     
-    async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 1800 })
+    async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 7200 })
     
     return JsonResponse({'message': 'Report generation started.'}, status=202)
 

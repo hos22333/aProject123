@@ -129,7 +129,7 @@ def upload_files(service, file_path, file_name, mime_type, folder_id=None):
     media = MediaFileUpload(file_path, mimetype=mime_type, resumable=True)
 
     # Optional: set timeout
-    http = httplib2.Http(timeout=1800)
+    http = httplib2.Http(timeout=7200)
     authorized_http = AuthorizedHttp(service._http.credentials, http=http)
     drive_service = build('drive', 'v3', http=authorized_http)
 
