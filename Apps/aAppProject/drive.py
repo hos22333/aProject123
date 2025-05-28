@@ -106,6 +106,22 @@ def download_file_as_bytes(service, file_id):
 
 def upload_files(service, file_path, file_name, mime_type, folder_id=None):
     folder_id = folder_id or REPORTS_FOLDER_ID
+
+    # Search for existing file with the same name in the folder
+    query = f"name='{file_name}' and '{folder_id}' in parents and trashed=false"
+    existing_files = service.files().list(q=query, fields="files(id, name)").execute().get("files", [])
+
+    if existing_files:
+        print(f"File exists: {existing_files[0]['name']} (ID: {existing_files[0]['id']})")
+    else:
+        print("File does not exist.")
+
+    # Delete existing file(s) with the same name
+    for file in existing_files:
+        print(f"Deleting existing file: {file['name']} (ID: {file['id']})")
+        service.files().delete(fileId=file['id']).execute()
+
+
     file_metadata = {
         'name': file_name,
         'parents': [folder_id]
@@ -129,12 +145,28 @@ def upload_files(service, file_path, file_name, mime_type, folder_id=None):
         if status:
             print(f"Upload progress: {int(status.progress() * 100)}%")
 
-    print(f"Upload complete. File ID: {response.get('id')}")
+    print(f"Upload complete. File ID: {response.get('id')}, File Name: {file_name}")
     return response.get('id')
 
 
 def upload_files_directly(service, file_obj, file_name, mime_type, folder_id=None):
     folder_id = folder_id or REPORTS_FOLDER_ID
+
+    # Search for existing file with the same name in the folder
+    query = f"name='{file_name}' and '{folder_id}' in parents and trashed=false"
+    existing_files = service.files().list(q=query, fields="files(id, name)").execute().get("files", [])
+
+    if existing_files:
+        print(f"File exists: {existing_files[0]['name']} (ID: {existing_files[0]['id']})")
+    else:
+        print("File does not exist.")
+        
+    # Delete existing file(s) with the same name
+    for file in existing_files:
+        print(f"Deleting existing file: {file['name']} (ID: {file['id']})")
+        service.files().delete(fileId=file['id']).execute()
+
+
     file_metadata = {
         'name': file_name,
         'parents': [folder_id]

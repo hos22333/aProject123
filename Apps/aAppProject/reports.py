@@ -227,7 +227,7 @@ def word_submittal_report(request, project_id, logo, color):
                 continue  # Skip this machine and continue with the rest
             
             themachinename = themachines.nameMachine
-            section_titles = []
+            section_titles = [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
 
             if machine_name == "DataSheetNS":
                 machine_name = "Manual Screen" 
@@ -249,20 +249,6 @@ def word_submittal_report(request, project_id, logo, color):
                 machine_name = "Gritremoval"
                 section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
 
-            elif machine_name == "DataSheetSS":
-                machine_name = "Sand Silo"
-
-            elif machine_name == "DataSheetPS":
-                machine_name = "Primary Sedimentation"
-
-            elif machine_name == "DataSheetQV":
-                machine_name = "Quick Valve"
-
-            elif machine_name == "DataSheetTV":
-                machine_name = "Telescopic Valve"
-                
-            elif machine_name == "DataSheetTH":
-                machine_name = "Sludge Thickener"
 
             # Add machine title with font size 14 and numbering
             machine_title = doc.add_paragraph(f"{index}. {themachinename}", style="Heading3")
@@ -471,62 +457,19 @@ def word_calculation_report(request, project_id, logo, color):
         # Add machine details
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
-            section_titles = []
+            machine_name == f"{machine_name}_{firstletter}"
 
-            if machine_name == f"NS_{firstletter}":
-                machine_name = "Manual Screen" 
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"MS_{firstletter}":
-                machine_name = "Mechanical Screen" 
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"BC_{firstletter}":
-                machine_name = "Belt Conveyor"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"CT_{firstletter}":
-                machine_name = "Circular Tanks	"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"GR_{firstletter}":
-                machine_name = "Gritremoval"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"SC_{firstletter}":
-                machine_name = "Screw Conveyor"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"PS_{firstletter}":
-                machine_name = "Primary Sedimentation"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"MX_{firstletter}":
-                machine_name = "Rectangular Mixers"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"RT_{firstletter}":
-                machine_name = "Rectangular Tanks"
-                section_titles = ["Inputs", "Outputs"]
-                
-            elif machine_name == f"TH_{firstletter}":
-                machine_name = "Sludge Thickener"
-                section_titles = ["Inputs", "Outputs"]
-                
-            elif machine_name == f"BS_{firstletter}":
-                machine_name = "Basket screens"
-                section_titles = ["Inputs", "Outputs"]
-                
-            elif machine_name == f"PNch_{firstletter}":
-                machine_name = "Channel Penstocks"
-                section_titles = ["Inputs", "Outputs"]
-                
-            elif machine_name == f"PNwa_{firstletter}":
-                machine_name = "Wall Penstocks"
-                section_titles = ["Inputs", "Outputs"]
+            try:
+                themachines = AddMachine.objects.get(keyValue=machine_name)
+            except AddMachine.DoesNotExist:
+                print(f"Skipping machine '{machine_name}' for company ID {aCompany.id}: not found in AddMachine.")
+                continue  # Skip this machine and continue with the rest
+            
+            themachinename = themachines.nameMachine
+            section_titles = ["Inputs", "Outputs"]
 
             # Add machine title with font size 14 and numbering
-            machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
+            machine_title = doc.add_paragraph(f"{index}. {themachinename}", style="Heading3")
             machine_title.runs[0].font.size = Pt(14)
 
             for i in range(1, 3):  # Loop from Sec01 to Sec02
@@ -845,7 +788,7 @@ def save_word_pdf_submittal_report(user, project_id, logo, color):
 
 
             
-            section_titles = []
+            section_titles = [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
 
             if machine_name == "DataSheetNS":
                 machine_name = "Manual Screen" 
@@ -866,21 +809,6 @@ def save_word_pdf_submittal_report(user, project_id, logo, color):
             elif machine_name == "DataSheetGR":
                 machine_name = "Gritremoval"
                 section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
-
-            elif machine_name == "DataSheetSS":
-                machine_name = "Sand Silo"
-
-            elif machine_name == "DataSheetPS":
-                machine_name = "Primary Sedimentation"
-
-            elif machine_name == "DataSheetQV":
-                machine_name = "Quick Valve"
-
-            elif machine_name == "DataSheetTV":
-                machine_name = "Telescopic Valve"
-                
-            elif machine_name == "DataSheetTH":
-                machine_name = "Sludge Thickener"
 
             # Add machine title with font size 14 and numbering
             machine_title = doc.add_paragraph(f"{index}. {themachinename}", style="Heading3")
@@ -1824,67 +1752,24 @@ def save_word_pdf_calculation_report(user, project_id, logo, color):
         # Add machine details
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
-            section_titles = []
+            machine_name == f"{machine_name}_{firstletter}"
 
-            if machine_name == f"NS_{firstletter}":
-                machine_name = "Manual Screen" 
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"MS_{firstletter}":
-                machine_name = "Mechanical Screen" 
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"BC_{firstletter}":
-                machine_name = "Belt Conveyor"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"CT_{firstletter}":
-                machine_name = "Circular Tanks	"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"GR_{firstletter}":
-                machine_name = "Gritremoval"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"SC_{firstletter}":
-                machine_name = "Screw Conveyor"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"PS_{firstletter}":
-                machine_name = "Primary Sedimentation"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"MX_{firstletter}":
-                machine_name = "Rectangular Mixers"
-                section_titles = ["Inputs", "Outputs"]
-
-            elif machine_name == f"RT_{firstletter}":
-                machine_name = "Rectangular Tanks"
-                section_titles = ["Inputs", "Outputs"]
-                
-            elif machine_name == f"TH_{firstletter}":
-                machine_name = "Sludge Thickener"
-                section_titles = ["Inputs", "Outputs"]
-                
-            elif machine_name == f"BS_{firstletter}":
-                machine_name = "Basket screens"
-                section_titles = ["Inputs", "Outputs"]
-                
-            elif machine_name == f"PNch_{firstletter}":
-                machine_name = "Channel Penstocks"
-                section_titles = ["Inputs", "Outputs"]
-                
-            elif machine_name == f"PNwa_{firstletter}":
-                machine_name = "Wall Penstocks"
-                section_titles = ["Inputs", "Outputs"]
+            try:
+                themachines = AddMachine.objects.get(keyValue=machine_name)
+            except AddMachine.DoesNotExist:
+                print(f"Skipping machine '{machine_name}' for company ID {aCompany.id}: not found in AddMachine.")
+                continue  # Skip this machine and continue with the rest
             
+            themachinename = themachines.nameMachine
+            section_titles = ["Inputs", "Outputs"]
+
             # Add machine title with font size 14 and numbering
-            machine_title = doc.add_paragraph(f"{index}. {machine_name}", style="Heading3")
+            machine_title = doc.add_paragraph(f"{index}. {themachinename}", style="Heading3")
             machine_title.runs[0].font.size = Pt(14)
             
             pdf.alias_nb_pages()  # Important for "of {nb}" to work
             pdf.add_page()
-            pdf.colored_header(index, machine_name)
+            pdf.colored_header(index, themachinename)
 
             for i in range(1, 3):  # Loop from Sec01 to Sec02
                 section_name = f"Sec{i:02d}"
@@ -2219,25 +2104,6 @@ def save_all_pdf_report(user, project_id, logo):
                 sheet_key = "GR"
                 section_titles = ["General Data", "Design Data", "Walkway, Handrail, Wheel Data", "Scrapper Data", "Gearmotor Data", "Scrapper Data", "Drive unit", "Control panel Data", "Material Data ", " "]
 
-            elif machine_name == "DataSheetSS":
-                machine_name = "Sand Silo"
-                sheet_key = "SS"
-
-            elif machine_name == "DataSheetPS":
-                machine_name = "Primary Sedimentation"
-                sheet_key = "PS"
-
-            elif machine_name == "DataSheetQV":
-                machine_name = "Quick Valve"
-                sheet_key = "QV"
-
-            elif machine_name == "DataSheetTV":
-                machine_name = "Telescopic Valve"
-                sheet_key = "TV"
-                
-            elif machine_name == "DataSheetTH":
-                machine_name = "Sludge Thickener"
-                sheet_key = "TH"
 
 
             sheet_key = themachines.keyValue[0:-2]

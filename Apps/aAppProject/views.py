@@ -2,10 +2,11 @@ from django.shortcuts import render
 
 from config import settings
 from django_q.tasks import async_task
+from django_q.models import Task
 from .tasks import save_reports_task
 from .forms import ProjectForm
 from .models import APP_Project
-from .reports import word_submittal_report, word_calculation_report, save_word_pdf_submittal_report, save_word_pdf_calculation_report, save_all_pdf_report
+from .reports import word_submittal_report, word_calculation_report
 from .drive import create_folder, service, check_folder_exists, get_folder_id_by_name, upload_files, get_file_ids_in_folder, download_file, download_file_as_bytes, upload_files_directly
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppSubmittal.models import Machine
@@ -86,7 +87,7 @@ def project_list(request):
 
             
             base_static_path = os.path.join(settings.BASE_DIR, 'static', 'aReports')
-            company_folder = os.path.join(base_static_path, company_slug)
+            company_folder = os.path.join(base_static_path, company_name)
             project_folder = os.path.join(company_folder, folder_name)
             # Create the folders if they don't exist
             os.makedirs(project_folder, exist_ok=True)
@@ -399,7 +400,7 @@ def generate_calculation_report(request, project_id):
     except APP_Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
 
-from django_q.models import Task
+
 def save_reports(request, project_id):
     print("###############################")
     print("###############################")
@@ -418,134 +419,6 @@ def save_reports(request, project_id):
     async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 1800 })
     
     return JsonResponse({'message': 'Report generation started.'}, status=202)
-
-""" def save_reports(request, project_id):
-    print("###############################")
-    print("###############################")
-    print("###############################")
-    print("###############################")
-    print("###############################")    
-    print("start, save_reports, project_id : ", project_id)
-    
-    
-    project = get_object_or_404(APP_Project, pk=project_id)
-    try:        
-        # Log the action
-              
-        # Get the user’s company and project
-        aCompany = UserCompany.objects.get(user=request.user)
-        
-        # Determine the company and generate the corresponding report
-        if aCompany:
-            save_submittal_report(request, project_id)
-            save_calculation_report(request, project_id)
-            save_pdf_report(request, project_id)
-            project.last_saved_time = now()
-            project.save()
-            return JsonResponse({'message': 'Reports saved successfully!'}, status=200)
-            #return HttpResponse(status=204)
-
-        else:
-            return JsonResponse({'error': 'Invalid company ID'}, status=400)
-            #return HttpResponse("Invalid company ID", status=400)
-        
-        
-
-    except UserCompany.DoesNotExist:
-        return JsonResponse({'error': 'User does not belong to a company'}, status=403)
-        
-
-    except APP_Project.DoesNotExist:
-        return JsonResponse({'error': 'Project not found'}, status=404)
-        
-
-
-def save_submittal_report(request, project_id):    
-    print("start, save_submittal_report, project_id : ", project_id)
-    
-    try:
-        
-        
-        
-        # Get the user’s company and project
-        aCompany = UserCompany.objects.get(user=request.user)
-
-        
-        # Determine the company and generate the corresponding report
-        if aCompany.company.nameCompanies == "AAAA":
-            print("Company 1")
-            return save_word_pdf_submittal_report(request, project_id, "LogoAAA", "FFA500")
-
-        elif aCompany.company.nameCompanies == "BBBB":
-            print("Company 2")
-            return save_word_pdf_submittal_report(request, project_id, "LogoBBB", "ADD8E6")
-
-        else:
-            return HttpResponse("Invalid company ID", status=400)
-
-    except UserCompany.DoesNotExist:
-        return HttpResponse("User does not belong to a company", status=403)
-
-    except APP_Project.DoesNotExist:
-        return HttpResponse("Project not found", status=404)
-
-
-def save_calculation_report(request, project_id):    
-    print("start, save_calculation_report, project_id : ", project_id)
-    
-    try:
-        #pdb.set_trace()
-        
-        #pdb.set_trace()
-        # Get the user’s company and project
-        aCompany = UserCompany.objects.get(user=request.user)
-
-        #pdb.set_trace()
-        # Determine the company and generate the corresponding report
-        if aCompany.company.nameCompanies == "AAAA":
-            print("Company 1")
-            return save_word_pdf_calculation_report(request, project_id, "LogoAAA", "FFA500")
-
-        elif aCompany.company.nameCompanies == "BBBB":
-            print("Company 2")
-            return save_word_pdf_calculation_report(request, project_id, "LogoBBB", "ADD8E6")
-
-        else:
-            return HttpResponse("Invalid company ID", status=400)
-
-    except UserCompany.DoesNotExist:
-        return HttpResponse("User does not belong to a company", status=403)
-
-    except APP_Project.DoesNotExist:
-        return HttpResponse("Project not found", status=404)
-
-
-def save_pdf_report(request, project_id):    
-    print("start, save_pdf_report, project_id : ", project_id)
-    
-    try:
-        # Log the action
-       
-        # Get the user’s company and project
-        aCompany = UserCompany.objects.get(user=request.user)
-
-        # Determine the company and generate the corresponding report
-        if aCompany.company.nameCompanies == "AAAA":
-            print("Company 1")
-            return save_all_pdf_report(request, project_id, "LogoAAA")
-
-        elif aCompany.company.nameCompanies == "BBBB":
-            print("Company 2")
-            return save_all_pdf_report(request, project_id, "LogoBBB")
-
-        else:
-            return HttpResponse("Invalid company ID", status=400)
-
-    except UserCompany.DoesNotExist:
-        return HttpResponse("User does not belong to a company", status=403)
-
-    except APP_Project.DoesNotExist:
-        return HttpResponse("Project not found", status=404) """
 
 
 def download_project_reports(request, project_id):
