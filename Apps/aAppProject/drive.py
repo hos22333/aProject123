@@ -103,6 +103,14 @@ def download_file_as_bytes(service, file_id):
         status, done = downloader.next_chunk()
     return fh.getvalue()
 
+def make_file_public(service, file_id):
+    """Make a Google Drive file publicly accessible via a direct link."""
+    permission = {
+        'type': 'anyone',
+        'role': 'reader'
+    }
+    service.permissions().create(fileId=file_id, body=permission).execute()
+    print(f"File {file_id} is now public.")
 
 def upload_files(service, file_path, file_name, mime_type, folder_id=None):
     folder_id = folder_id or REPORTS_FOLDER_ID
@@ -145,6 +153,7 @@ def upload_files(service, file_path, file_name, mime_type, folder_id=None):
         if status:
             print(f"Upload progress: {int(status.progress() * 100)}%")
 
+    make_file_public(service, response.get('id'))
     print(f"Upload complete. File ID: {response.get('id')}, File Name: {file_name}")
     return response.get('id')
 

@@ -31,4 +31,5 @@ def save_reports_task(project_id, user_id):
             fail_silently=False
         )
         
+        print(f"the User's Email is :  {user.email}")
         print(f"the files saved complete for project {project_id}")
