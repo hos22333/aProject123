@@ -466,6 +466,8 @@ def download_drive_project_reports(request, project_id):
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for file_id, file_name in files_in_folder:
             file_data = download_file_as_bytes(service, file_id)  # <- returns file content
+            if file_data is None:
+                continue 
             zipf.writestr(file_name, file_data)
 
     zip_buffer.seek(0)  # Move pointer to the beginning

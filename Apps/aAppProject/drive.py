@@ -95,13 +95,18 @@ def download_file(service, file_id, file_name, download_folder):
 
 
 def download_file_as_bytes(service, file_id):
-    request = service.files().get_media(fileId=file_id)
-    fh = io.BytesIO()
-    downloader = MediaIoBaseDownload(fh, request)
-    done = False
-    while not done:
-        status, done = downloader.next_chunk()
-    return fh.getvalue()
+    try:
+        request = service.files().get_media(fileId=file_id)
+        fh = io.BytesIO()
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while not done:
+            status, done = downloader.next_chunk()
+        fh.seek(0)
+        return fh.getvalue()
+    except Exception as e:
+        print(f"Download error for file {file_id}: {e}")
+        return None
 
 def make_file_public(service, file_id):
     """Make a Google Drive file publicly accessible via a direct link."""
@@ -136,12 +141,7 @@ def upload_files(service, file_path, file_name, mime_type, folder_id=None):
     }
     media = MediaFileUpload(file_path, mimetype=mime_type, resumable=True)
 
-    # Optional: set timeout
-    http = httplib2.Http(timeout=7200)
-    authorized_http = AuthorizedHttp(service._http.credentials, http=http)
-    drive_service = build('drive', 'v3', http=authorized_http)
-
-    request = drive_service.files().create(
+    request = service.files().create(
         body=file_metadata,
         media_body=media,
         fields='id'
