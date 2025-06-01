@@ -400,6 +400,46 @@ def generate_calculation_report(request, project_id):
     except APP_Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
 
+from .models import ReportProgress
+
+from django.utils.timezone import localtime
+from django.http import JsonResponse
+from datetime import date
+from .models import ReportProgress
+
+def get_today_report_progress(request):
+    user = request.user
+    today = date.today()
+
+    progresses = ReportProgress.objects.filter(user=user)
+    today_progress = progresses.filter(updated_at__date=today)
+
+    data = [
+        {
+            'project_id': p.project_id,
+            'percent': p.percent,
+            'status': p.status,
+            'updated_at': localtime(p.updated_at).strftime('%Y-%m-%d %H:%M:%S'),
+        }
+        for p in today_progress
+    ]
+
+    return JsonResponse({'progress': data})
+
+def get_report_progress(request, project_id):
+    try:
+        progress = ReportProgress.objects.filter(user=request.user, project_id=project_id).latest('updated_at')
+        return JsonResponse({
+            "percent": progress.percent,
+            "status": progress.status
+        })
+    except ReportProgress.DoesNotExist:
+        return JsonResponse({"percent": 0, "status": "not_started"})
+    except Exception as e:
+        return JsonResponse({"percent": 0, "status": f"error: {str(e)}"})
+
+
+from .models import ReportProgress
 
 def save_reports(request, project_id):
     print("###############################")
@@ -408,6 +448,8 @@ def save_reports(request, project_id):
     print("###############################")
     print("###############################")    
     print("start, save_reports, project_id : ", project_id)
+    
+
     user_id = request.user.id
     group_id = f"user-{user_id}-project-{project_id}"
 
@@ -417,6 +459,8 @@ def save_reports(request, project_id):
         return JsonResponse({'message': 'Report generation is already in progress. Please wait.'}, status=429)
     
     async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 7200 })
+
+    
     
     return JsonResponse({'message': 'Report generation started.'}, status=202)
 

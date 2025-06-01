@@ -132,7 +132,11 @@ def upload_files(service, file_path, file_name, mime_type, folder_id=None):
     # Delete existing file(s) with the same name
     for file in existing_files:
         print(f"Deleting existing file: {file['name']} (ID: {file['id']})")
-        service.files().delete(fileId=file['id']).execute()
+        
+        try:
+            service.files().delete(fileId=file['id']).execute()
+        except Exception as e:
+            print(f"[Drive Warning] Could not delete file ID {file['id']}: {e}")
 
 
     file_metadata = {
