@@ -16,3 +16,6 @@ matplotlib
 fpdf
 PyPDF2
 reportlab
+google-api-python-client 
+google-auth-oauthlib
+django_q2
