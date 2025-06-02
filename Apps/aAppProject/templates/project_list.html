@@ -33,11 +33,7 @@
         </form>
         
         <h3 class="mt-4">Projects List</h3>
-        <!-- <div id="saveStatus" style="margin-top:10px; font-weight:bold; color:red;"></div> -->
-        <!-- <div id="progress-bar-wrapper">
-            <div id="progress-status">...</div>
-            <progress id="progress-bar" value="0" max="100"></progress>
-        </div> -->
+        
         <table class="table table-bordered mt-2">
             <thead>
                 <tr>
@@ -83,12 +79,8 @@
                                 <button class="dropdown-item text-info" onclick="showDetails('{{ project.name|escapejs }}', '{{ project.client_name|escapejs }}', '{{ project.capacity|escapejs }}', '{{ project.cover_page_text|escapejs }}')">Show All</button>
                                 <button class="dropdown-item text-success" onclick="reviewSubmittalMachines('{{ project.id }}')">Review Submittal Machines</button>
                                 <button class="dropdown-item text-success" onclick="reviewCalculationMachines('{{ project.id }}')">Review Calculation Machines</button>
-                                <a href="{% url 'generate_report' project.id %}" class="dropdown-item">Generate Submittal (Word file)</a>
-                                <a href="{% url 'generate_calculation_report' project.id %}" class="dropdown-item">Generate Calcualtion (Word file)</a>
-                                <!-- <a href="{% url 'save_reports' project.id %}" class="dropdown-item">Save Reports</a> -->
                                 <button class="saveReportsBtn dropdown-item" data-url="{% url 'save_reports' project.id %}" data-project-id="{{ project.id }}">Save Reports</button>
-                                <a href="{% url 'download_project_reports' project.id %}" class="dropdown-item"> Download All Reports (ZIP) </a>
-                                <a href="{% url 'download_drive_project_reports' project.id %}" class="dropdown-item"> Download All Reports (DRIVE) </a>
+                                <a href="{% url 'download_drive_project_reports' project.id %}" class="dropdown-item"> Download All Reports (ZIP) </a>
                               </li>
                             </ul>
                           </div>
@@ -2334,85 +2326,6 @@ function showDetails(name, client, capacity, coverpagetext) {
 
 </script>
 
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('.saveReportsBtn').on('click', function (e) {
-            e.preventDefault();
-            let url = $(this).data('url');
-            $('#saveStatus').html(`
-                <span class="spinner-border spinner-border-sm text-primary me-2" role="status" aria-hidden="true"></span>
-                Saving reports... Please wait.
-            `);
-
-            $.ajax({
-                url: url,
-                method: 'GET',
-                success: function () {
-                    $('#saveStatus').html('<span class="text-success">Reports started saving successfully, now you can leave the page</span>');
-                },
-                error: function () {
-                    $('#saveStatus').html('<span class="text-danger">An error occurred while saving reports.</span>');
-                }
-            });
-        });
-    });
-</script> -->
-
-
-<!-- <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const progressBar = document.getElementById('progress-bar');
-    const progressStatus = document.getElementById('progress-status');
-    const saveButtons = document.querySelectorAll('.saveReportsBtn');
-
-    saveButtons.forEach(button => {
-        button.addEventListener('click', function () {
-
-
-            const url = this.dataset.url;
-            const projectId = url.split('/').filter(Boolean).pop();
-
-            // Reset UI
-            progressBar.value = 0;
-            progressStatus.innerText = "Starting...";
-
-            // Trigger the report generation
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    progressStatus.innerText = data.message || "Report started...";
-                    startPolling(projectId);
-                })
-                .catch(error => {
-                    console.error("Failed to start report:", error);
-                    progressStatus.innerText = "Error starting report.";
-                });
-        });
-    });
-
-    function startPolling(projectId) {
-        const interval = setInterval(() => {
-            fetch(`/Project/get_report_progress/${projectId}/`)
-                .then(response => response.json())
-                .then(data => {
-                    progressBar.value = data.percent;
-                    progressStatus.innerText = `${data.percent}% - ${data.status}`;
-
-                    if (data.percent >= 100 || data.status.includes("error")) {
-                        clearInterval(interval);
-                        progressStatus.innerText = "✅ Report generation complete!";
-                    }
-                })
-                .catch(err => {
-                    console.error("Progress check failed:", err);
-                    progressStatus.innerText = "❌ Error checking progress.";
-                });
-        }, 2000); // every 2 seconds
-    }
-});
-</script> -->
-
 <script>
 function pollReportProgress(projectId) {
     const progressBar = document.getElementById(`progress-bar-${projectId}`);
@@ -2444,15 +2357,19 @@ function pollReportProgress(projectId) {
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".saveReportsBtn").forEach(button => {
         const projectId = button.dataset.projectId;
+        const url = button.dataset.url;
 
         button.addEventListener("click", function () {
-            const url = this.dataset.url;
             this.disabled = true;
             this.innerText = "Saving...";
 
             fetch(url)
                 .then(() => {
                     pollReportProgress(projectId);
+                })
+                .catch(error => {
+                    console.error("Save request failed:", error);
+                    alert("Failed to start saving report.");
                 })
                 .finally(() => {
                     this.disabled = false;
@@ -2466,60 +2383,5 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
-<!-- <script>
-function pollReportProgress(projectId) {
-    const progressBar = document.getElementById(`progress-bar-${projectId}`);
-    const progressStatus = document.getElementById(`progress-status-${projectId}`);
 
-    const intervalId = setInterval(() => {
-        fetch(`/Project/get_report_progress/${projectId}/`)
-            .then(response => response.json())
-            .then(data => {
-                progressBar.value = data.percent;
-                progressStatus.innerText = `${data.status} (${data.percent}%)`;
-
-                if (data.percent >= 100 || data.status.includes("done")) {
-                    clearInterval(intervalId);
-                    progressStatus.innerText = "✅ Completed";
-                }
-            })
-            .catch(err => {
-                console.error("Progress check failed", err);
-                clearInterval(intervalId);
-                progressStatus.innerText = "❌ Error";
-            });
-    }, 2000);
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    // Get today’s progress from server
-    fetch('/Project/get_today_report_progress/')
-        .then(res => res.json())
-        .then(data => {
-            data.progress.forEach(item => {
-                pollReportProgress(item.project_id);
-            });
-        });
-
-    // Button click behavior stays the same
-    document.querySelectorAll(".saveReportsBtn").forEach(button => {
-        const projectId = button.dataset.projectId;
-
-        button.addEventListener("click", function () {
-            const url = this.dataset.url;
-            this.disabled = true;
-            this.innerText = "Saving...";
-
-            fetch(url)
-                .then(() => {
-                    pollReportProgress(projectId);
-                })
-                .finally(() => {
-                    this.disabled = false;
-                    this.innerText = "Save Reports";
-                });
-        });
-    });
-});
-</script> -->
 {% endblock %}

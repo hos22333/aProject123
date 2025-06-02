@@ -266,8 +266,9 @@ def word_submittal_report(request, project_id, logo, color):
                         section_data.append((key, value))
 
                 if len(section_data) > 1:  # If the section has valid data, create a table
-                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
-                    doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
+                    if aCompany.company.nameCompanies == "AAAA":
+                        section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                        doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
 
                     add_table(doc, section_data)  # Removed redundant title
 
@@ -699,12 +700,15 @@ def save_word_pdf_submittal_report(user, project_id, logo, color):
             if logo == "LogoAAA":
                 self.set_fill_color(255, 153, 0)
                 tableborder = 1
+                self.set_text_color(0)
+                self.cell(80, 8, "Field", border=tableborder, fill=True)
+                self.cell(110, 8, "Value", border=tableborder, ln=True, fill=True)
             elif logo == "LogoBBB": 
-                self.set_fill_color(173, 216, 230)
+                self.set_fill_color(255, 255, 255)
                 tableborder = 0
-            self.set_text_color(0)
-            self.cell(80, 8, "Field", border=tableborder, fill=True)
-            self.cell(110, 8, "Value", border=tableborder, ln=True, fill=True)
+                self.set_text_color(0)
+                self.cell(80, 8, " ", border=tableborder, fill=True)
+                self.cell(110, 8, " ", border=tableborder, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
@@ -820,7 +824,10 @@ def save_word_pdf_submittal_report(user, project_id, logo, color):
 
             for i in range(1, 11):  # Loop from Sec01 to Sec10
                 section_name = f"Sec{i:02d}"
-                section_data = [("Field", "Value")]
+                if aCompany.company.nameCompanies == "AAAA":
+                    section_data = [("Field", "Value")]
+                elif aCompany.company.nameCompanies == "BBBB":
+                    section_data = [(" ", " ")]
                 pdf_section_data = []
 
                 for j in range(1, 21, 2):  # Step by 2 to avoid duplication
@@ -832,10 +839,11 @@ def save_word_pdf_submittal_report(user, project_id, logo, color):
                         pdf_section_data.append((key, value))
 
                 if len(section_data) > 1:  # If the section has valid data, create a table
-                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
-                    doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
+                    if aCompany.company.nameCompanies == "AAAA":
+                        section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                        doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
 
-                    pdf.section_title(f"{section_name}: {section_title}")
+                        pdf.section_title(f"{section_name}: {section_title}")
 
                     add_table(doc, section_data)  # Removed redundant title
 
@@ -1673,12 +1681,15 @@ def save_word_pdf_calculation_report(user, project_id, logo, color):
             if logo == "LogoAAA":
                 self.set_fill_color(255, 153, 0)
                 tableborder = 1
+                self.set_text_color(0)
+                self.cell(80, 8, "Field", border=tableborder, fill=True)
+                self.cell(110, 8, "Value", border=tableborder, ln=True, fill=True)
             elif logo == "LogoBBB": 
-                self.set_fill_color(173, 216, 230)
+                self.set_fill_color(255, 255, 255)
                 tableborder = 0
-            self.set_text_color(0)
-            self.cell(80, 8, "Field", border=tableborder, fill=True)
-            self.cell(110, 8, "Value", border=tableborder, ln=True, fill=True)
+                self.set_text_color(0)
+                self.cell(80, 8, " ", border=tableborder, fill=True)
+                self.cell(110, 8, " ", border=tableborder, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
@@ -1773,7 +1784,10 @@ def save_word_pdf_calculation_report(user, project_id, logo, color):
 
             for i in range(1, 3):  # Loop from Sec01 to Sec02
                 section_name = f"Sec{i:02d}"
-                section_data = [("Field", "Value")]
+                if aCompany.company.nameCompanies == "AAAA":
+                    section_data = [("Field", "Value")]
+                elif aCompany.company.nameCompanies == "BBBB":
+                    section_data = [(" ", " ")]
                 pdf_section_data = []
 
                 for j in range(1, 31, 2):  # Step by 2 to avoid duplication
@@ -1785,10 +1799,11 @@ def save_word_pdf_calculation_report(user, project_id, logo, color):
                         pdf_section_data.append((key, value))
 
                 if len(section_data) > 1:  # If the section has valid data, create a table
-                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
-                    doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
+                    if aCompany.company.nameCompanies == "AAAA":
+                        section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                        doc.add_paragraph(f"{section_name}: {section_title}", style="Heading3")  # Only one title now
 
-                    pdf.section_title(f"{section_name}: {section_title}")
+                        pdf.section_title(f"{section_name}: {section_title}")
 
                     add_table(doc, section_data)  # Removed redundant title
 
@@ -1994,12 +2009,15 @@ def save_all_pdf_report(user, project_id, logo):
             if logo == "LogoAAA":
                 self.set_fill_color(255, 153, 0)
                 tableborder = 1
+                self.set_text_color(0)
+                self.cell(80, 8, "Field", border=tableborder, fill=True)
+                self.cell(110, 8, "Value", border=tableborder, ln=True, fill=True)
             elif logo == "LogoBBB": 
-                self.set_fill_color(173, 216, 230)
+                self.set_fill_color(255, 255, 255)  
                 tableborder = 0
-            self.set_text_color(0)
-            self.cell(80, 8, "Field", border=tableborder, fill=True)
-            self.cell(110, 8, "Value", border=tableborder, ln=True, fill=True)
+                self.set_text_color(0)
+                self.cell(80, 8, " ", border=tableborder, fill=True)
+                self.cell(110, 8, " ", border=tableborder, ln=True, fill=True)
 
             self.set_font("DejaVu", "", 10)
             for field, value in data:
@@ -2129,8 +2147,9 @@ def save_all_pdf_report(user, project_id, logo):
                         pdf_section_data.append((key, value))
 
                 if len(pdf_section_data) > 1:  # If the section has valid data, create a table
-                    section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
-                    pdf.section_title(f"{section_name}: {section_title}")
+                    if aCompany.company.nameCompanies == "AAAA":
+                        section_title = section_titles[i-1] if i-1 < len(section_titles) else f"Section {i}"
+                        pdf.section_title(f"{section_name}: {section_title}")
                     pdf.add_table(pdf_section_data)
 
             

@@ -6,6 +6,7 @@ from django_q.models import Task
 from .tasks import save_reports_task
 from .forms import ProjectForm
 from .models import APP_Project
+from .models import ReportProgress
 from .reports import word_submittal_report, word_calculation_report
 from .drive import create_folder, service, check_folder_exists, get_folder_id_by_name, upload_files, get_file_ids_in_folder, download_file, download_file_as_bytes, upload_files_directly
 from Apps.aAppMechanical.models import UserCompany
@@ -343,92 +344,9 @@ def get_calc_machines(request, project_id):
 
 ################################################################
 
-def generate_report(request, project_id):
-    try:
-        #pdb.set_trace()
-        # Log the action
-        
-        #pdb.set_trace()
-        # Get the user’s company and project
-        aCompany = UserCompany.objects.get(user=request.user)
-
-        #pdb.set_trace()
-        # Determine the company and generate the corresponding report
-        if aCompany.company.nameCompanies == "AAAA":
-            print("Company 1")
-            return word_submittal_report(request, project_id, "LogoAAA", "FFA500")
-
-        elif aCompany.company.nameCompanies == "BBBB":
-            print("Company 2")
-            return word_submittal_report(request, project_id, "LogoBBB", "ADD8E6")
-
-        else:
-            return HttpResponse("Invalid company ID", status=400)
-
-    except UserCompany.DoesNotExist:
-        return HttpResponse("User does not belong to a company", status=403)
-
-    except APP_Project.DoesNotExist:
-        return HttpResponse("Project not found", status=404)
-
-
-def generate_calculation_report(request, project_id):
-    try:
-        #pdb.set_trace()
-        # Log the action
-        
-        #pdb.set_trace()
-        # Get the user’s company and project
-        aCompany = UserCompany.objects.get(user=request.user)
-
-        #pdb.set_trace()
-        # Determine the company and generate the corresponding report
-        if aCompany.company.nameCompanies == "AAAA":
-            print("Company 1")
-            return word_calculation_report(request, project_id, "LogoAAA", "FFA500")
-
-        elif aCompany.company.nameCompanies == "BBBB":
-            print("Company 2")
-            return word_calculation_report(request, project_id, "LogoBBB", "ADD8E6")
-
-        else:
-            return HttpResponse("Invalid company ID", status=400)
-
-    except UserCompany.DoesNotExist:
-        return HttpResponse("User does not belong to a company", status=403)
-
-    except APP_Project.DoesNotExist:
-        return HttpResponse("Project not found", status=404)
-
-from .models import ReportProgress
-
-from django.utils.timezone import localtime
-from django.http import JsonResponse
-from datetime import date
-from .models import ReportProgress
-
-def get_today_report_progress(request):
-    user = request.user
-    today = date.today()
-
-    progresses = ReportProgress.objects.filter(user=user)
-    today_progress = progresses.filter(updated_at__date=today)
-
-    data = [
-        {
-            'project_id': p.project_id,
-            'percent': p.percent,
-            'status': p.status,
-            'updated_at': localtime(p.updated_at).strftime('%Y-%m-%d %H:%M:%S'),
-        }
-        for p in today_progress
-    ]
-
-    return JsonResponse({'progress': data})
-
 def get_report_progress(request, project_id):
     try:
-        progress = ReportProgress.objects.filter(user=request.user, project_id=project_id).latest('updated_at')
+        progress = ReportProgress.objects.filter( project_id=project_id).latest('updated_at')
         return JsonResponse({
             "percent": progress.percent,
             "status": progress.status
@@ -439,7 +357,6 @@ def get_report_progress(request, project_id):
         return JsonResponse({"percent": 0, "status": f"error: {str(e)}"})
 
 
-from .models import ReportProgress
 
 def save_reports(request, project_id):
     print("###############################")
@@ -448,7 +365,15 @@ def save_reports(request, project_id):
     print("###############################")
     print("###############################")    
     print("start, save_reports, project_id : ", project_id)
-    
+    user = request.user
+    project = APP_Project.objects.get(pk=project_id)
+    ReportProgress.objects.update_or_create(
+        user=user,
+        project_id=project_id,
+        status=f"{project.name}_starting",
+        percent=5,
+        
+    )
 
     user_id = request.user.id
     group_id = f"user-{user_id}-project-{project_id}"
@@ -458,7 +383,7 @@ def save_reports(request, project_id):
     if existing_task:
         return JsonResponse({'message': 'Report generation is already in progress. Please wait.'}, status=429)
     
-    async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 7200 })
+    async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 600 })
 
     
     

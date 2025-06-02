@@ -23,8 +23,6 @@ def update_progress(user, project_id, percent, status):
 def save_reports_task(project_id, user_id):
     user = User.objects.get(id=user_id)
     ReportProgress.objects.filter(user=user, project_id=project_id).delete()
-    project = APP_Project.objects.get(pk=project_id)
-    update_progress(user, project_id, 5, f"{project.name}_starting")
     time.sleep(2)
     try:
         user = User.objects.get(id=user_id)
@@ -50,11 +48,11 @@ def save_reports_task(project_id, user_id):
 
             elif aCompany.company.nameCompanies == "BBBB":
                 update_progress(user, project_id, 30, f"{project.name}_submittal report")
-                save_word_pdf_submittal_report(user, project_id, "LogoBBB", "ADD8E6")
+                save_word_pdf_submittal_report(user, project_id, "LogoBBB", "ffffff")
                 time.sleep(2)
 
                 update_progress(user, project_id, 60, f"{project.name}_calculation report")
-                save_word_pdf_calculation_report(user, project_id, "LogoBBB", "ADD8E6")
+                save_word_pdf_calculation_report(user, project_id, "LogoBBB", "ffffff")
                 time.sleep(2)
 
                 update_progress(user, project_id, 90, f"{project.name}_final report")
@@ -80,7 +78,7 @@ def save_reports_task(project_id, user_id):
     except Exception as e:
         print("Handled task error:", e)
         try:
-            update_progress(user, project_id, 100, f"{project.name}_error: {str(e)[:480]}")
+            update_progress(user, project_id, -1, f"{project.name}_error: {str(e)[:480]}")
         except Exception as update_error:
             print("Could not update progress due to DB failure:", update_error)
         return None
