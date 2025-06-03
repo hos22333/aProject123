@@ -88,4 +88,14 @@ urlpatterns = [
     path('edit-api-key/<int:data_id>/', views.edit_APIkey, name='edit_APIkey'),
 
     #############################
+
+    path('manage-dxf/', views.manage_dxf_files, name='manage_dxf_files'),
+    
+    #############################
+    
+    path('data-transfer-list/', views.data_transfer_list, name='data_transfer_list'),
+    path('delete-Field/<int:data_id>/', views.delete_data_transfer_data, name='delete_data_transfer_data'),
+    path('edit-Field/<int:data_id>/', views.edit_data_transfer_data, name='edit_data_transfer_data'),
+
+    #############################
 ]

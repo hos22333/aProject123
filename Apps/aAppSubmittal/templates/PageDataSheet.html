@@ -1114,6 +1114,7 @@
             </div> <!-- Close row div -->
 
             <div class="text-center">
+                <button type="button" id="load-data" class="btn btn-primary">Load Calculation Data</button>
                 <button type="submit" name="savebuttonname" class="btn btn-lg btn-primary mt-3">Save</button>                                
                 
             </div>
@@ -2582,5 +2583,21 @@
     });
 </script>
 
+<!-- <script>
+document.getElementById("load-data").addEventListener("click", function () {
+    const projectId = document.getElementById("project-select").value;
+
+    fetch(`/submittal/load-data/?project_id=${projectId}`)
+        .then(response => response.json())
+        .then(data => {
+            for (const field in data) {
+                const input = document.getElementById(`id_${field}`);
+                if (input) {
+                    input.value = data[field] !== null ? data[field] : '';
+                }
+            }
+        });
+});
+</script> -->
 
 {% endblock %}

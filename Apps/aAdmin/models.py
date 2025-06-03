@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from Apps.aAppMechanical.models import Companies
 
 
 class Autho(models.Model):
@@ -34,3 +34,12 @@ class UserRole(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.role.name}"
 
+
+class DataTransfer(models.Model):
+    keyValue            = models.CharField(max_length=255)
+    CalculationField = models.CharField(max_length=255)
+    SubmittalField = models.CharField(max_length=255)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.keyValue}_{self.company}"

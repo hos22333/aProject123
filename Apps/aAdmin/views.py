@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
-from .forms import UserCreationForm, RoleForm, AuthoForm, UserRoleForm, RoleAuthoForm
+from .forms import UserCreationForm, RoleForm, AuthoForm, UserRoleForm, RoleAuthoForm, DXFUploadForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Role
 from .models import Autho
 from .models import UserRole
 from .models import RoleAutho
+from .models import DataTransfer
 
 from django.contrib.auth.models import User
 from Apps.aAppCalculation.models import modelcalc_log
@@ -20,6 +21,10 @@ from Apps.aAppSubmittal.models import AddMachine
 from django.shortcuts import get_object_or_404
 
 
+
+from .forms import DataTransferForm
+
+
 from Apps.aAppMechanical.forms import UserCompanyForm
 from Apps.aAppMechanical.forms import CompanyForm
 from Apps.aAppMechanical.forms import FormFieldConfigForm
@@ -30,6 +35,7 @@ from Apps.aAppCalculation.forms import APIkeyForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
+from django.utils.text import slugify
 
 from config import settings
 import os
@@ -616,6 +622,95 @@ def delete_APIkey(request, data_id):
     
     data.delete()
     return redirect('APIkey_list')  # Redirect back to the list
+
+
+#######################################
+
+def manage_dxf_files(request):
+    dxf_dir = os.path.join(settings.BASE_DIR, "static", "aDxfs")
+    files = [f for f in os.listdir(dxf_dir) ]
+
+    if request.method == 'POST':
+        if 'upload' in request.POST:
+            form = DXFUploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                uploaded_file = form.cleaned_data['file']
+                save_path = os.path.join(dxf_dir, uploaded_file.name)
+                with open(save_path, 'wb+') as destination:
+                    for chunk in uploaded_file.chunks():
+                        destination.write(chunk)
+                messages.success(request, "File uploaded successfully.")
+                return redirect('manage_dxf_files')
+        elif 'delete' in request.POST:
+            file_to_delete = request.POST.get('file_name')
+            delete_path = os.path.join(dxf_dir, file_to_delete)
+            if os.path.exists(delete_path):
+                os.remove(delete_path)
+                messages.success(request, f"{file_to_delete} deleted.")
+            else:
+                messages.error(request, "File does not exist.")
+            return redirect('manage_dxf_files')
+    else:
+        form = DXFUploadForm()
+
+    return render(request, 'manage_dxf_files.html', {
+        'files': files,
+        'form': form
+    })
+
+
+#######################################
+
+# Create Machine
+def data_transfer_list(request):
+     # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    print(user_company)
+
+    if request.method == 'POST':
+        form = DataTransferForm(request.POST)
+        
+        if form.is_valid():
+            form.save()
+    else:
+        form = DataTransferForm()
+
+    # Fetch all current roles
+    datas = DataTransfer.objects.filter(company=user_company)
+
+    return render(request, 'data_transfer_list.html', {'form': form, 'datas': datas})
+
+# Delete Machine
+def delete_data_transfer_data(request, data_id):
+    data = get_object_or_404(DataTransfer, id=data_id)
+    
+    data.delete()
+    return redirect('data_transfer_list')  # Redirect back to the list
+
+
+
+# Edit Machine
+def edit_data_transfer_data(request, data_id):
+    data = get_object_or_404(DataTransfer, id=data_id)
+
+    
+
+    if request.method == 'POST':
+        form = DataTransferForm(request.POST, instance=data)
+        if form.is_valid():
+            form.save()
+            return redirect('data_transfer_list')  # Redirect back to the main page
+    else:
+        form = DataTransferForm(instance=data)
+
+    return render(request, 'edit_data_transfer_data.html', {'form': form, 'data': data})
+
 
 
 #######################################

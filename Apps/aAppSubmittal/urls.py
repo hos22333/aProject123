@@ -12,8 +12,17 @@ urlpatterns = [
 
     path("PageDataSheet/", views.LoadPageDataSheet, name="PageDataSheet"),
     path("PageDataSheet/Save/", views.SavePageDataSheet, name="SavePageDataSheet"),
-###############
+
+#########################################################################################################
 
     path("Draw/<int:aMachine_ID>/<str:aType>/", views.General_DXF_ALL, name="General_DXF_ALL"),
     path("FullDrawing/<int:aMachine_ID>/<str:aType>/", views.FullDrawing, name="FullDrawing"),
+
+#########################################################################################################
+
+
+
+
+#########################################################################################################
+
 ]

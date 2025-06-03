@@ -7,8 +7,7 @@ from .tasks import save_reports_task
 from .forms import ProjectForm
 from .models import APP_Project
 from .models import ReportProgress
-from .reports import word_submittal_report, word_calculation_report
-from .drive import create_folder, service, check_folder_exists, get_folder_id_by_name, upload_files, get_file_ids_in_folder, download_file, download_file_as_bytes, upload_files_directly
+from .drive import create_folder, service, check_folder_exists, get_folder_id_by_name, get_file_ids_in_folder, download_file_as_bytes, upload_files_directly
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppSubmittal.models import Machine
 from Apps.aAppSubmittal.models import AddMachine
