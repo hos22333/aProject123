@@ -78,7 +78,8 @@ class modelcalc(models.Model):
           
 
     def __str__(self):
-        return f"{self.project.name if self.project.name else 'No Project'} ({self.oSec00Field03})"
+        project_name = self.project.name if self.project and self.project.name else 'No Project'
+        return f"{project_name} ({self.oSec00Field03})"
 
 
 
@@ -156,7 +157,8 @@ class modelcalc_log(models.Model):
           
 
     def __str__(self):
-        return f"{self.project.name} ({self.oSec00Field03})"
+        project_name = self.project.name if self.project and self.project.name else 'No Project'
+        return f"{project_name} ({self.oSec00Field03})"
 
 
 class API_Keys(models.Model):

@@ -24,7 +24,7 @@
                                 {% endfor %}
                             </select>
                             <small id="sheet_key_error" class="text-danger" style="display:none;">Please select a machine.</small>
-                            <button type="submit" class="btn btn-lg btn-primary mt-3">Load</button>
+                            <button type="submit" name="loadpage" class="btn btn-lg btn-primary mt-3">Load</button>
                         </form>
 
                         
@@ -54,7 +54,7 @@
                                     <select name="project" id="project" class="form-control shadow-sm rounded">
                                         <option value="">-- Select a Project --</option>
                                         {% for project in projects %}
-                                            <option value="{{ project.id }}">{{ project.name }}</option>
+                                            <option value="{{ project.id }}" {% if form.initial.project|stringformat:"s" == project.id|stringformat:"s" %}selected{% endif %}>{{ project.name }}</option>
                                         {% endfor %}
                                     </select>
                                     <small id="project_error" class="text-danger" style="display:none;">Please select a project.</small>
@@ -1114,9 +1114,8 @@
             </div> <!-- Close row div -->
 
             <div class="text-center">
-                <button type="button" id="load-data" class="btn btn-primary">Load Calculation Data</button>
-                <button type="submit" name="savebuttonname" class="btn btn-lg btn-primary mt-3">Save</button>                                
-                
+                <button type="submit" name="loadcalculationdataname" class="btn btn-lg btn-info mt-3">Load Data</button>
+                <button type="submit" name="savebuttonname" class="btn btn-lg btn-primary mt-3">Save</button>
             </div>
 
         </form>
@@ -2583,20 +2582,108 @@
     });
 </script>
 
-<!-- <script>
-document.getElementById("load-data").addEventListener("click", function () {
-    const projectId = document.getElementById("project-select").value;
 
-    fetch(`/submittal/load-data/?project_id=${projectId}`)
-        .then(response => response.json())
-        .then(data => {
-            for (const field in data) {
-                const input = document.getElementById(`id_${field}`);
-                if (input) {
-                    input.value = data[field] !== null ? data[field] : '';
-                }
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("projectForm");
+    const inputs = form.querySelectorAll("input, select, textarea");
+
+    // Save original values
+    inputs.forEach(input => {
+        input.dataset.original = input.value;
+    });
+
+    // When Load Data button is clicked, set a flag in sessionStorage
+    const loadButton = document.querySelector("button[name='loadcalculationdataname']");
+    if (loadButton) {
+        loadButton.addEventListener("click", () => {
+            sessionStorage.setItem("loadCalcClicked", "true");
+        });
+    }
+
+    // On page load, check if "Load Data" was clicked last time
+    if (sessionStorage.getItem("loadCalcClicked") === "true") {
+        inputs.forEach(input => {
+            const original = input.dataset.original;
+            const current = input.value;
+            if (original !== undefined && original !== current) {
+                input.style.backgroundColor = "#ffe6e6";  // Light red
+                input.style.borderColor = "#ff4d4d";      // Red border
             }
         });
+
+        // Clear the flag so it doesn't apply to the next reload
+        sessionStorage.removeItem("loadCalcClicked");
+    }
+});
+</script>
+
+
+<!-- <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("projectForm");
+    const inputs = form.querySelectorAll("input, select, textarea");
+
+    // Step 1: Store original values
+    inputs.forEach(input => {
+        input.dataset.original = input.value;
+    });
+
+    // Step 2: On form submit, mark which button was clicked
+    let loadCalcClicked = false;
+
+    // Attach to the Load Calculation Data button
+    const loadButton = document.querySelector("button[name='loadcalculationdataname']");
+    document.querySelectorAll(".load-data-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                loadButton.addEventListener("click", () => {
+                    loadCalcClicked = true;
+                });
+            });
+        });
+
+
+    // Step 3: After page reload (due to POST), compare values
+    // This runs only after the form reloads
+    window.addEventListener("pageshow", function () {
+        if (loadCalcClicked) {
+            inputs.forEach(input => {
+                if (input.dataset.original && input.value !== input.dataset.original) {
+                    input.style.backgroundColor = "#ffe6e6";  // Light red
+                    input.style.borderColor = "#ff4d4d";      // Red border
+                }
+            });
+        }
+    });
+});
+</script> -->
+
+
+
+<!-- <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Track all inputs/selects/textareas in the form
+    const form = document.getElementById("projectForm");
+    const inputs = form.querySelectorAll("input, select, textarea");
+
+    inputs.forEach(function (element) {
+        // Save the initial value
+        element.setAttribute("data-original", element.value);
+
+        // Add a change event listener
+        element.addEventListener("change", function () {
+            const original = element.getAttribute("data-original");
+            const current = element.value;
+
+            if (original !== current) {
+                element.style.backgroundColor = "#ffe6e6";  // light red
+                element.style.borderColor = "#ff4d4d";      // red border
+            } else {
+                element.style.backgroundColor = "";
+                element.style.borderColor = "";
+            }
+        });
+    });
 });
 </script> -->
 

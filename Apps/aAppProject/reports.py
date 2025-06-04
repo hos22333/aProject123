@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from django.shortcuts import render
 from config import settings
 from .models import APP_Project
+from .models import ReportProgress
 from .drive import create_folder, service, check_folder_exists, get_folder_id_by_name, upload_files, upload_files_directly
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppSubmittal.models import Machine
@@ -42,7 +43,14 @@ from PyPDF2 import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 from openpyxl import Workbook
 
-
+def update_progress(user, project_id, percent, status):
+    ReportProgress.objects.update_or_create(
+        user=user,
+        project_id=project_id,
+        status=status,
+        percent=percent,
+        
+    )
 
 def save_word_pdf_submittal_report(user, project_id, logo, color):  
     print("start, save_word_pdf_submittal_report, project_id : ", project_id)
@@ -273,6 +281,8 @@ def save_word_pdf_submittal_report(user, project_id, logo, color):
         project = APP_Project.objects.get(id=project_id)
         machines = Machine.objects.filter(project=project)
         
+        machine_count = machines.count()
+        print(f"Number of machines: {machine_count}")
         # Create a Word document
         doc = Document()
 
@@ -314,6 +324,9 @@ def save_word_pdf_submittal_report(user, project_id, logo, color):
         doc.add_paragraph("\n")
 
         # Add machine details
+        machine_percent = 50/machine_count
+        process_percent = machine_percent / 2
+        percent = 20
         for index, machine in enumerate(machines, start=1):  # Add numbering
             machine_name = machine.oSec00Field03
             machine_DB = machine.oSec00Field03
@@ -326,11 +339,19 @@ def save_word_pdf_submittal_report(user, project_id, logo, color):
                 continue  # Skip this machine and continue with the rest
             
             sheet_key = themachines.keyValue
+            dxf_sheet_key = sheet_key[0:-2]
             themachinename = themachines.nameMachine
-            General_saved_DXF_ALL(user, machine_ID, sheet_key, project_id)
+
+            percent=percent+process_percent
+            new_percent = (percent+process_percent)
+            general_DXF_percent = percent + ((new_percent - percent)/2)
+            update_progress(user, project_id, percent, f"{project.name}_General DXF_{dxf_sheet_key}.dxf")
+            General_saved_DXF_ALL(user, machine_ID, sheet_key, project_id, general_DXF_percent)
+
+            percent=percent+process_percent
+            update_progress(user, project_id, percent, f"{project.name}_Full Drawing DXF_{dxf_sheet_key}")
             SavedFullDrawing(user, machine_ID, sheet_key, project_id)
             
-            #SavedFullDrawing(request, machine_ID, sheet_key)
 
 
             
@@ -393,6 +414,8 @@ def save_word_pdf_submittal_report(user, project_id, logo, color):
 
             doc.add_page_break()     
 
+
+        update_progress(user, project_id, 75, f"{project.name}_word submittal report")
         # Define the folder path
         company_slug = slugify(project.company.nameCompanies)
         company_name = company_slug.upper()
@@ -444,6 +467,9 @@ def save_word_pdf_submittal_report(user, project_id, logo, color):
             create_folder(service, folder_name, company_folder_id)
             project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
             upload_files(service,file_path, file_name, mime_type, project_folder_id)
+
+
+        update_progress(user, project_id, 78, f"{project.name}_pdf submittal report")
 
         pdf_file_path = os.path.join(project_folder, f"{project_slug}_report.pdf")
         pdf.output(pdf_file_path)
@@ -544,7 +570,7 @@ def resolve_fieldvalue(machine, fieldvalue):
 
 
 # DXF Download Views
-def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id): 
+def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id, general_DXF_percent): 
     print("start, General_saved_DXF_ALL", project_id, aMachine_ID, aType)
     
     
@@ -679,6 +705,7 @@ def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id):
 
 
         # Define PDF output path
+        update_progress(user, project_id, general_DXF_percent, f"{project.name}_General DXF_{category}.pdf")
         pdf_output_path = modified_path.replace(".dxf", ".pdf")
 
         try:
@@ -1240,7 +1267,6 @@ def save_word_pdf_calculation_report(user, project_id, logo, color):
     
     
     try:
-        
         ###LOG
         aLogEntry.objects.create(
                 user=user,
@@ -1255,6 +1281,7 @@ def save_word_pdf_calculation_report(user, project_id, logo, color):
         project = APP_Project.objects.get(id=project_id)
         machines = modelcalc.objects.filter(project=project)
         
+        update_progress(user, project_id, 80, f"{project.name}_woed calculation report")
         
         print(aCompany.id)
         print(project.id)
@@ -1404,6 +1431,9 @@ def save_word_pdf_calculation_report(user, project_id, logo, color):
             create_folder(service, folder_name, company_folder_id)
             project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
             upload_files(service,file_path, file_name, mime_type, project_folder_id)
+
+
+        update_progress(user, project_id, 85, f"{project.name}_pdf Calculation report")
 
         pdf_file_path = os.path.join(project_folder, f"{project_slug}_Calculation_report.pdf")
         pdf.output(pdf_file_path)

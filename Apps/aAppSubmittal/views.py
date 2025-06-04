@@ -46,7 +46,7 @@ def LoadPageDataSheet(request):
     if not request.user.is_authenticated:
         return redirect("login")
 
-     # Get the company of the logged-in user    
+    # Get the company of the logged-in user    
     user_company = None
     if request.user.is_authenticated:
         try:
@@ -61,7 +61,7 @@ def LoadPageDataSheet(request):
     sheet_key = None
     
     # If POST, get the selected sheet_key
-    if request.method == "POST":
+    if request.method == "POST" and 'loadpage' in request.POST:
         sheet_key = request.POST.get("sheet_key")
         if sheet_key :
             machineShow = "Yes"
@@ -112,6 +112,8 @@ def LoadPageDataSheet(request):
 
     form = FormDataSheet(user=request.user, form_type=form_type)
     
+    
+
     print(f"Initial value for oSec01Field02: {form.fields['oSec01Field02'].initial}")
     
     
@@ -280,6 +282,9 @@ def LoadPageDataSheet(request):
 
 
 
+
+
+
 def SavePageDataSheet(request):
     sheet_key = request.POST.get("sheet_key")
     print(sheet_key)
@@ -329,8 +334,208 @@ def SavePageDataSheet(request):
 
     print(form_type)
     
+    
 
-    if request.method == "POST":
+    # ============================================
+    # 🔵 HANDLE LOAD FROM modelcalc (preview only)
+    # ============================================
+    if request.method == "POST" and 'loadcalculationdataname' in request.POST:
+        machineShow = "Yes"
+        selected_project_id = request.POST.get("project")
+        keyvalue = sheet_key[:-2] 
+        print("Key Value : ",keyvalue)
+
+
+        form_data = request.POST.copy()
+
+        if selected_project_id:
+            print("selected_project_id : ", selected_project_id)
+            form_data["project"] = selected_project_id
+
+        if sheet_key and selected_project_id:
+            calc_instance = modelcalc.objects.filter(project_id=selected_project_id, company=user_company, oSec00Field03=sheet_key).first()
+            if calc_instance:
+                mappings = DataTransfer.objects.filter(keyValue=keyvalue, company=user_company)
+                print("mappings : ", mappings)
+                for mapping in mappings:
+                    calc_field = mapping.CalculationField
+                    print("calc Data : ", getattr(calc_instance, calc_field))
+                    form_field = mapping.SubmittalField
+                    if hasattr(calc_instance, calc_field):
+                        form_data[form_field] = getattr(calc_instance, calc_field)
+
+        form = FormDataSheet(initial=form_data, form_type=form_type)
+
+        #######################################
+        print("#######################")
+        
+        # Initialize all section variables
+        aSection01Show = "Yes"
+        aSection02Show = "Yes"
+        aSection03Show = "Yes"
+        aSection04Show = "Yes"
+        aSection05Show = "Yes"
+        aSection06Show = "Yes"
+        aSection07Show = "Yes"
+        aSection08Show = "Yes"
+        aSection09Show = "Yes"
+        aSection10Show = "Yes"
+
+        # Initialize visibility dictionaries
+        aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+        aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+        aSection03FieldShow = {f"aSection03Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+        aSection04FieldShow = {f"aSection04Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+        aSection05FieldShow = {f"aSection05Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+        aSection06FieldShow = {f"aSection06Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+        aSection07FieldShow = {f"aSection07Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+        aSection08FieldShow = {f"aSection08Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+        aSection09FieldShow = {f"aSection09Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+        aSection10FieldShow = {f"aSection10Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
+            
+        print(form.fields['oSec01Field01'].initial)
+        print(form.fields['oSec02Field01'].initial)
+        print(form.fields['oSec03Field01'].initial)
+        print(form.fields['oSec04Field01'].initial)
+        print(form.fields['oSec05Field01'].initial)
+        print(form.fields['oSec06Field01'].initial)
+        print(form.fields['oSec07Field01'].initial)
+        print(form.fields['oSec08Field01'].initial)
+        print(form.fields['oSec09Field01'].initial)
+        print(form.fields['oSec10Field01'].initial)
+        
+        # Apply conditions to modify the values
+        if form.fields['oSec01Field01'].initial in ["oooo", None]:
+            aSection01Show = "Hide"
+        
+        if form.fields['oSec02Field01'].initial in ["oooo", None]:
+            aSection02Show = "Hide"
+        
+        if form.fields['oSec03Field01'].initial in ["oooo", None]:
+            aSection03Show = "Hide"
+        
+        if form.fields['oSec04Field01'].initial in ["oooo", None]:
+            aSection04Show = "Hide"
+        
+        if form.fields['oSec05Field01'].initial in ["oooo", None]:
+            aSection05Show = "Hide"
+        
+        if form.fields['oSec06Field01'].initial in ["oooo", None]:
+            aSection06Show = "Hide"
+        
+        if form.fields['oSec07Field01'].initial in ["oooo", None]:
+            aSection07Show = "Hide"
+        
+        if form.fields['oSec08Field01'].initial in ["oooo", None]:
+            aSection08Show = "Hide"
+        
+        if form.fields['oSec09Field01'].initial in ["oooo", None]:
+            aSection09Show = "Hide"
+        
+        if form.fields['oSec10Field01'].initial in ["oooo", None]:
+            aSection10Show = "Hide"
+            
+        print(aSection01Show)
+        print(aSection02Show)
+        print(aSection03Show)
+        print(aSection04Show)
+        print(aSection05Show)
+        print(aSection06Show)
+        print(aSection07Show)
+        print(aSection08Show)
+        print(aSection09Show)
+        print(aSection10Show)
+
+        # Update visibility based on field counts
+        for i in range(0, 10):
+            if form.fields[f'oSec01Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                aSection01FieldShow[f"aSection01Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                aSection01FieldShow[f"aSection01Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+        for i in range(0, 10):
+            if form.fields[f'oSec02Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                aSection02FieldShow[f"aSection02Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                aSection02FieldShow[f"aSection02Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+        for i in range(0, 10):
+            if form.fields[f'oSec03Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                aSection03FieldShow[f"aSection03Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                aSection03FieldShow[f"aSection03Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+        for i in range(0, 10):
+            if form.fields[f'oSec04Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                aSection04FieldShow[f"aSection04Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                aSection04FieldShow[f"aSection04Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+        for i in range(0, 10):
+            if form.fields[f'oSec05Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                aSection05FieldShow[f"aSection05Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                aSection05FieldShow[f"aSection05Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+        for i in range(0, 10):
+            if form.fields[f'oSec06Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                aSection06FieldShow[f"aSection06Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                aSection06FieldShow[f"aSection06Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+        for i in range(0, 10):
+            if form.fields[f'oSec07Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                aSection07FieldShow[f"aSection07Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                aSection07FieldShow[f"aSection07Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+        for i in range(0, 10):
+            if form.fields[f'oSec08Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                aSection08FieldShow[f"aSection08Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                aSection08FieldShow[f"aSection08Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+        for i in range(0, 10):
+            if form.fields[f'oSec09Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                aSection09FieldShow[f"aSection09Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                aSection09FieldShow[f"aSection09Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+
+        for i in range(0, 10):
+            if form.fields[f'oSec10Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
+                aSection10FieldShow[f"aSection10Field{str(i*2+1).zfill(2)}Show"] = "Hide"
+                aSection10FieldShow[f"aSection10Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+                    
+
+        return render(request, "PageDataSheet.html", {
+            "form": form,
+            "machines": machines,
+            "projects": projects,
+            "aMachineName": aMachineName,
+            "user_company": user_company,
+            "sheet_key": sheet_key,
+            "sheet_keys": sheet_keys,
+            "machineShow": machineShow,
+            "aSection01Show": aSection01Show,
+            "aSection02Show": aSection02Show,
+            "aSection03Show": aSection03Show,
+            "aSection04Show": aSection04Show,
+            "aSection05Show": aSection05Show,
+            "aSection06Show": aSection06Show,
+            "aSection07Show": aSection07Show,
+            "aSection08Show": aSection08Show,
+            "aSection09Show": aSection09Show,
+            "aSection10Show": aSection10Show,
+            **aSection01FieldShow,
+            **aSection02FieldShow,
+            **aSection03FieldShow,
+            **aSection04FieldShow,
+            **aSection05FieldShow,
+            **aSection06FieldShow,
+            **aSection07FieldShow,
+            **aSection08FieldShow,
+            **aSection09FieldShow,
+            **aSection10FieldShow,
+        })
+
+
+
+    # =====================================
+    # ✅ HANDLE SAVE TO DATABASE
+    # =====================================
+
+    if request.method == "POST" and 'savebuttonname' in request.POST:
         form = FormDataSheet(form_type=form_type, data=request.POST)
 
         if form.is_valid():

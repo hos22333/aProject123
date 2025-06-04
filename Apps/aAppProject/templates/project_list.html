@@ -2341,10 +2341,15 @@ function pollReportProgress(projectId) {
                 progressBar.value = percent;
                 progressStatus.innerText = `${status} (${percent}%)`;
 
-                if (percent >= 100 || status.includes("done")) {
+                if (percent == 100) {
                     clearInterval(intervalId);
                     progressStatus.innerText = "✅ Completed";
                 }
+                else if (data.percent == -1) {
+                progressStatus.innerText = "❌ Error";
+                progressBar.value = 0;
+                progressBar.classList.add("bg-danger");
+            } 
             })
             .catch(error => {
                 console.error("Progress polling error:", error);
@@ -2353,6 +2358,28 @@ function pollReportProgress(projectId) {
             });
     }, 2000); // Every 2s
 }
+
+/* function updateProgress(projectId) {
+    fetch(`/Project/progress/${projectId}/`)  
+        .then(response => response.json())
+        .then(data => {
+            const progressStatus = document.getElementById(`progress-status-${projectId}`);
+            const progressBar = document.getElementById(`progress-bar-${projectId}`);
+
+            if (data.percent === -1) {
+                progressStatus.innerText = "❌ Timeout Error";
+                progressBar.value = 0;
+                progressBar.classList.add("bg-danger");
+            } else if (data.percent === 100) {
+                progressStatus.innerText = "✅ Complete";
+                progressBar.value = 100;
+                progressBar.classList.remove("bg-danger");
+            } else {
+                progressStatus.innerText = `${data.status}`;
+                progressBar.value = data.percent;
+            }
+        });
+} */
 
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".saveReportsBtn").forEach(button => {

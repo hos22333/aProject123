@@ -24,6 +24,7 @@ def save_reports_task(project_id, user_id):
     user = User.objects.get(id=user_id)
     ReportProgress.objects.filter(user=user, project_id=project_id).delete()
     time.sleep(2)
+    
     try:
         user = User.objects.get(id=user_id)
         project = APP_Project.objects.get(pk=project_id)
@@ -34,11 +35,11 @@ def save_reports_task(project_id, user_id):
 
         if aCompany:
             if aCompany.company.nameCompanies == "AAAA":
-                update_progress(user, project_id, 30, f"{project.name}_submittal report")
+                update_progress(user, project_id, 20, f"{project.name}_submittal report")
                 save_word_pdf_submittal_report(user, project_id, "LogoAAA", "FFA500")
                 time.sleep(2)
 
-                update_progress(user, project_id, 60, f"{project.name}_calculation report")
+                update_progress(user, project_id, 80, f"{project.name}_calculation report")
                 save_word_pdf_calculation_report(user, project_id, "LogoAAA", "FFA500")
                 time.sleep(2)
 
@@ -47,11 +48,11 @@ def save_reports_task(project_id, user_id):
                 time.sleep(2)
 
             elif aCompany.company.nameCompanies == "BBBB":
-                update_progress(user, project_id, 30, f"{project.name}_submittal report")
+                update_progress(user, project_id, 20, f"{project.name}_submittal report")
                 save_word_pdf_submittal_report(user, project_id, "LogoBBB", "ffffff")
                 time.sleep(2)
 
-                update_progress(user, project_id, 60, f"{project.name}_calculation report")
+                update_progress(user, project_id, 80, f"{project.name}_calculation report")
                 save_word_pdf_calculation_report(user, project_id, "LogoBBB", "ffffff")
                 time.sleep(2)
 

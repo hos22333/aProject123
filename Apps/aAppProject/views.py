@@ -382,35 +382,11 @@ def save_reports(request, project_id):
     if existing_task:
         return JsonResponse({'message': 'Report generation is already in progress. Please wait.'}, status=429)
     
-    async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 600 })
+    async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 5400 })
 
     
     
     return JsonResponse({'message': 'Report generation started.'}, status=202)
-
-
-def download_project_reports(request, project_id):
-
-    project = APP_Project.objects.get(id=project_id)
-    company_name = slugify(project.company.nameCompanies)
-    project_name = slugify(project.name)
-    folder_name = slugify(f"{project_id}_{company_name}_{project_name}")
-
-    folder_path = os.path.join(settings.BASE_DIR, 'static', 'aReports', company_name, folder_name)
-
-    # In-memory zip
-    buffer = BytesIO()
-    with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-        for root, _, files in os.walk(folder_path):
-            for file in files:
-                abs_path = os.path.join(root, file)
-                rel_path = os.path.relpath(abs_path, folder_path)
-                zip_file.write(abs_path, arcname=rel_path)
-
-    buffer.seek(0)
-    response = HttpResponse(buffer, content_type='application/zip')
-    response['Content-Disposition'] = f'attachment; filename="{folder_name}_reports.zip"'
-    return response
 
 
 def download_drive_project_reports(request, project_id):
