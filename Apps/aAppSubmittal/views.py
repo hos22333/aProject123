@@ -1,4 +1,5 @@
 import pdb
+import json
 
 from Apps.aAppProject.models import APP_Project
 from .models import AddMachine
@@ -346,8 +347,19 @@ def SavePageDataSheet(request):
         print("Key Value : ",keyvalue)
 
 
-        form_data = request.POST.copy()
+        initial_instance = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company).first()
+        initial_values = {}
 
+        if initial_instance:
+            for field in FormDataSheet(form_type=form_type).fields:
+                if hasattr(initial_instance, field):
+                    value = getattr(initial_instance, field)
+                    if value is not None:
+                        initial_values[field] = str(value)
+
+
+
+        form_data = request.POST.copy()
         if selected_project_id:
             print("selected_project_id : ", selected_project_id)
             form_data["project"] = selected_project_id
@@ -363,6 +375,9 @@ def SavePageDataSheet(request):
                     form_field = mapping.SubmittalField
                     if hasattr(calc_instance, calc_field):
                         form_data[form_field] = getattr(calc_instance, calc_field)
+                    
+                
+                
 
         form = FormDataSheet(initial=form_data, form_type=form_type)
 
@@ -527,6 +542,7 @@ def SavePageDataSheet(request):
             **aSection08FieldShow,
             **aSection09FieldShow,
             **aSection10FieldShow,
+            "initial_values": json.dumps(initial_values),
         })
 
 

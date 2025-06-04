@@ -2582,83 +2582,27 @@
     });
 </script>
 
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("projectForm");
     const inputs = form.querySelectorAll("input, select, textarea");
 
-    // Save original values
+    // Load initial machine values from Django
+    const initialValues = {{ initial_values|default:'{}'|safe }};
+
     inputs.forEach(input => {
-        input.dataset.original = input.value;
-    });
-
-    // When Load Data button is clicked, set a flag in sessionStorage
-    const loadButton = document.querySelector("button[name='loadcalculationdataname']");
-    if (loadButton) {
-        loadButton.addEventListener("click", () => {
-            sessionStorage.setItem("loadCalcClicked", "true");
-        });
-    }
-
-    // On page load, check if "Load Data" was clicked last time
-    if (sessionStorage.getItem("loadCalcClicked") === "true") {
-        inputs.forEach(input => {
-            const original = input.dataset.original;
-            const current = input.value;
-            if (original !== undefined && original !== current) {
-                input.style.backgroundColor = "#ffe6e6";  // Light red
-                input.style.borderColor = "#ff4d4d";      // Red border
+        const name = input.name;
+        if (initialValues.hasOwnProperty(name)) {
+            const original = initialValues[name]?.trim();
+            const current = input.value?.trim();
+            if (original !== current) {
+                input.style.backgroundColor = "#ffe6e6"; // Light red
+                input.style.borderColor = "#ff4d4d";     // Red border
             }
-        });
-
-        // Clear the flag so it doesn't apply to the next reload
-        sessionStorage.removeItem("loadCalcClicked");
-    }
-});
-</script>
-
-
-<!-- <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("projectForm");
-    const inputs = form.querySelectorAll("input, select, textarea");
-
-    // Step 1: Store original values
-    inputs.forEach(input => {
-        input.dataset.original = input.value;
-    });
-
-    // Step 2: On form submit, mark which button was clicked
-    let loadCalcClicked = false;
-
-    // Attach to the Load Calculation Data button
-    const loadButton = document.querySelector("button[name='loadcalculationdataname']");
-    document.querySelectorAll(".load-data-btn").forEach(button => {
-            button.addEventListener("click", function () {
-                loadButton.addEventListener("click", () => {
-                    loadCalcClicked = true;
-                });
-            });
-        });
-
-
-    // Step 3: After page reload (due to POST), compare values
-    // This runs only after the form reloads
-    window.addEventListener("pageshow", function () {
-        if (loadCalcClicked) {
-            inputs.forEach(input => {
-                if (input.dataset.original && input.value !== input.dataset.original) {
-                    input.style.backgroundColor = "#ffe6e6";  // Light red
-                    input.style.borderColor = "#ff4d4d";      // Red border
-                }
-            });
         }
     });
 });
-</script> -->
-
-
+</script>
 
 <!-- <script>
 document.addEventListener("DOMContentLoaded", function () {
