@@ -9,8 +9,23 @@ from django.shortcuts import redirect
 
 @login_required
 def cost_calculation_form(request):
-    categories = Category.objects.prefetch_related("items__sizes").all()
-    return render(request, "aCost/cost_form.html", {"categories": categories})
+    categories = Category.objects.prefetch_related("items__sizes").order_by("id").all()
+    return render(request, "aCost/cost_form.html", {
+    'categories': categories,
+    'item_ids': {
+        'steel': 1,
+        'stst': 2,
+        
+        'GearMotor': 3,
+        'Bearings': 4,
+        'Bolts': 5,
+        
+        'Painting': 6,
+        'Galvanization': 7,
+        'Packing': 9,
+        # add others as needed
+    }
+})
 
 @login_required
 def get_sizes(request, item_id):

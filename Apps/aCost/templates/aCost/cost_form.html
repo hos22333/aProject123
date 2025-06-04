@@ -1,93 +1,365 @@
 {% extends "base.html" %}
 
 {% block content %}
-<br>
-<br>
-<br>
-<br>    
-
+<br><br><br><br>
 
 <head>
     <title>Cost Calculation Form</title>
     <script>
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            let cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                let cookie = cookies[i].trim();
-                if (cookie.startsWith(name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                let cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    let cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
                 }
             }
+            return cookieValue;
         }
-        return cookieValue;
-    }
 
-    function loadSizes(itemId, categoryId, row) {
-        if (!itemId) return;
-        
-        fetch(`/Cost/get_sizes/${itemId}/`)
-            .then(response => response.json())
-            .then(data => {
-                let sizeSelect = document.getElementById(`size_${categoryId}_${row}`);
-                sizeSelect.innerHTML = '<option value="">Select Size</option>';
-                
-                data.sizes.forEach(size => {
-                    let option = document.createElement('option');
-                    option.value = size.id;
-                    option.textContent = size.name;
-                    sizeSelect.appendChild(option);
+        function loadSizes(itemId, categoryId, row, callback = null) {
+            if (!itemId) return;
+
+            fetch(`/Cost/get_sizes/${itemId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    let sizeSelect = document.getElementById(`size_${categoryId}_${row}`);
+                    sizeSelect.innerHTML = '<option value="">Select Size</option>';
+
+                    data.sizes.forEach(size => {
+                        let option = document.createElement('option');
+                        option.value = size.id;
+                        option.textContent = size.name;
+                        sizeSelect.appendChild(option);
+                    });
+
+                    if (callback) {
+                        callback(sizeSelect, data.sizes);
+                    }
+                })
+                .catch(error => console.error('Error fetching sizes:', error));
+        }
+
+        function loadPrice(sizeId, categoryId, row) {
+            if (!sizeId) return;
+
+            fetch(`/Cost/get_price/${sizeId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById(`price_${categoryId}_${row}`).value = data.price;
+                    calculateCost(categoryId, row);
+                })
+                .catch(error => console.error('Error fetching price:', error));
+        }
+
+        function calculateCost(categoryId, row) {
+            let price = parseFloat(document.getElementById(`price_${categoryId}_${row}`).value) || 0;
+            let quantity = parseInt(document.getElementById(`quantity_${categoryId}_${row}`).value) || 0;
+            document.getElementById(`total_${categoryId}_${row}`).value = (price * quantity).toFixed(2);
+        }
+
+        function selectOptionByValue(selectElement, value) {
+            for (let i = 0; i < selectElement.options.length; i++) {
+                if (selectElement.options[i].value === value.toString()) {
+                    selectElement.selectedIndex = i;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function autoSelectItems() {
+            const cat1 = 1;
+            const cat2 = 2;
+            const cat3 = 3;
+
+            const item1_1_id = {{ item_ids.stst }};     // St.St., Category 1, Row 1
+            const item1_2_id = {{ item_ids.steel }};    // Steel, Category 1, Row 2
+
+            const item2_1_id = {{ item_ids.GearMotor }};    // Bolts, Category 2, Row 1
+            const item2_2_id = {{ item_ids.Bearings}};   // Washer, Category 2, Row 2
+
+            const item3_1_id = {{ item_ids.Painting }};  // Bearing, Category 3, Row 1
+            const item3_2_id = {{ item_ids.Galvanization }};  // Oil Seal, Category 3, Row 2
+
+            // --- Category 1, Row 1 ---
+            const item_1_1 = document.getElementById(`item_1_1`);
+            if (item_1_1 && selectOptionByValue(item_1_1, item1_1_id)) {
+                loadSizes(item1_1_id, cat1, '1', (sizeSelect, sizes) => {
+                    if (sizes.length > 1) {
+                        selectOptionByValue(sizeSelect, sizes[1].id);
+                        loadPrice(sizes[1].id, cat1, '1');
+                    }
                 });
-            })
-            .catch(error => console.error('Error fetching sizes:', error));
-    }
+            }
 
-    function loadPrice(sizeId, categoryId, row) {
-        if (!sizeId) return;
+            // --- Category 1, Row 2 ---
+            const item_1_2 = document.getElementById(`item_1_2`);
+            if (item_1_2 && selectOptionByValue(item_1_2, item1_2_id)) {
+                loadSizes(item1_2_id, cat1, '2', (sizeSelect, sizes) => {
+                    if (sizes.length > 0) {
+                        selectOptionByValue(sizeSelect, sizes[0].id);
+                        loadPrice(sizes[0].id, cat1, '2');
+                    }
+                });
+            }
 
-        fetch(`/Cost/get_price/${sizeId}/`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById(`price_${categoryId}_${row}`).value = data.price;
-                calculateCost(categoryId, row);
-            })
-            .catch(error => console.error('Error fetching price:', error));
-    }
+            // --- Category 2, Row 1 ---
+            const item_2_1 = document.getElementById(`item_2_1`);
+            if (item_2_1 && selectOptionByValue(item_2_1, item2_1_id)) {
+                loadSizes(item2_1_id, cat2, '1', (sizeSelect, sizes) => {
+                    if (sizes.length > 0) {
+                        selectOptionByValue(sizeSelect, sizes[0].id);
+                        loadPrice(sizes[0].id, cat2, '1');
+                    }
+                });
+            }
 
-    function calculateCost(categoryId, row) {
-        let price = parseFloat(document.getElementById(`price_${categoryId}_${row}`).value) || 0;
-        let quantity = parseInt(document.getElementById(`quantity_${categoryId}_${row}`).value) || 0;
-        document.getElementById(`total_${categoryId}_${row}`).value = (price * quantity).toFixed(2);
-    }
-</script>
+            // --- Category 2, Row 2 ---
+            const item_2_2 = document.getElementById(`item_2_2`);
+            if (item_2_2 && selectOptionByValue(item_2_2, item2_2_id)) {
+                loadSizes(item2_2_id, cat2, '2', (sizeSelect, sizes) => {
+                    if (sizes.length > 1) {
+                        selectOptionByValue(sizeSelect, sizes[1].id);
+                        loadPrice(sizes[1].id, cat2, '2');
+                    }
+                });
+            }
+
+            // --- Category 3, Row 1 ---
+            const item_3_1 = document.getElementById(`item_3_1`);
+            if (item_3_1 && selectOptionByValue(item_3_1, item3_1_id)) {
+                loadSizes(item3_1_id, cat3, '1', (sizeSelect, sizes) => {
+                    if (sizes.length > 0) {
+                        selectOptionByValue(sizeSelect, sizes[0].id);
+                        loadPrice(sizes[0].id, cat3, '1');
+                    }
+                });
+            }
+
+            // --- Category 3, Row 2 ---
+            const item_3_2 = document.getElementById(`item_3_2`);
+            if (item_3_2 && selectOptionByValue(item_3_2, item3_2_id)) {
+                loadSizes(item3_2_id, cat3, '2', (sizeSelect, sizes) => {
+                    if (sizes.length > 0) {
+                        selectOptionByValue(sizeSelect, sizes[0].id);
+                        loadPrice(sizes[0].id, cat3, '2');
+                    }
+                });
+            }
+
+            // Quantities
+            const quantityMap = [
+                [`quantity_${cat1}_1`, 157],
+                [`quantity_${cat1}_2`, 88],
+                [`quantity_${cat2}_1`, 64],
+                [`quantity_${cat2}_2`, 36],
+                [`quantity_${cat3}_1`, 147],
+                [`quantity_${cat3}_2`, 24],
+            ];
+
+            quantityMap.forEach(([id, qty]) => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.value = qty;
+                    const [_, catId, row] = id.split(/[_]+/); // extract category and row from id
+                    calculateCost(catId, row);
+                }
+            });
+        }
+
+
+
+
+        
+    </script>
+
+
+    <script>
+        function calculateCategorySubtotal(categoryId) {
+            let subtotal = 0;
+            const totalInputs = document.querySelectorAll(`input[id^='total_${categoryId}_']`);
+            totalInputs.forEach(input => {
+                subtotal += parseFloat(input.value) || 0;
+            });
+            document.getElementById(`subtotal_${categoryId}`).value = subtotal.toFixed(2);
+            calculateGrandTotal();
+        }
+
+        function calculateCost(categoryId, row) {
+            let price = parseFloat(document.getElementById(`price_${categoryId}_${row}`).value) || 0;
+            let quantity = parseInt(document.getElementById(`quantity_${categoryId}_${row}`).value) || 0;
+            let total = price * quantity;
+            document.getElementById(`total_${categoryId}_${row}`).value = total.toFixed(2);
+            calculateCategorySubtotal(categoryId);
+        }
+
+        function calculateGrandTotal() {
+            let grandTotal = 0;
+            const subtotals = document.querySelectorAll("input[id^='subtotal_']");
+            subtotals.forEach(input => {
+                grandTotal += parseFloat(input.value) || 0;
+            });
+            document.getElementById("grand_total").value = grandTotal.toFixed(2);
+        }
+
+    </script>
 </head>
+
 <body>
     <form onsubmit="return false;">
-        {% for category in categories %}
-            <h3>{{ category.name }}</h3>
-            {% for i in "1234" %}
-                <div>
-                    <select id="item_{{ category.id }}_{{ i }}" onchange="loadSizes(this.value, '{{ category.id }}', '{{ i }}')">
-                        <option value="">Select Item</option>
-                        {% for item in category.items.all %}
-                            <option value="{{ item.id }}">{{ item.name }}</option>
-                        {% endfor %}
-                    </select>
+        <!-- Category 1 -->
+        <h3>{{ categories.0.name }}</h3>
+        <!-- Row 1 -->
+        <div>
+            <select id="item_1_1" onchange="loadSizes(this.value, '{{ categories.0.id }}', '1')">
+                <option value="">Select Item</option>
+                {% for item in categories.0.items.all %}
+                    <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+            </select>
 
-                    <select id="size_{{ category.id }}_{{ i }}" onchange="loadPrice(this.value, '{{ category.id }}', '{{ i }}')">
-                        <option value="">Select Size</option>
-                    </select>
+            <select id="size_1_1" onchange="loadPrice(this.value, '{{ categories.0.id }}', '1')">
+                <option value="">Select Size</option>
+            </select>
 
-                    <input type="number" id="price_{{ category.id }}_{{ i }}" readonly>
-                    <input type="number" id="quantity_{{ category.id }}_{{ i }}" oninput="calculateCost('{{ category.id }}', '{{ i }}')">
-                    <input type="number" id="total_{{ category.id }}_{{ i }}" readonly>
-                </div>
-            {% endfor %}
-        {% endfor %}
+            <input type="number" id="price_1_1" readonly>
+            <input type="number" id="quantity_1_1" oninput="calculateCost('{{ categories.0.id }}', '1')">
+            <input type="number" id="total_1_1" readonly>
+        </div>
+
+        <!-- Row 2 -->
+        <div>
+            <select id="item_1_2" onchange="loadSizes(this.value, '{{ categories.0.id }}', '2')">
+                <option value="">Select Item</option>
+                {% for item in categories.0.items.all %}
+                    <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="size_1_2" onchange="loadPrice(this.value, '{{ categories.0.id }}', '2')">
+                <option value="">Select Size</option>
+            </select>
+
+            <input type="number" id="price_1_2" readonly>
+            <input type="number" id="quantity_1_2" oninput="calculateCost('{{ categories.0.id }}', '2')">
+            <input type="number" id="total_1_2" readonly>
+        </div>
+
+        <div>
+            <label><strong>Subtotal ({{ categories.0.name }}):</strong></label>
+            <input type="number" id="subtotal_1" readonly>
+        </div>
+
+
+        <br>
+
+        <!-- Category 2 -->
+        <h3>{{ categories.1.name }}</h3>
+        <!-- Row 1 -->
+        <div>
+            <select id="item_2_1" onchange="loadSizes(this.value, '{{ categories.1.id }}', '1')">
+                <option value="">Select Item</option>
+                {% for item in categories.1.items.all %}
+                    <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="size_2_1" onchange="loadPrice(this.value, '{{ categories.1.id }}', '1')">
+                <option value="">Select Size</option>
+            </select>
+
+            <input type="number" id="price_2_1" readonly>
+            <input type="number" id="quantity_2_1" oninput="calculateCost('{{ categories.1.id }}', '1')">
+            <input type="number" id="total_2_1" readonly>
+        </div>
+
+        <!-- Row 2 -->
+        <div>
+            <select id="item_2_2" onchange="loadSizes(this.value, '{{ categories.1.id }}', '2')">
+                <option value="">Select Item</option>
+                {% for item in categories.1.items.all %}
+                    <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="size_2_2" onchange="loadPrice(this.value, '{{ categories.1.id }}', '2')">
+                <option value="">Select Size</option>
+            </select>
+
+            <input type="number" id="price_2_2" readonly>
+            <input type="number" id="quantity_2_2" oninput="calculateCost('{{ categories.1.id }}', '2')">
+            <input type="number" id="total_2_2" readonly>
+        </div>
+
+        <div>
+            <label><strong>Subtotal ({{ categories.1.name }}):</strong></label>
+            <input type="number" id="subtotal_2" readonly>
+        </div>
+
+
+        <br>
+
+        <!-- Category 3 -->
+        <h3>{{ categories.2.name }}</h3>
+        <!-- Row 1 -->
+        <div>
+            <select id="item_3_1" onchange="loadSizes(this.value, '{{ categories.2.id }}', '1')">
+                <option value="">Select Item</option>
+                {% for item in categories.2.items.all %}
+                    <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="size_3_1" onchange="loadPrice(this.value, '{{ categories.2.id }}', '1')">
+                <option value="">Select Size</option>
+            </select>
+
+            <input type="number" id="price_3_1" readonly>
+            <input type="number" id="quantity_3_1" oninput="calculateCost('{{ categories.2.id }}', '1')">
+            <input type="number" id="total_3_1" readonly>
+        </div>
+
+        <!-- Row 2 -->
+        <div>
+            <select id="item_3_2" onchange="loadSizes(this.value, '{{ categories.2.id }}', '2')">
+                <option value="">Select Item</option>
+                {% for item in categories.2.items.all %}
+                    <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="size_3_2" onchange="loadPrice(this.value, '{{ categories.2.id }}', '2')">
+                <option value="">Select Size</option>
+            </select>
+
+            <input type="number" id="price_3_2" readonly>
+            <input type="number" id="quantity_3_2" oninput="calculateCost('{{ categories.2.id }}', '2')">
+            <input type="number" id="total_3_2" readonly>
+        </div>
+
+        <div>
+            <label><strong>Subtotal ({{ categories.2.name }}):</strong></label>
+            <input type="number" id="subtotal_3" readonly>
+        </div>
+
+        <br>
+        <div>
+            <label><strong>Grand Total:</strong></label>
+            <input type="number" id="grand_total" readonly>
+        </div>
+        <br>
+
+
+
+
         <button onclick="submitForm(false)">Save as New</button>
         <button onclick="submitForm(true)">Update Existing</button>
+        <button type="button" onclick="autoSelectItems()">Auto Select Sample</button>
     </form>
 </body>
 {% endblock %}
