@@ -72,19 +72,22 @@
             return false;
         }
 
-        function autoSelectItems() {
-            const cat1 = 1;
-            const cat2 = 2;
-            const cat3 = 3;
 
-            // Item and size IDs
+    
+    </script>
+
+    <script>
+        async function autoSelectItems() {
+            const response = await fetch("{% url 'get_autofill_data' %}");
+            const { item_ids, size_ids, quantity_map } = await response.json();
+
             const itemSizeMap = {
-                item_1_1: { itemId: 2, sizeId: 3 },  // St.St. - 304
-                item_1_2: { itemId: 1, sizeId: 1 },  // Steel - 37
-                item_2_1: { itemId: 3, sizeId: 4 },  // GearMotor - 550 Wat, 3 RPM
-                item_2_2: { itemId: 4, sizeId: 7 },  // Bearings - D60
-                item_3_1: { itemId: 6, sizeId: 10 }, // Painting - Painting A
-                item_3_2: { itemId: 7, sizeId: 12 }  // Galvanization - Galv A
+                item_1_1: { itemId: item_ids['stst'], sizeId: size_ids['stst_304'] },
+                item_1_2: { itemId: item_ids['steel'], sizeId: size_ids['steel_37'] },
+                item_2_1: { itemId: item_ids['GearMotor'], sizeId: size_ids['GearMotor_550W'] },
+                item_2_2: { itemId: item_ids['Bearings'], sizeId: size_ids['Bearings_D60'] },
+                item_3_1: { itemId: item_ids['Painting'], sizeId: size_ids['Painting_A'] },
+                item_3_2: { itemId: item_ids['Galvanization'], sizeId: size_ids['Galv_A'] },
             };
 
             Object.entries(itemSizeMap).forEach(([elementId, { itemId, sizeId }]) => {
@@ -98,32 +101,32 @@
                 }
             });
 
-            // Quantities
-            const quantityMap = [
-                [`quantity_${cat1}_1`, 157],
-                [`quantity_${cat1}_2`, 88],
-                [`quantity_${cat2}_1`, 64],
-                [`quantity_${cat2}_2`, 36],
-                [`quantity_${cat3}_1`, 147],
-                [`quantity_${cat3}_2`, 24],
-            ];
-
-            quantityMap.forEach(([id, qty]) => {
-                const input = document.getElementById(id);
+            Object.entries(quantity_map).forEach(([key, qty]) => {
+                const input = document.getElementById(`quantity_${key}`);
                 if (input) {
                     input.value = qty;
-                    const [_, catId, row] = id.split(/[_]+/);
+                    const [catId, row] = key.split("_");
                     calculateCost(catId, row);
                 }
             });
         }
 
+        function selectOptionByValue(selectElement, value) {
+            if (!selectElement) return false;
+            for (let i = 0; i < selectElement.options.length; i++) {
+                if (selectElement.options[i].value == value) {
+                    selectElement.selectedIndex = i;
+                    selectElement.dispatchEvent(new Event('change'));
+                    return true;
+                }
+            }
+            return false;
+        }
 
-
-
-
-        
+        document.addEventListener("DOMContentLoaded", autoSelectItems);
     </script>
+
+
 
 
     <script>
@@ -161,70 +164,70 @@
 
 
 <script>
-function exportToExcel() {
-    const data = [];
-    const categories = [1, 2, 3];
+    function exportToExcel() {
+        const data = [];
+        const categories = [1, 2, 3];
 
-    categories.forEach(cat => {
-        let categorySubtotal = 0;
-        for (let row = 1; row <= 2; row++) {
-            const itemSelect = document.getElementById(`item_${cat}_${row}`);
-            const sizeSelect = document.getElementById(`size_${cat}_${row}`);
-            const quantityInput = document.getElementById(`quantity_${cat}_${row}`);
-            const priceInput = document.getElementById(`price_${cat}_${row}`);
-            const totalInput = document.getElementById(`total_${cat}_${row}`);
+        categories.forEach(cat => {
+            let categorySubtotal = 0;
+            for (let row = 1; row <= 2; row++) {
+                const itemSelect = document.getElementById(`item_${cat}_${row}`);
+                const sizeSelect = document.getElementById(`size_${cat}_${row}`);
+                const quantityInput = document.getElementById(`quantity_${cat}_${row}`);
+                const priceInput = document.getElementById(`price_${cat}_${row}`);
+                const totalInput = document.getElementById(`total_${cat}_${row}`);
 
-            if (itemSelect && itemSelect.value) {
-                const itemName = itemSelect.options[itemSelect.selectedIndex]?.text || '';
-                const sizeName = sizeSelect?.options[sizeSelect.selectedIndex]?.text || '';
-                const quantity = quantityInput?.value || '';
-                const price = priceInput?.value || '';
-                const total = totalInput?.value || '';
+                if (itemSelect && itemSelect.value) {
+                    const itemName = itemSelect.options[itemSelect.selectedIndex]?.text || '';
+                    const sizeName = sizeSelect?.options[sizeSelect.selectedIndex]?.text || '';
+                    const quantity = quantityInput?.value || '';
+                    const price = priceInput?.value || '';
+                    const total = totalInput?.value || '';
 
-                categorySubtotal += parseFloat(total) || 0;
+                    categorySubtotal += parseFloat(total) || 0;
 
-                data.push({
-                    Category: `Category ${cat}`,
-                    Item: itemName,
-                    Size: sizeName,
-                    Quantity: quantity,
-                    Price: price,
-                    Total: total
-                });
+                    data.push({
+                        Category: `Category ${cat}`,
+                        Item: itemName,
+                        Size: sizeName,
+                        Quantity: quantity,
+                        Price: price,
+                        Total: total
+                    });
+                }
             }
-        }
 
-        // Add subtotal row
+            // Add subtotal row
+            data.push({
+                Category: `Subtotal for Category ${cat}`,
+                Item: '',
+                Size: '',
+                Quantity: '',
+                Price: '',
+                Total: categorySubtotal.toFixed(2)
+            });
+
+            // Empty row for spacing
+            data.push({});
+        });
+
+        // Add Grand Total
+        const grandTotal = document.getElementById("grand_total")?.value || '0';
         data.push({
-            Category: `Subtotal for Category ${cat}`,
+            Category: 'Grand Total',
             Item: '',
             Size: '',
             Quantity: '',
             Price: '',
-            Total: categorySubtotal.toFixed(2)
+            Total: grandTotal
         });
 
-        // Empty row for spacing
-        data.push({});
-    });
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Cost Summary");
 
-    // Add Grand Total
-    const grandTotal = document.getElementById("grand_total")?.value || '0';
-    data.push({
-        Category: 'Grand Total',
-        Item: '',
-        Size: '',
-        Quantity: '',
-        Price: '',
-        Total: grandTotal
-    });
-
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Cost Summary");
-
-    XLSX.writeFile(workbook, "Cost_Summary.xlsx");
-}
+        XLSX.writeFile(workbook, "Cost_Summary.xlsx");
+    }
 </script>
 
 </head>

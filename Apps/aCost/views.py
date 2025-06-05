@@ -11,21 +11,60 @@ from django.shortcuts import redirect
 def cost_calculation_form(request):
     categories = Category.objects.prefetch_related("items__sizes").order_by("id").all()
     return render(request, "aCost/cost_form.html", {
-    'categories': categories,
-    'item_ids': {
+        'categories': categories,
+    })
+
+
+def get_autofill_data(request):
+    
+    # add key-values
+    
+    # based on the key-values get the parameters ids from the database
+    
+    
+    
+    
+    item_ids = {
         'steel': 1,
         'stst': 2,
-        
         'GearMotor': 3,
         'Bearings': 4,
         'Bolts': 5,
-        
         'Painting': 6,
         'Galvanization': 7,
         'Packing': 9,
-        # add others as needed
     }
-})
+
+    size_ids = {
+        'steel_37': 1,
+        'stst_304': 2,
+        'stst_316': 3,
+        'GearMotor_370W': 4,
+        'GearMotor_550W': 5,
+        'GearMotor_750W': 8,
+        'Bearings_D50': 6,
+        'Bearings_D60': 7,
+        'Bolts': 9,
+        'Painting_A': 10,
+        'Painting_B': 11,
+        'Galv_A': 12,
+    }
+
+    quantity_map = {
+        '1_1': 100,
+        '1_2': 200,
+        '2_1': 150,
+        '2_2': 50,
+        '3_1': 20,
+        '3_2': 30,
+    }
+
+    return JsonResponse({
+        'item_ids': item_ids,
+        'size_ids': size_ids,
+        'quantity_map': quantity_map,
+    })
+
 
 @login_required
 def get_sizes(request, item_id):

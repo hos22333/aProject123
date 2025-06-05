@@ -14,6 +14,10 @@ urlpatterns = [
     
     
     
+    path("get-autofill-data/", views.get_autofill_data, name="get_autofill_data"),
+
+    
+    
     
     ####
     ####
