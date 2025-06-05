@@ -78,16 +78,20 @@
 
     <script>
         async function autoSelectItems() {
-            const response = await fetch("{% url 'get_autofill_data' %}");
+            // Get the selected project type value
+            const projectType = document.getElementById('project_type').value;
+
+            // Pass projectType as a query parameter
+            const response = await fetch("{% url 'get_autofill_data' %}?project_type=" + encodeURIComponent(projectType));
             const { item_ids, size_ids, quantity_map } = await response.json();
 
             const itemSizeMap = {
-                item_1_1: { itemId: item_ids['stst'], sizeId: size_ids['stst_304'] },
-                item_1_2: { itemId: item_ids['steel'], sizeId: size_ids['steel_37'] },
-                item_2_1: { itemId: item_ids['GearMotor'], sizeId: size_ids['GearMotor_550W'] },
-                item_2_2: { itemId: item_ids['Bearings'], sizeId: size_ids['Bearings_D60'] },
-                item_3_1: { itemId: item_ids['Painting'], sizeId: size_ids['Painting_A'] },
-                item_3_2: { itemId: item_ids['Galvanization'], sizeId: size_ids['Galv_A'] },
+                item_1_1: { itemId: item_ids['Cat01Row01Field01'], sizeId: size_ids['Cat01Row01Field02'] },
+                item_1_2: { itemId: item_ids['Cat01Row02Field01'], sizeId: size_ids['Cat01Row02Field02'] },
+                item_2_1: { itemId: item_ids['Cat02Row01Field01'], sizeId: size_ids['Cat02Row01Field02'] },
+                item_2_2: { itemId: item_ids['Cat02Row02Field01'], sizeId: size_ids['Cat02Row02Field02'] },
+                item_3_1: { itemId: item_ids['Cat03Row01Field01'], sizeId: size_ids['Cat03Row01Field02'] },
+                item_3_2: { itemId: item_ids['Cat03Row02Field01'], sizeId: size_ids['Cat03Row02Field02'] },
             };
 
             Object.entries(itemSizeMap).forEach(([elementId, { itemId, sizeId }]) => {
@@ -233,7 +237,26 @@
 </head>
 
 <body>
+
+
+    
+
     <form onsubmit="return false;">
+
+        <!-- Combo Box Example -->
+        <div>
+            <label for="project_type"><strong>Project Type:</strong></label>
+            <select id="project_type" name="project_type">
+                <option value="OptionA">OptionA</option>
+                <option value="OptionB">OptionB</option>
+                <option value="OptionC">OptionC</option>
+                <option value="OptionD">OptionD</option>
+            </select>
+        </div>
+        <br>
+
+
+
         <!-- Category 1 -->
         <h3>{{ categories.0.name }}</h3>
         <!-- Row 1 -->

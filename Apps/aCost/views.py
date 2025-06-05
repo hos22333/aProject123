@@ -17,47 +17,74 @@ def cost_calculation_form(request):
 
 def get_autofill_data(request):
     
+
+
+    project_type = request.GET.get('project_type', None)  # <-- Add this line
+
+    print(f"Project Type: {project_type}")  # <-- Add this line for debugging
+    
+    if project_type == 'OptionA':
+        item_ids = {
+            'Cat01Row01Field01': 1,
+            'Cat01Row02Field01': 2,
+            'Cat02Row01Field01': 3,
+            'Cat02Row02Field01': 4,
+            'Cat03Row01Field01': 5,
+            'Cat03Row02Field01': 6,
+        }
+
+        size_ids = {
+            'Cat01Row01Field02': 1,
+            'Cat01Row02Field02': 2,
+            'Cat02Row01Field02': 5,
+            'Cat02Row02Field02': 7,
+            'Cat03Row01Field02': 9,
+            'Cat03Row02Field02': 10,
+        }
+
+        quantity_map = {
+            '1_1': 100,
+            '1_2': 200,
+            '2_1': 150,
+            '2_2': 50,
+            '3_1': 20,
+            '3_2': 30,
+        }
+        
+        
+    if project_type == 'OptionB':
+        item_ids = {
+            'Cat01Row01Field01': 2,
+            'Cat01Row02Field01': 1,
+            'Cat02Row01Field01': 4,
+            'Cat02Row02Field01': 3,
+            'Cat03Row01Field01': 6,
+            'Cat03Row02Field01': 5,
+        }
+
+        size_ids = {
+            'Cat01Row01Field02': 2,
+            'Cat01Row02Field02': 1,
+            'Cat02Row01Field02': 7,
+            'Cat02Row02Field02': 5,
+            'Cat03Row01Field02': 10,
+            'Cat03Row02Field02': 9,
+        }
+
+        quantity_map = {
+            '1_1': 10,
+            '1_2': 20,
+            '2_1': 15,
+            '2_2': 5,
+            '3_1': 2,
+            '3_2': 3,
+        }
+    
     # add key-values
     
     # based on the key-values get the parameters ids from the database
     
     
-    
-    
-    item_ids = {
-        'steel': 1,
-        'stst': 2,
-        'GearMotor': 3,
-        'Bearings': 4,
-        'Bolts': 5,
-        'Painting': 6,
-        'Galvanization': 7,
-        'Packing': 9,
-    }
-
-    size_ids = {
-        'steel_37': 1,
-        'stst_304': 2,
-        'stst_316': 3,
-        'GearMotor_370W': 4,
-        'GearMotor_550W': 5,
-        'GearMotor_750W': 8,
-        'Bearings_D50': 6,
-        'Bearings_D60': 7,
-        'Bolts': 9,
-        'Painting_A': 10,
-        'Painting_B': 11,
-        'Galv_A': 12,
-    }
-
-    quantity_map = {
-        '1_1': 100,
-        '1_2': 200,
-        '2_1': 150,
-        '2_2': 50,
-        '3_1': 20,
-        '3_2': 30,
-    }
 
     return JsonResponse({
         'item_ids': item_ids,
