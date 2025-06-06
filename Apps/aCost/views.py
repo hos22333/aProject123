@@ -1,96 +1,166 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Category, ItemSize, SizePrice, CostFormData, CategoryItem
+from .models import Category, ItemSize, SizePrice, CostFormData, CategoryItem, AutoFillConfig
 from .forms import CategoryForm, CategoryItemForm, ItemSizeForm, SizePriceForm, MachineCostForm
 
 import json
 from django.shortcuts import redirect
 
+
+from Apps.aAppSubmittal.models import AddMachine
+
 @login_required
 def cost_calculation_form(request):
+    
+    
     categories = Category.objects.prefetch_related("items__sizes").order_by("id").all()
+    
+    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None").exclude(nameForm__exact="No").order_by('order')
+
     return render(request, "aCost/cost_form.html", {
         'categories': categories,
+        "sheet_keys": sheet_keys,
     })
 
 
+
+
+
 def get_autofill_data(request):
-    
+    project_type = request.GET.get('project_type')
+    print(f"Project Type: {project_type}")
 
+    item_ids = {}
+    size_ids = {}
+    quantity_map = {}
 
-    project_type = request.GET.get('project_type', None)  # <-- Add this line
+    configs = AutoFillConfig.objects.filter(project_type=project_type)
 
-    print(f"Project Type: {project_type}")  # <-- Add this line for debugging
-    
-    if project_type == 'OptionA':
-        item_ids = {
-            'Cat01Row01Field01': 1,
-            'Cat01Row02Field01': 2,
-            'Cat02Row01Field01': 3,
-            'Cat02Row02Field01': 4,
-            'Cat03Row01Field01': 5,
-            'Cat03Row02Field01': 6,
-        }
+    for config in configs:
+        cat_id = f"{config.category_id:02}"  # e.g., '01'
+        row_num = f"{config.row_number:02}"  # e.g., '01'
 
-        size_ids = {
-            'Cat01Row01Field02': 1,
-            'Cat01Row02Field02': 2,
-            'Cat02Row01Field02': 5,
-            'Cat02Row02Field02': 7,
-            'Cat03Row01Field02': 9,
-            'Cat03Row02Field02': 10,
-        }
-
-        quantity_map = {
-            '1_1': 100,
-            '1_2': 200,
-            '2_1': 150,
-            '2_2': 50,
-            '3_1': 20,
-            '3_2': 30,
-        }
-        
-        
-    if project_type == 'OptionB':
-        item_ids = {
-            'Cat01Row01Field01': 2,
-            'Cat01Row02Field01': 1,
-            'Cat02Row01Field01': 4,
-            'Cat02Row02Field01': 3,
-            'Cat03Row01Field01': 6,
-            'Cat03Row02Field01': 5,
-        }
-
-        size_ids = {
-            'Cat01Row01Field02': 2,
-            'Cat01Row02Field02': 1,
-            'Cat02Row01Field02': 7,
-            'Cat02Row02Field02': 5,
-            'Cat03Row01Field02': 10,
-            'Cat03Row02Field02': 9,
-        }
-
-        quantity_map = {
-            '1_1': 10,
-            '1_2': 20,
-            '2_1': 15,
-            '2_2': 5,
-            '3_1': 2,
-            '3_2': 3,
-        }
-    
-    # add key-values
-    
-    # based on the key-values get the parameters ids from the database
-    
-    
+        # Keys must match frontend expectations
+        item_ids[f'Cat{cat_id}Row{row_num}Field01'] = config.item.id if config.item else 0
+        size_ids[f'Cat{cat_id}Row{row_num}Field02'] = config.size.id if config.size else 0
+        quantity_map[f'{config.category_id}_{config.row_number}'] = config.quantity
 
     return JsonResponse({
         'item_ids': item_ids,
         'size_ids': size_ids,
         'quantity_map': quantity_map,
     })
+    
+    
+# def get_autofill_data(request):
+    
+
+
+#     project_type = request.GET.get('project_type', None)  # <-- Add this line
+
+#     print(f"Project Type: {project_type}")  # <-- Add this line for debugging
+    
+#     if project_type == 'OptionA':
+#         item_ids = {
+#             'Cat01Row01Field01': 1,
+#             'Cat01Row02Field01': 2,
+#             'Cat01Row03Field01': 1,
+#             'Cat01Row04Field01': 2,
+            
+#             'Cat02Row01Field01': 3,
+#             'Cat02Row02Field01': 4,
+#             'Cat02Row03Field01': 3,
+#             'Cat02Row04Field01': 4,
+            
+#             'Cat03Row01Field01': 5,
+#             'Cat03Row02Field01': 6,
+#             'Cat03Row03Field01': 5,
+#             'Cat03Row04Field01': 6,
+#         }
+
+#         size_ids = {
+#             'Cat01Row01Field02': 1,
+#             'Cat01Row02Field02': 2,
+#             'Cat02Row01Field02': 5,
+#             'Cat02Row02Field02': 7,
+#             'Cat03Row01Field02': 9,
+#             'Cat03Row02Field02': 10,
+#         }
+
+#         quantity_map = {
+#             '1_1': 100,
+#             '1_2': 200,
+#             '1_3': 100,
+#             '1_4': 200,
+            
+#             '2_1': 150,
+#             '2_2': 50,
+#             '2_3': 150,
+#             '2_4': 50,
+            
+#             '3_1': 20,
+#             '3_2': 30,
+#             '3_3': 20,
+#             '3_4': 30,
+#         }
+        
+        
+#     if project_type == 'OptionB':
+#         item_ids = {
+#             'Cat01Row01Field01': 1,
+#             'Cat01Row02Field01': 2,
+#             'Cat01Row03Field01': 0,
+#             'Cat01Row04Field01': 0,
+            
+#             'Cat02Row01Field01': 3,
+#             'Cat02Row02Field01': 4,
+#             'Cat02Row03Field01': 0,
+#             'Cat02Row04Field01': 0,
+            
+#             'Cat03Row01Field01': 5,
+#             'Cat03Row02Field01': 6,
+#             'Cat03Row03Field01': 0,
+#             'Cat03Row04Field01': 0,
+#         }
+
+#         size_ids = {
+#             'Cat01Row01Field02': 1,
+#             'Cat01Row02Field02': 2,
+#             'Cat02Row01Field02': 5,
+#             'Cat02Row02Field02': 7,
+#             'Cat03Row01Field02': 9,
+#             'Cat03Row02Field02': 10,
+#         }
+
+#         quantity_map = {
+#             '1_1': 100,
+#             '1_2': 200,
+#             '1_3': 100,
+#             '1_4': 200,
+            
+#             '2_1': 150,
+#             '2_2': 50,
+#             '2_3': 150,
+#             '2_4': 50,
+            
+#             '3_1': 20,
+#             '3_2': 30,
+#             '3_3': 20,
+#             '3_4': 30,
+#         }
+    
+#     # add key-values
+    
+#     # based on the key-values get the parameters ids from the database
+    
+    
+
+#     return JsonResponse({
+#         'item_ids': item_ids,
+#         'size_ids': size_ids,
+#         'quantity_map': quantity_map,
+#     })
 
 
 @login_required

@@ -51,3 +51,30 @@ class CostFormData(models.Model):
 
     def __str__(self):
         return f"Cost Data by {self.user.username} on {self.created_at}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class AutoFillConfig(models.Model):
+    project_type = models.CharField(max_length=50)
+    category_id = models.IntegerField()
+    row_number = models.IntegerField()
+    item = models.ForeignKey(CategoryItem, on_delete=models.SET_NULL, null=True, blank=True)
+    size = models.ForeignKey(ItemSize, on_delete=models.SET_NULL, null=True, blank=True)
+    quantity = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ('project_type', 'category_id', 'row_number')
