@@ -4,6 +4,7 @@ import json
 from Apps.aAppProject.models import APP_Project
 from .models import AddMachine
 from .models import Machine
+from .models import Machine_log
 from .models import DXF_data
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppMechanical.models import aLogEntry
@@ -346,9 +347,17 @@ def SavePageDataSheet(request):
         keyvalue = sheet_key[:-2] 
         print("Key Value : ",keyvalue)
 
-
-        initial_instance = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company).first()
+        """ initial_form = FormDataSheet(user=request.user, form_type=form_type)
+        print("initial_form : ",initial_form)
         initial_values = {}
+        for i in range(1, 11):
+            for j in range(1, 21):
+                if initial_form.fields[f'oSec{str(i).zfill(2)}Field{str(j).zfill(2)}'].initial in ["oooo", None, ""]:
+                    initial_values[f"oSec{str(i).zfill(2)}Field{str(j).zfill(2)}"] = initial_form.fields[f'oSec{str(i).zfill(2)}Field{str(j).zfill(2)}'].initial """
+
+        initial_instance = Machine_log.objects.filter(oSec00Field03=DB_Name, company=user_company).first()
+        initial_values = {}
+        print("initial_instance : ",initial_instance)
 
         if initial_instance:
             for field in FormDataSheet(form_type=form_type).fields:
@@ -357,7 +366,7 @@ def SavePageDataSheet(request):
                     if value is not None:
                         initial_values[field] = str(value)
 
-
+        print("initial_values : ",initial_values)
 
         form_data = request.POST.copy()
         if selected_project_id:
