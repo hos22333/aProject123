@@ -478,6 +478,7 @@ class DXF_data(models.Model):
     sheetkey = models.CharField(max_length=255)
     fieldname = models.CharField(max_length=255)
     fieldvalue = models.CharField(max_length=255)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.sheetkey}__{self.fieldname}"
+        return f"{self.sheetkey}__{self.fieldname}__{self.company}"

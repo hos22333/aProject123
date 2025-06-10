@@ -489,7 +489,7 @@ $SKPOLY
   9
 $TDCREATE
  40
-2460815.4728935184
+2460837.498321759
   9
 $TDUCREATE
  40
@@ -497,7 +497,7 @@ $TDUCREATE
   9
 $TDUPDATE
  40
-2460815.4728935184
+2460837.498321759
   9
 $TDUUPDATE
  40
@@ -933,7 +933,7 @@ $FINGERPRINTGUID
   9
 $VERSIONGUID
   2
-{69A84DDE-99CC-4024-8318-986C5E38DAC6}
+{01D1D884-5338-4982-8C3B-F26F703AF5F9}
   9
 $EXTNAMES
 290
@@ -4437,7 +4437,7 @@ AcDbMText
  71
 5
   1
-970 mm
+570 mm
   0
 POINT
   5
@@ -4779,7 +4779,7 @@ AcDbMText
  71
 5
   1
-500
+600
  50
 90.0
   0
@@ -5045,7 +5045,7 @@ AcDbMText
  71
 5
   1
-9000 mm
+2000 mm
  50
 90.0
   0
@@ -5333,7 +5333,7 @@ AcDbMText
  71
 5
   1
-50 mm
+25 mm
   0
 POINT
   5
@@ -64169,7 +64169,7 @@ Standard
  75
 0
   1
-970 mm
+570 mm
 100
 AcDbAlignedDimension
  13
@@ -64233,7 +64233,7 @@ Standard
  75
 0
   1
-500
+600
 100
 AcDbAlignedDimension
  13
@@ -64297,7 +64297,7 @@ Standard
  75
 0
   1
-9000 mm
+2000 mm
 100
 AcDbAlignedDimension
  13
@@ -64361,7 +64361,7 @@ Standard
  75
 0
   1
-50 mm
+25 mm
 100
 AcDbAlignedDimension
  13
@@ -71823,7 +71823,7 @@ DictionaryVariables
 280
 0
   1
-1.4.1 @ 2025-05-19T08:20:58.383100+00:00
+1.4.1 @ 2025-06-10T08:57:35.571942+00:00
   0
 ENDSEC
   0

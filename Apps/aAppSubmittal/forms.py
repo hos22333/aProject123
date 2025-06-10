@@ -1019,9 +1019,18 @@ class FormDataSheet_log(forms.Form):
 class DXFdataForm(forms.ModelForm):
     class Meta:
         model = DXF_data
-        fields = ['sheetkey', 'fieldname', 'fieldvalue']
+        fields = ['sheetkey', 'fieldname', 'fieldvalue', 'company']
         widgets = {
             'sheetkey': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the machine sheetkey'}),
             'fieldname': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the field name'}),
             'fieldvalue': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the field value'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Add Bootstrap class to make it large
+        self.fields['company'].widget.attrs.update({'class': 'form-control form-control-lg'})
+        
+        # Add empty label as placeholder
+        self.fields['company'].empty_label = "Select a company..."

@@ -1655,6 +1655,10 @@ def General_DXF_ALL(request, aMachine_ID, aType):
             user_company = None
 
     datas = DXF_data.objects.filter(sheetkey = sheetkey)
+    print("Data is : ", datas)
+    machine = Machine.objects.get(id=aMachine_ID)
+    for d in datas:
+        print(f"{d.fieldname} : {resolve_fieldvalue(machine, d.fieldvalue)}")
 
 
     return process_dxf(
