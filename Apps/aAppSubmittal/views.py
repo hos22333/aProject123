@@ -11,6 +11,7 @@ from Apps.aAppMechanical.models import aLogEntry
 from Apps.aAdmin.models import DataTransfer
 from Apps.aAppCalculation.models import modelcalc
 from Apps.aAppMechanical.models import Companies
+from Apps.aAppMechanical.models import FormFieldConfig
 
 
 from .forms import FormDataSheet, FormDataSheet_log
@@ -347,24 +348,15 @@ def SavePageDataSheet(request):
         keyvalue = sheet_key[:-2] 
         print("Key Value : ",keyvalue)
 
-        """ initial_form = FormDataSheet(user=request.user, form_type=form_type)
-        print("initial_form : ",initial_form)
-        initial_values = {}
-        for i in range(1, 11):
-            for j in range(1, 21):
-                if initial_form.fields[f'oSec{str(i).zfill(2)}Field{str(j).zfill(2)}'].initial in ["oooo", None, ""]:
-                    initial_values[f"oSec{str(i).zfill(2)}Field{str(j).zfill(2)}"] = initial_form.fields[f'oSec{str(i).zfill(2)}Field{str(j).zfill(2)}'].initial """
+        
 
-        initial_instance = Machine_log.objects.filter(oSec00Field03=DB_Name, company=user_company).first()
+        # Get initial values from FormFieldConfig instead of Machine_log
         initial_values = {}
-        print("initial_instance : ",initial_instance)
-
-        if initial_instance:
-            for field in FormDataSheet(form_type=form_type).fields:
-                if hasattr(initial_instance, field):
-                    value = getattr(initial_instance, field)
-                    if value is not None:
-                        initial_values[field] = str(value)
+        field_configs = FormFieldConfig.objects.filter(form_name=form_type, company=user_company)
+        
+        for config in field_configs:
+            if config.initial_value not in [None, ""]:
+                initial_values[config.field_name] = config.initial_value
 
         print("initial_values : ",initial_values)
 
