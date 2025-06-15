@@ -2582,53 +2582,24 @@
     });
 </script>
 
+
+{{ highlight_fields|json_script:"highlight-fields-data" }}
+
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("projectForm");
-    const inputs = form.querySelectorAll("input, select, textarea");
+  document.addEventListener('DOMContentLoaded', () => {
+    const highlightFields = JSON.parse(
+      document.getElementById('highlight-fields-data').textContent
+    );
 
-    // Load initial machine values from Django
-    const initialValues = {{ initial_values|default:'{}'|safe }};
-
-    inputs.forEach(input => {
-        const name = input.name;
-        if (initialValues.hasOwnProperty(name)) {
-            const original = initialValues[name]?.trim();
-            const current = input.value?.trim();
-            if (original !== current) {
-                input.style.backgroundColor = "#e6ffe8"; // Light red
-                input.style.borderColor = "#4dff8c";     // Red border
-            }
-        }
+    highlightFields.forEach(fieldName => {
+      const field = document.querySelector(`[name="${fieldName}"]`);
+      if (field) {
+        field.style.backgroundColor = '#e6ffe8';
+        field.style.borderColor = '#4dff8c';
+      }
     });
-});
+  });
 </script>
 
-<!-- <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Track all inputs/selects/textareas in the form
-    const form = document.getElementById("projectForm");
-    const inputs = form.querySelectorAll("input, select, textarea");
-
-    inputs.forEach(function (element) {
-        // Save the initial value
-        element.setAttribute("data-original", element.value);
-
-        // Add a change event listener
-        element.addEventListener("change", function () {
-            const original = element.getAttribute("data-original");
-            const current = element.value;
-
-            if (original !== current) {
-                element.style.backgroundColor = "#ffe6e6";  // light red
-                element.style.borderColor = "#ff4d4d";      // red border
-            } else {
-                element.style.backgroundColor = "";
-                element.style.borderColor = "";
-            }
-        });
-    });
-});
-</script> -->
 
 {% endblock %}

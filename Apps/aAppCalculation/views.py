@@ -1109,7 +1109,7 @@ def generate_report_BBB(request, project_id, sheet_key):
                 if i == 0:
                     shading_elm = OxmlElement("w:shd")
                     shading_elm.set(ns.qn("w:val"), "clear")  # Set shading value
-                    shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Light blue color
+                    shading_elm.set(ns.qn("w:fill"), "ffffff")  # Light blue color
                     cell._tc.get_or_add_tcPr().append(shading_elm)
    
     
@@ -1319,24 +1319,24 @@ def generate_report_BBB(request, project_id, sheet_key):
         machine_title = doc.add_paragraph(f" {aMachineName}", style="Heading3")
         machine_title.runs[0].font.size = Pt(14)
 
-        input_section_data = [("Field", "Value")]
+        input_section_data = [(" ", " ")]
         for input_key, input_value in Input_data:
             input_key = input_key.strip() if input_key else ""
             input_value = input_value.strip() if input_value else ""
             if input_key and input_value and input_key.lower() != "oooo" and input_key.lower() != "" and input_key.lower() != "n/a" and input_value.lower() != "oooo" and input_value.lower() != "" and input_value.lower() != "n/a":
                 input_section_data.append((input_key, input_value))
         if len(input_section_data) > 1:  # If the section has valid data, create a table
-            doc.add_paragraph(f"Input", style="Heading3")  # Only one title now
+            doc.add_paragraph(f" ", style="Heading3")  # Only one title now
             add_table(doc, input_section_data)  # Removed redundant title
 
-        output_section_data = [("Field", "Value")]
+        output_section_data = [(" ", " ")]
         for output_key, output_value in Output_data:
             output_key = output_key.strip() if output_key else ""
             output_value = output_value.strip() if output_value else ""
             if output_key and output_value and output_key.lower() != "oooo" and output_key.lower() != "" and output_key.lower() != "n/a" and output_value.lower() != "oooo" and output_value.lower() != "" and output_value.lower() != "n/a":
                 output_section_data.append((output_key, output_value))
         if len(output_section_data) > 1:  # If the section has valid data, create a table
-            doc.add_paragraph(f"Output", style="Heading3")  # Only one title now
+            doc.add_paragraph(f" ", style="Heading3")  # Only one title now
             add_table(doc, output_section_data)  # Removed redundant title
 
 
@@ -2213,7 +2213,7 @@ def generate_saved_report_BBB(request, machine_id):
                 if i == 0:
                     shading_elm = OxmlElement("w:shd")
                     shading_elm.set(ns.qn("w:val"), "clear")  # Set shading value
-                    shading_elm.set(ns.qn("w:fill"), "ADD8E6")  # Light blue color
+                    shading_elm.set(ns.qn("w:fill"), "ffffff")  # Light blue color
                     cell._tc.get_or_add_tcPr().append(shading_elm)
    
     
@@ -2425,24 +2425,24 @@ def generate_saved_report_BBB(request, machine_id):
         machine_title = doc.add_paragraph(f" {aMachineName}", style="Heading3")
         machine_title.runs[0].font.size = Pt(14)
 
-        input_section_data = [("Field", "Value")]
+        input_section_data = [(" ", " ")]
         for input_key, input_value in Input_data:
             input_key = input_key.strip() if input_key else ""
             input_value = input_value.strip() if input_value else ""
             if input_key and input_value and input_key.lower() != "oooo" and input_key.lower() != "" and input_key.lower() != "n/a" and input_value.lower() != "oooo" and input_value.lower() != "" and input_value.lower() != "n/a":
                 input_section_data.append((input_key, input_value))
         if len(input_section_data) > 1:  # If the section has valid data, create a table
-            doc.add_paragraph(f"Input", style="Heading3")  # Only one title now
+            doc.add_paragraph(f" ", style="Heading3")  # Only one title now
             add_table(doc, input_section_data)  # Removed redundant title
 
-        output_section_data = [("Field", "Value")]
+        output_section_data = [(" ", " ")]
         for output_key, output_value in Output_data:
             output_key = output_key.strip() if output_key else ""
             output_value = output_value.strip() if output_value else ""
             if output_key and output_value and output_key.lower() != "oooo" and output_key.lower() != "" and output_key.lower() != "n/a" and output_value.lower() != "oooo" and output_value.lower() != "" and output_value.lower() != "n/a":
                 output_section_data.append((output_key, output_value))
         if len(output_section_data) > 1:  # If the section has valid data, create a table
-            doc.add_paragraph(f"Output", style="Heading3")  # Only one title now
+            doc.add_paragraph(f" ", style="Heading3")  # Only one title now
             add_table(doc, output_section_data)  # Removed redundant title
 
 

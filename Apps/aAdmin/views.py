@@ -551,7 +551,7 @@ def DXFdata_list(request):
         form = DXFdataForm()
         
     
-    datas = DXF_data.objects.all()
+    datas = list(DXF_data.objects.all())
     
     return render(request, 'DXFdata_list.html', {'form': form, 'datas': datas})
 

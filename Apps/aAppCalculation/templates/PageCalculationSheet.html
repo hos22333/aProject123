@@ -395,7 +395,12 @@
             </div> <!-- Close row div -->
 
             <div class="text-center">
-                <button type="submit" name="form1_submit" class="btn btn-primary btn-lg mt-3">Calculate</button>                                
+                <!-- <button type="submit" name="form1_submit" class="btn btn-primary btn-lg mt-3">Calculate</button>        -->                  
+                <button type="button" id="calculateBtn" class="btn btn-primary btn-lg mt-3">Calculate</button>
+                <div id="loadingIndicator" style="display: none; margin-top: 10px;">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Processing calculation...
+                </div>       
                 <button type="submit" name="generate_report" formaction="{% url 'generate_report' %}" class="btn btn-success btn-lg mt-3">Report</button>
             </div>
 
@@ -566,6 +571,43 @@
             }
         });
     });
+</script>
+
+
+<script>
+document.getElementById("calculateBtn").addEventListener("click", function () {
+    const form = document.getElementById("projectForm");
+    const formData = new FormData(form);
+    formData.append("form1_submit", "true");  // mimic the submit button
+    const loading = document.getElementById("loadingIndicator");
+    
+    loading.style.display = "block";  // Show loading spinner
+
+    fetch("{% url 'submitPageCalculationSheet' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Calculation failed");
+        return response.text();  // or .json() if returning JSON
+    })
+    .then(html => {
+        // Replace the whole page with returned HTML (or handle partial DOM update)
+        document.open();
+        document.write(html);
+        document.close();
+    })
+    .catch(error => {
+        alert("An error occurred during calculation.");
+        console.error(error);
+    })
+    .finally(() => {
+        loading.style.display = "none";  // Hide loading after completion
+    });
+});
 </script>
 
 

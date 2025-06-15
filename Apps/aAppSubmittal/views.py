@@ -121,6 +121,9 @@ def LoadPageDataSheet(request):
     
     
     # Initialize all section variables
+    """ for i in range(1, 11):
+       locals()[f"aSection{str(i).zfill(2)}Show"] = "Yes" """
+
     aSection01Show = "Yes"
     aSection02Show = "Yes"
     aSection03Show = "Yes"
@@ -133,6 +136,8 @@ def LoadPageDataSheet(request):
     aSection10Show = "Yes"
 
     # Initialize visibility dictionaries
+    """ for j in range(1, 11):
+       locals()[f"aSection{str(j).zfill(2)}Show"] = {f"aSection{str(j).zfill(2)}Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)} """
     aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
     aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
     aSection03FieldShow = {f"aSection03Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
@@ -144,6 +149,9 @@ def LoadPageDataSheet(request):
     aSection09FieldShow = {f"aSection09Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
     aSection10FieldShow = {f"aSection10Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
     
+
+    """ for j in range(1, 11):
+        print(form.fields[f'oSec{str(j).zfill(2)}Field01'].initial)  """
     print(form.fields['oSec01Field01'].initial)
     print(form.fields['oSec02Field01'].initial)
     print(form.fields['oSec03Field01'].initial)
@@ -156,6 +164,9 @@ def LoadPageDataSheet(request):
     print(form.fields['oSec10Field01'].initial)
 
     # Apply conditions to modify the values
+    """ for j in range(1, 11):
+        if form.fields[f'oSec{str(j).zfill(2)}Field01'].initial in ["oooo", None]:
+            locals()[f"aSection{str(j).zfill(2)}Show"] = "Hide" """
     if form.fields['oSec01Field01'].initial in ["oooo", None]:
         aSection01Show = "Hide"
 
@@ -349,17 +360,7 @@ def SavePageDataSheet(request):
         print("Key Value : ",keyvalue)
 
         
-
-        # Get initial values from FormFieldConfig instead of Machine_log
-        initial_values = {}
-        field_configs = FormFieldConfig.objects.filter(form_name=form_type, company=user_company)
-        
-        for config in field_configs:
-            if config.initial_value not in [None, ""]:
-                initial_values[config.field_name] = config.initial_value
-
-        print("initial_values : ",initial_values)
-
+        highlight_fields = []
         form_data = request.POST.copy()
         if selected_project_id:
             print("selected_project_id : ", selected_project_id)
@@ -376,10 +377,11 @@ def SavePageDataSheet(request):
                     form_field = mapping.SubmittalField
                     if hasattr(calc_instance, calc_field):
                         form_data[form_field] = getattr(calc_instance, calc_field)
+                        highlight_fields.append(form_field)
                     
                 
                 
-
+        print("highlight_fields : ",highlight_fields)
         form = FormDataSheet(initial=form_data, form_type=form_type)
 
         #######################################
@@ -543,10 +545,11 @@ def SavePageDataSheet(request):
             **aSection08FieldShow,
             **aSection09FieldShow,
             **aSection10FieldShow,
-            "initial_values": json.dumps(initial_values),
+            "highlight_fields": highlight_fields,
         })
 
 
+    
 
     # =====================================
     # ✅ HANDLE SAVE TO DATABASE
