@@ -18,11 +18,14 @@ def update_progress(user, project_id, percent, status):
         
     )
 
+def fail_and_exit(user, project_id, project_name, error_message):
+    update_progress(user, project_id, -1, f"{project_name}_error: {error_message[:480]}")
+    raise Exception(error_message)
 
 
 def save_reports_task(project_id, user_id):
     user = User.objects.get(id=user_id)
-    ReportProgress.objects.filter(user=user, project_id=project_id).delete()
+    """ ReportProgress.objects.filter(user=user, project_id=project_id).delete() """
     time.sleep(2)
     
     try:
@@ -35,29 +38,53 @@ def save_reports_task(project_id, user_id):
 
         if aCompany:
             if aCompany.company.nameCompanies == "AAAA":
-                update_progress(user, project_id, 20, f"{project.name}_submittal report")
-                save_word_pdf_submittal_report(user, project_id, "LogoAAA", "FFA500")
+                try:
+                    update_progress(user, project_id, 20, f"{project.name}_submittal report")
+                    save_word_pdf_submittal_report(user, project_id, "LogoAAA", "FFA500")
+                except Exception as e:
+                    return fail_and_exit(user, project_id, project.name, f"Submittal report error: {e}")
+                
                 time.sleep(2)
 
-                update_progress(user, project_id, 80, f"{project.name}_calculation report")
-                save_word_pdf_calculation_report(user, project_id, "LogoAAA", "FFA500")
+                try:
+                    update_progress(user, project_id, 80, f"{project.name}_calculation report")
+                    save_word_pdf_calculation_report(user, project_id, "LogoAAA", "FFA500")
+                except Exception as e:
+                    return fail_and_exit(user, project_id, project.name, f"Calculation report error: {e}")
+                
                 time.sleep(2)
 
-                update_progress(user, project_id, 90, f"{project.name}_final report")
-                save_all_pdf_report(user, project_id, "LogoAAA")
+                try:
+                    update_progress(user, project_id, 90, f"{project.name}_final report")
+                    save_all_pdf_report(user, project_id, "LogoAAA")
+                except Exception as e:
+                    return fail_and_exit(user, project_id, project.name, f"Final report error: {e}")
+                
                 time.sleep(2)
 
             elif aCompany.company.nameCompanies == "BBBB":
-                update_progress(user, project_id, 20, f"{project.name}_submittal report")
-                save_word_pdf_submittal_report(user, project_id, "LogoBBB", "ffffff")
+                try:
+                    update_progress(user, project_id, 20, f"{project.name}_submittal report")
+                    save_word_pdf_submittal_report(user, project_id, "LogoBBB", "ffffff")
+                except Exception as e:
+                    return fail_and_exit(user, project_id, project.name, f"Submittal report error: {e}")
+                
                 time.sleep(2)
 
-                update_progress(user, project_id, 80, f"{project.name}_calculation report")
-                save_word_pdf_calculation_report(user, project_id, "LogoBBB", "ffffff")
+                try:
+                    update_progress(user, project_id, 80, f"{project.name}_calculation report")
+                    save_word_pdf_calculation_report(user, project_id, "LogoBBB", "ffffff")
+                except Exception as e:
+                    return fail_and_exit(user, project_id, project.name, f"Calculation report error: {e}")
+                
                 time.sleep(2)
 
-                update_progress(user, project_id, 90, f"{project.name}_final report")
-                save_all_pdf_report(user, project_id, "LogoBBB")
+                try:
+                    update_progress(user, project_id, 90, f"{project.name}_final report")
+                    save_all_pdf_report(user, project_id, "LogoBBB")
+                except Exception as e:
+                    return fail_and_exit(user, project_id, project.name, f"Final report error: {e}")
+                
                 time.sleep(2)
 
             project.last_saved_time = now()
@@ -76,6 +103,8 @@ def save_reports_task(project_id, user_id):
 
             print(f"the User's Email is :  {user.email}")
             print(f"the files saved complete for project {project_id}")
+        else:
+            return fail_and_exit(user, project_id, project.name, "Company info missing")
     except Exception as e:
         print("Handled task error:", e)
         try:

@@ -1281,7 +1281,7 @@ def save_word_pdf_calculation_report(user, project_id, logo, color):
         project = APP_Project.objects.get(id=project_id)
         machines = modelcalc.objects.filter(project=project)
         
-        update_progress(user, project_id, 80, f"{project.name}_woed calculation report")
+        update_progress(user, project_id, 80, f"{project.name}_word calculation report")
         
         print(aCompany.id)
         print(project.id)

@@ -366,6 +366,10 @@ def save_reports(request, project_id):
     print("start, save_reports, project_id : ", project_id)
     user = request.user
     project = APP_Project.objects.get(pk=project_id)
+
+    # 🧹 Delete old progress for this project and user
+    ReportProgress.objects.filter(project_id=project_id).delete()
+
     ReportProgress.objects.update_or_create(
         user=user,
         project_id=project_id,
@@ -382,11 +386,11 @@ def save_reports(request, project_id):
     if existing_task:
         return JsonResponse({'message': 'Report generation is already in progress. Please wait.'}, status=429)
     
-    async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 5400 })
-
-    
-    
-    return JsonResponse({'message': 'Report generation started.'}, status=202)
+    try:
+        async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 5400 })
+        return JsonResponse({'message': 'Report generation started.'}, status=202)
+    except Exception as e:
+        return JsonResponse({'message': f'Report Error:{e}.'})
 
 
 def download_drive_project_reports(request, project_id):
