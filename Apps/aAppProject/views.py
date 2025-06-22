@@ -19,12 +19,13 @@ import requests
 import time
 
 
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, HttpResponseServerError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
 from django.utils.timezone import now 
 from django.contrib.auth.models import User
+from django.contrib import messages
 
 
 
@@ -395,32 +396,51 @@ def save_reports(request, project_id):
 
 def download_drive_project_reports(request, project_id):
 
-    project = APP_Project.objects.get(id=project_id)
-    company_slug = slugify(project.company.nameCompanies)
-    company_name = project.company.nameCompanies
-    project_name = slugify(project.name)
-    folder_name = slugify(f"{project_id}_{company_slug}_{project_name}")
+    try:    
+        project = APP_Project.objects.get(id=project_id)
+        company_slug = slugify(project.company.nameCompanies)
+        company_name = project.company.nameCompanies
+        project_name = slugify(project.name)
+        folder_name = slugify(f"{project_id}_{company_slug}_{project_name}")
 
 
-    folder_id = get_folder_id_by_name( service , "aReports")
-    company_folder_id = get_folder_id_by_name( service , company_name, folder_id)
-    project_folder_id = get_folder_id_by_name( service , folder_name, company_folder_id )
+        folder_id = get_folder_id_by_name( service , "aReports")
+        if not folder_id:
+            raise Exception("Main reports folder not found.")
+        
+        company_folder_id = get_folder_id_by_name( service , company_name, folder_id)
+        if not company_folder_id:
+            raise Exception(f"Company folder '{company_name}' not found in Drive.")
+        
+        project_folder_id = get_folder_id_by_name( service , folder_name, company_folder_id )
+        if not project_folder_id:
+            raise Exception(f"Project folder '{folder_name}' not found in Drive.")
 
-    files_in_folder = get_file_ids_in_folder(service, project_folder_id)
+        files_in_folder = get_file_ids_in_folder(service, project_folder_id)
+        if not files_in_folder:
+            raise Exception("No files found in the project folder.")
 
-    
-    # Create in-memory ZIP file
-    zip_buffer = BytesIO()
-    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for file_id, file_name in files_in_folder:
-            file_data = download_file_as_bytes(service, file_id)  # <- returns file content
-            if file_data is None:
-                continue 
-            zipf.writestr(file_name, file_data)
 
-    zip_buffer.seek(0)  # Move pointer to the beginning
+        # Create in-memory ZIP file
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for file_id, file_name in files_in_folder:
+                file_data = download_file_as_bytes(service, file_id)  # <- returns file content
+                if file_data is None:
+                    continue 
+                zipf.writestr(file_name, file_data)
 
-    response = HttpResponse(zip_buffer, content_type='application/zip')
-    response['Content-Disposition'] = f'attachment; filename="{folder_name}_reports.zip"'
-    return response
+        zip_buffer.seek(0)  # Move pointer to the beginning
+
+        response = HttpResponse(zip_buffer, content_type='application/zip')
+        response['Content-Disposition'] = f'attachment; filename="{folder_name}_reports.zip"'
+        return response
+    except Exception as e:
+        # Handle error: return a friendly message
+        error_message = f"An error occurred while preparing the reports: {str(e)}"
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return HttpResponseServerError(error_message)
+        else:
+            messages.error(request, error_message)
+            return redirect(request.META.get("HTTP_REFERER", "/"))
 

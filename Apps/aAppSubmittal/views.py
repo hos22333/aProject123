@@ -23,7 +23,7 @@ from datetime import datetime
 import requests
 
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseServerError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
@@ -1564,7 +1564,7 @@ def get_dxf_paths(user_company, category, aType):
 
 # Helper function to modify DXF files
 def modify_dxf_file(static_path, modified_path, modifications):
-    doc = ezdxf.readfile(static_path)
+    """ doc = ezdxf.readfile(static_path)
 
     for entity in doc.modelspace().query("DIMENSION"):
         if entity.dxf.text in modifications:
@@ -1578,7 +1578,66 @@ def modify_dxf_file(static_path, modified_path, modifications):
 
         entity.render()
 
+    doc.saveas(modified_path) """
+
+
+    # Normalize keys in modifications dict for safe matching
+    normalized_mods = {
+        key.lower().strip(): value for key, value in modifications.items()
+    }
+
+    doc = ezdxf.readfile(static_path)
+    msp = doc.modelspace()
+
+    # DIMENSION entities
+    for entity in msp.query("DIMENSION"):
+        old_text = entity.dxf.text
+        cleaned_text = old_text.lower().strip()
+        if cleaned_text in normalized_mods:
+            new_text = normalized_mods[cleaned_text]
+            print(f"[DIMENSION] Replacing '{old_text}' → '{new_text}'")
+            entity.dxf.text = new_text
+
+            # Optionally update style
+            dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)
+            if dimstyle:
+                dimstyle.dxf.dimtxt = 0.1  # Text height
+                dimstyle.dxf.dimasz = 0.1  # Arrow size
+
+            entity.render()
+
+    # TEXT entities
+    for entity in msp.query("TEXT"):
+        old_text = entity.dxf.text
+        cleaned_text = old_text.lower().strip()
+        if cleaned_text in normalized_mods:
+            new_text = normalized_mods[cleaned_text]
+            print(f"[TEXT] Replacing '{old_text}' → '{new_text}'")
+            entity.dxf.text = new_text
+
+    # MTEXT entities
+    for entity in msp.query("MTEXT"):
+        old_text = entity.text
+        cleaned_text = old_text.lower().strip()
+        if cleaned_text in normalized_mods:
+            new_text = normalized_mods[cleaned_text]
+            print(f"[MTEXT] Replacing '{old_text}' → '{new_text}'")
+            entity.text = new_text
+
+    # ATTRIB entities (inside blocks)
+    for entity in msp.query("INSERT"):
+        if not entity.has_attribs():
+            continue
+        for attrib in entity.attribs:
+            tag = attrib.dxf.tag
+            if tag in modifications:
+                new_text = modifications[tag]
+                print(f"[ATTRIB] Tag '{tag}' → '{new_text}'")
+                attrib.dxf.text = new_text
+
+    # Save the modified file
     doc.saveas(modified_path)
+
 
 # Main DXF Processing Function
 def process_dxf(request, aMachine_ID, category, modifications, output_filename, aType):
@@ -1600,13 +1659,17 @@ def process_dxf(request, aMachine_ID, category, modifications, output_filename, 
     machine = Machine.objects.get(id=aMachine_ID)
 
     if request.method == "POST":
-        modify_dxf_file(static_path, modified_path, modifications(machine))
+        try:
+            modify_dxf_file(static_path, modified_path, modifications(machine))
 
-        # Serve the modified file for download
-        with open(modified_path, "rb") as dxf_file:
-            response = HttpResponse(dxf_file.read(), content_type="application/dxf")
-            response["Content-Disposition"] = f'attachment; filename="{output_filename}"'
-            return response
+            # Serve the modified file for download
+            with open(modified_path, "rb") as dxf_file:
+                response = HttpResponse(dxf_file.read(), content_type="application/dxf")
+                response["Content-Disposition"] = f'attachment; filename="{output_filename}"'
+                return response
+        except Exception as e:
+            print("Error:", e)
+            return HttpResponseServerError("Failed to generate DXF file.")
 
     return HttpResponse("Invalid request", status=400)
 
