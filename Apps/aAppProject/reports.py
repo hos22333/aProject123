@@ -577,7 +577,7 @@ def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id, general_DXF_perc
     
     # Helper function to modify DXF files
     def modify_saved_dxf_file(static_path, modified_path, modifications):
-        doc = ezdxf.readfile(static_path)
+        """ doc = ezdxf.readfile(static_path)
 
         for entity in doc.modelspace().query("DIMENSION"):
             if entity.dxf.text in modifications:
@@ -591,6 +591,63 @@ def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id, general_DXF_perc
 
             entity.render()
 
+        doc.saveas(modified_path) """
+
+        # Normalize keys in modifications dict for safe matching
+        normalized_mods = {
+            key.lower().strip(): value for key, value in modifications.items()
+        }
+
+        doc = ezdxf.readfile(static_path)
+        msp = doc.modelspace()
+
+        # DIMENSION entities
+        for entity in msp.query("DIMENSION"):
+            old_text = entity.dxf.text
+            cleaned_text = old_text.lower().strip()
+            if cleaned_text in normalized_mods:
+                new_text = normalized_mods[cleaned_text]
+                print(f"[DIMENSION] Replacing '{old_text}' → '{new_text}'")
+                entity.dxf.text = new_text
+
+                # Optionally update style
+                dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)
+                if dimstyle:
+                    dimstyle.dxf.dimtxt = 0.1  # Text height
+                    dimstyle.dxf.dimasz = 0.1  # Arrow size
+
+                entity.render()
+
+        # TEXT entities
+        for entity in msp.query("TEXT"):
+            old_text = entity.dxf.text
+            cleaned_text = old_text.lower().strip()
+            if cleaned_text in normalized_mods:
+                new_text = normalized_mods[cleaned_text]
+                print(f"[TEXT] Replacing '{old_text}' → '{new_text}'")
+                entity.dxf.text = new_text
+
+        # MTEXT entities
+        for entity in msp.query("MTEXT"):
+            old_text = entity.text
+            cleaned_text = old_text.lower().strip()
+            if cleaned_text in normalized_mods:
+                new_text = normalized_mods[cleaned_text]
+                print(f"[MTEXT] Replacing '{old_text}' → '{new_text}'")
+                entity.text = new_text
+
+        # ATTRIB entities (inside blocks)
+        for entity in msp.query("INSERT"):
+            if not entity.has_attribs():
+                continue
+            for attrib in entity.attribs:
+                tag = attrib.dxf.tag
+                if tag in modifications:
+                    new_text = modifications[tag]
+                    print(f"[ATTRIB] Tag '{tag}' → '{new_text}'")
+                    attrib.dxf.text = new_text
+
+        # Save the modified file
         doc.saveas(modified_path)
 
 
@@ -1736,10 +1793,12 @@ def save_all_pdf_report(user, project_id, logo):
             os.remove(pdf_file_path)
 
             appendix = None
-            if os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{file_name}.pdf") :
-                appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{file_name}.pdf")
-            elif os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf") :
-                appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf")
+            if file_name not in [" ", None , "", "None"]:
+                if os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{file_name}.pdf") :
+                    appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{file_name}.pdf")
+            else:
+                if os.path.exists(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf") :
+                    appendix = PdfReader(f"static/aReports/{company_slug.upper()}/{folder_name}/{sheet_key}_new.pdf")
 
             if appendix != None:
                 for page in appendix.pages:
