@@ -121,9 +121,6 @@ def LoadPageDataSheet(request):
     
     
     # Initialize all section variables
-    """ for i in range(1, 11):
-       locals()[f"aSection{str(i).zfill(2)}Show"] = "Yes" """
-
     aSection01Show = "Yes"
     aSection02Show = "Yes"
     aSection03Show = "Yes"
@@ -136,8 +133,6 @@ def LoadPageDataSheet(request):
     aSection10Show = "Yes"
 
     # Initialize visibility dictionaries
-    """ for j in range(1, 11):
-       locals()[f"aSection{str(j).zfill(2)}Show"] = {f"aSection{str(j).zfill(2)}Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)} """
     aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
     aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
     aSection03FieldShow = {f"aSection03Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
@@ -150,8 +145,6 @@ def LoadPageDataSheet(request):
     aSection10FieldShow = {f"aSection10Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
     
 
-    """ for j in range(1, 11):
-        print(form.fields[f'oSec{str(j).zfill(2)}Field01'].initial)  """
     print(form.fields['oSec01Field01'].initial)
     print(form.fields['oSec02Field01'].initial)
     print(form.fields['oSec03Field01'].initial)
@@ -164,9 +157,6 @@ def LoadPageDataSheet(request):
     print(form.fields['oSec10Field01'].initial)
 
     # Apply conditions to modify the values
-    """ for j in range(1, 11):
-        if form.fields[f'oSec{str(j).zfill(2)}Field01'].initial in ["oooo", None]:
-            locals()[f"aSection{str(j).zfill(2)}Show"] = "Hide" """
     if form.fields['oSec01Field01'].initial in ["oooo", None]:
         aSection01Show = "Hide"
 
@@ -1712,7 +1702,7 @@ def General_DXF_ALL(request, aMachine_ID, aType):
         except UserCompany.DoesNotExist:
             user_company = None
 
-    datas = DXF_data.objects.filter(sheetkey = sheetkey)
+    datas = DXF_data.objects.filter(sheetkey = sheetkey, company = user_company)
     print("Data is : ", datas)
     machine = Machine.objects.get(id=aMachine_ID)
     for d in datas:
@@ -1844,7 +1834,7 @@ def FullDrawing(request, aMachine_ID, aType):
             message=f"at {now()} {request.user} DXF download {aType} "
         )
     
-    datas = DXF_data.objects.filter(sheetkey = sheetkey)
+    datas = DXF_data.objects.filter(sheetkey = sheetkey, company = user_company)
 
 
     return FullDrawing_process_dxf(

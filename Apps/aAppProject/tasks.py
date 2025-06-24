@@ -107,6 +107,14 @@ def save_reports_task(project_id, user_id):
             return fail_and_exit(user, project_id, project.name, "Company info missing")
     except Exception as e:
         print("Handled task error:", e)
+        # ✅ Send email after saving reports
+        send_mail(
+            subject=f"✅ Error hapened while saving: {project.name}",
+            message=f"The reports for project '{project.name}' were not generated and couldn't be saved.",
+            from_email=None,  # uses DEFAULT_FROM_EMAIL
+            recipient_list=[user.email],
+            fail_silently=False
+        )
         try:
             update_progress(user, project_id, -1, f"{project.name}_error: {str(e)[:480]}")
         except Exception as update_error:

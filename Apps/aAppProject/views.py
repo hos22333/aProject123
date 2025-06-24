@@ -379,6 +379,7 @@ def save_reports(request, project_id):
         
     )
 
+
     user_id = request.user.id
     group_id = f"user-{user_id}-project-{project_id}"
 
@@ -386,7 +387,7 @@ def save_reports(request, project_id):
     existing_task = Task.objects.filter(group=group_id, success__isnull=True).first()
     if existing_task:
         return JsonResponse({'message': 'Report generation is already in progress. Please wait.'}, status=429)
-    
+
     try:
         async_task('Apps.aAppProject.tasks.save_reports_task', project_id, user_id,q_options={ 'group': group_id, 'timeout': 5400 })
         return JsonResponse({'message': 'Report generation started.'}, status=202)
@@ -437,7 +438,7 @@ def download_drive_project_reports(request, project_id):
         return response
     except Exception as e:
         # Handle error: return a friendly message
-        error_message = f"An error occurred while preparing the reports: {str(e)}"
+        error_message = f"An error occurred while preparing the reports: {str(e)}. Please try again after 5 minutes."
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return HttpResponseServerError(error_message)
         else:

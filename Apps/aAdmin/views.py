@@ -484,7 +484,7 @@ def list_configs(request):
     if order == 'desc':
         sort_by = f'-{sort_by}'
     
-     # Get the company of the logged-in user    
+    # Get the company of the logged-in user    
     user_company = None
     if request.user.is_authenticated:
         try:
@@ -538,7 +538,17 @@ def delete_config(request, config_id):
 
 
 def DXFdata_list(request):
+    # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+            
+    print(user_company)
     if request.method == "POST":
+
         
         form = DXFdataForm(request.POST)
         if form.is_valid():
@@ -551,7 +561,8 @@ def DXFdata_list(request):
         form = DXFdataForm()
         
     
-    datas = list(DXF_data.objects.all())
+    datas = list(DXF_data.objects.filter(company = user_company))
+    """ datas = list(DXF_data.objects.all()) """
     
     return render(request, 'DXFdata_list.html', {'form': form, 'datas': datas})
 
