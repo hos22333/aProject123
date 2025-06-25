@@ -119,169 +119,54 @@ def LoadPageDataSheet(request):
 
     print(f"Initial value for oSec01Field02: {form.fields['oSec01Field02'].initial}")
     
-    
-    # Initialize all section variables
-    aSection01Show = "Yes"
-    aSection02Show = "Yes"
-    aSection03Show = "Yes"
-    aSection04Show = "Yes"
-    aSection05Show = "Yes"
-    aSection06Show = "Yes"
-    aSection07Show = "Yes"
-    aSection08Show = "Yes"
-    aSection09Show = "Yes"
-    aSection10Show = "Yes"
 
-    # Initialize visibility dictionaries
-    aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection03FieldShow = {f"aSection03Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection04FieldShow = {f"aSection04Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection05FieldShow = {f"aSection05Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection06FieldShow = {f"aSection06Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection07FieldShow = {f"aSection07Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection08FieldShow = {f"aSection08Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection09FieldShow = {f"aSection09Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection10FieldShow = {f"aSection10Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    
+    # Initialize section show variables and field show dicts
+    section_show = {f"aSection{str(s).zfill(2)}Show": "Yes" for s in range(1, 11)}
+    field_show = {
+        f"aSection{str(s).zfill(2)}Field{str(f).zfill(2)}Show": "Yes"
+        for s in range(1, 11)
+        for f in range(1, 21)
+    }
 
-    print(form.fields['oSec01Field01'].initial)
-    print(form.fields['oSec02Field01'].initial)
-    print(form.fields['oSec03Field01'].initial)
-    print(form.fields['oSec04Field01'].initial)
-    print(form.fields['oSec05Field01'].initial)
-    print(form.fields['oSec06Field01'].initial)
-    print(form.fields['oSec07Field01'].initial)
-    print(form.fields['oSec08Field01'].initial)
-    print(form.fields['oSec09Field01'].initial)
-    print(form.fields['oSec10Field01'].initial)
+    # Apply conditions to modify the section show values
+    for s in range(1, 11):
+        section_key = f"aSection{str(s).zfill(2)}Show"
+        field_name = f"oSec{str(s).zfill(2)}Field01"
+        print(form.fields[field_name].initial)
+        if form.fields[field_name].initial in ["oooo", None]:
+            section_show[section_key] = "Hide"
 
-    # Apply conditions to modify the values
-    if form.fields['oSec01Field01'].initial in ["oooo", None]:
-        aSection01Show = "Hide"
+    # Apply conditions to modify field visibility in pairs
+    for s in range(1, 11):
+        for i in range(0, 10):
+            field_index_1 = str(i*2+1).zfill(2)
+            field_index_2 = str(i*2+2).zfill(2)
+            field_name = f"oSec{str(s).zfill(2)}Field{field_index_1}"
+            if form.fields[field_name].initial in ["oooo", None]:
+                key1 = f"aSection{str(s).zfill(2)}Field{field_index_1}Show"
+                key2 = f"aSection{str(s).zfill(2)}Field{field_index_2}Show"
+                field_show[key1] = "Hide"
+                field_show[key2] = "Hide"
 
-    if form.fields['oSec02Field01'].initial in ["oooo", None]:
-        aSection02Show = "Hide"
+    # Print section shows
+    for k in section_show:
+        print(section_show[k])
 
-    if form.fields['oSec03Field01'].initial in ["oooo", None]:
-        aSection03Show = "Hide"
-
-    if form.fields['oSec04Field01'].initial in ["oooo", None]:
-        aSection04Show = "Hide"
-
-    if form.fields['oSec05Field01'].initial in ["oooo", None]:
-        aSection05Show = "Hide"
-
-    if form.fields['oSec06Field01'].initial in ["oooo", None]:
-        aSection06Show = "Hide"
-
-    if form.fields['oSec07Field01'].initial in ["oooo", None]:
-        aSection07Show = "Hide"
-
-    if form.fields['oSec08Field01'].initial in ["oooo", None]:
-        aSection08Show = "Hide"
-
-    if form.fields['oSec09Field01'].initial in ["oooo", None]:
-        aSection09Show = "Hide"
-
-    if form.fields['oSec10Field01'].initial in ["oooo", None]:
-        aSection10Show = "Hide"
-    
-    print(aSection01Show)
-    print(aSection02Show)
-    print(aSection03Show)
-    print(aSection04Show)
-    print(aSection05Show)
-    print(aSection06Show)
-    print(aSection07Show)
-    print(aSection08Show)
-    print(aSection09Show)
-    print(aSection10Show)
-    
-   
-    # Update visibility based on field counts
-    for i in range(0, 10):
-        if form.fields[f'oSec01Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection01FieldShow[f"aSection01Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection01FieldShow[f"aSection01Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec02Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection02FieldShow[f"aSection02Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection02FieldShow[f"aSection02Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec03Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection03FieldShow[f"aSection03Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection03FieldShow[f"aSection03Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec04Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection04FieldShow[f"aSection04Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection04FieldShow[f"aSection04Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec05Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection05FieldShow[f"aSection05Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection05FieldShow[f"aSection05Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec06Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection06FieldShow[f"aSection06Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection06FieldShow[f"aSection06Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec07Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection07FieldShow[f"aSection07Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection07FieldShow[f"aSection07Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec08Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection08FieldShow[f"aSection08Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection08FieldShow[f"aSection08Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec09Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection09FieldShow[f"aSection09Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection09FieldShow[f"aSection09Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec10Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection10FieldShow[f"aSection10Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection10FieldShow[f"aSection10Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    # print(projects)
-
-    return render(request, "PageDataSheet.html", {
+    # Merge context dicts
+    context = {
         "form": form,
         "machines": machines,
-        "projects": projects,  
-        "aMachineName": aMachineName,  
+        "projects": projects,
+        "aMachineName": aMachineName,
         "user_company": user_company,
         "sheet_key": sheet_key,
         "sheet_keys": sheet_keys,
         "machineShow": machineShow,
-        "aSection01Show": aSection01Show,
-        "aSection02Show": aSection02Show,
-        "aSection03Show": aSection03Show,
-        "aSection04Show": aSection04Show,
-        "aSection05Show": aSection05Show,
-        "aSection06Show": aSection06Show,
-        "aSection07Show": aSection07Show,
-        "aSection08Show": aSection08Show,
-        "aSection09Show": aSection09Show,
-        "aSection10Show": aSection10Show,
-        **aSection01FieldShow,
-        **aSection02FieldShow,
-        **aSection03FieldShow,
-        **aSection04FieldShow,
-        **aSection05FieldShow,
-        **aSection06FieldShow,
-        **aSection07FieldShow,
-        **aSection08FieldShow,
-        **aSection09FieldShow,
-        **aSection10FieldShow,
-    })
+        **section_show,
+        **field_show,
+    }
+
+    return render(request, "PageDataSheet.html", context)
 
 
 
@@ -377,136 +262,44 @@ def SavePageDataSheet(request):
         #######################################
         print("#######################")
         
-        # Initialize all section variables
-        aSection01Show = "Yes"
-        aSection02Show = "Yes"
-        aSection03Show = "Yes"
-        aSection04Show = "Yes"
-        aSection05Show = "Yes"
-        aSection06Show = "Yes"
-        aSection07Show = "Yes"
-        aSection08Show = "Yes"
-        aSection09Show = "Yes"
-        aSection10Show = "Yes"
 
-        # Initialize visibility dictionaries
-        aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-        aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-        aSection03FieldShow = {f"aSection03Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-        aSection04FieldShow = {f"aSection04Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-        aSection05FieldShow = {f"aSection05Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-        aSection06FieldShow = {f"aSection06Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-        aSection07FieldShow = {f"aSection07Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-        aSection08FieldShow = {f"aSection08Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-        aSection09FieldShow = {f"aSection09Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-        aSection10FieldShow = {f"aSection10Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-            
-        print(form.fields['oSec01Field01'].initial)
-        print(form.fields['oSec02Field01'].initial)
-        print(form.fields['oSec03Field01'].initial)
-        print(form.fields['oSec04Field01'].initial)
-        print(form.fields['oSec05Field01'].initial)
-        print(form.fields['oSec06Field01'].initial)
-        print(form.fields['oSec07Field01'].initial)
-        print(form.fields['oSec08Field01'].initial)
-        print(form.fields['oSec09Field01'].initial)
-        print(form.fields['oSec10Field01'].initial)
-        
-        # Apply conditions to modify the values
-        if form.fields['oSec01Field01'].initial in ["oooo", None]:
-            aSection01Show = "Hide"
-        
-        if form.fields['oSec02Field01'].initial in ["oooo", None]:
-            aSection02Show = "Hide"
-        
-        if form.fields['oSec03Field01'].initial in ["oooo", None]:
-            aSection03Show = "Hide"
-        
-        if form.fields['oSec04Field01'].initial in ["oooo", None]:
-            aSection04Show = "Hide"
-        
-        if form.fields['oSec05Field01'].initial in ["oooo", None]:
-            aSection05Show = "Hide"
-        
-        if form.fields['oSec06Field01'].initial in ["oooo", None]:
-            aSection06Show = "Hide"
-        
-        if form.fields['oSec07Field01'].initial in ["oooo", None]:
-            aSection07Show = "Hide"
-        
-        if form.fields['oSec08Field01'].initial in ["oooo", None]:
-            aSection08Show = "Hide"
-        
-        if form.fields['oSec09Field01'].initial in ["oooo", None]:
-            aSection09Show = "Hide"
-        
-        if form.fields['oSec10Field01'].initial in ["oooo", None]:
-            aSection10Show = "Hide"
-            
-        print(aSection01Show)
-        print(aSection02Show)
-        print(aSection03Show)
-        print(aSection04Show)
-        print(aSection05Show)
-        print(aSection06Show)
-        print(aSection07Show)
-        print(aSection08Show)
-        print(aSection09Show)
-        print(aSection10Show)
+        # Initialize section show values
+        section_show = {f"aSection{str(s).zfill(2)}Show": "Yes" for s in range(1, 11)}
 
-        # Update visibility based on field counts
-        for i in range(0, 10):
-            if form.fields[f'oSec01Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                aSection01FieldShow[f"aSection01Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                aSection01FieldShow[f"aSection01Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+        # Initialize visibility dictionaries for each section's fields
+        field_show = {
+            f"aSection{str(s).zfill(2)}Field{str(f).zfill(2)}Show": "Yes"
+            for s in range(1, 11)
+            for f in range(1, 21)
+        }
 
-        for i in range(0, 10):
-            if form.fields[f'oSec02Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                aSection02FieldShow[f"aSection02Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                aSection02FieldShow[f"aSection02Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+        # Print initial values for debugging
+        for s in range(1, 11):
+            field_name = f"oSec{str(s).zfill(2)}Field01"
+            print(form.fields[field_name].initial)
 
-        for i in range(0, 10):
-            if form.fields[f'oSec03Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                aSection03FieldShow[f"aSection03Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                aSection03FieldShow[f"aSection03Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+        # Apply section visibility conditions
+        for s in range(1, 11):
+            field_name = f"oSec{str(s).zfill(2)}Field01"
+            if form.fields[field_name].initial in ["oooo", None]:
+                section_show[f"aSection{str(s).zfill(2)}Show"] = "Hide"
 
-        for i in range(0, 10):
-            if form.fields[f'oSec04Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                aSection04FieldShow[f"aSection04Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                aSection04FieldShow[f"aSection04Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+        # Print section visibility for debugging
+        for s in range(1, 11):
+            print(section_show[f"aSection{str(s).zfill(2)}Show"])
 
-        for i in range(0, 10):
-            if form.fields[f'oSec05Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                aSection05FieldShow[f"aSection05Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                aSection05FieldShow[f"aSection05Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+        # Apply field visibility in pairs (fields 1&2, 3&4, ..., 19&20)
+        for s in range(1, 11):
+            for i in range(0, 10):
+                idx1 = str(i*2+1).zfill(2)
+                idx2 = str(i*2+2).zfill(2)
+                field_name = f"oSec{str(s).zfill(2)}Field{idx1}"
+                if form.fields[field_name].initial in ["oooo", None, ""]:
+                    field_show[f"aSection{str(s).zfill(2)}Field{idx1}Show"] = "Hide"
+                    field_show[f"aSection{str(s).zfill(2)}Field{idx2}Show"] = "Hide"
 
-        for i in range(0, 10):
-            if form.fields[f'oSec06Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                aSection06FieldShow[f"aSection06Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                aSection06FieldShow[f"aSection06Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-
-        for i in range(0, 10):
-            if form.fields[f'oSec07Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                aSection07FieldShow[f"aSection07Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                aSection07FieldShow[f"aSection07Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-
-        for i in range(0, 10):
-            if form.fields[f'oSec08Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                aSection08FieldShow[f"aSection08Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                aSection08FieldShow[f"aSection08Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-
-        for i in range(0, 10):
-            if form.fields[f'oSec09Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                aSection09FieldShow[f"aSection09Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                aSection09FieldShow[f"aSection09Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-
-        for i in range(0, 10):
-            if form.fields[f'oSec10Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                aSection10FieldShow[f"aSection10Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                aSection10FieldShow[f"aSection10Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-                    
-
-        return render(request, "PageDataSheet.html", {
+        # Merge section_show and field_show into context
+        context = {
             "form": form,
             "machines": machines,
             "projects": projects,
@@ -515,28 +308,13 @@ def SavePageDataSheet(request):
             "sheet_key": sheet_key,
             "sheet_keys": sheet_keys,
             "machineShow": machineShow,
-            "aSection01Show": aSection01Show,
-            "aSection02Show": aSection02Show,
-            "aSection03Show": aSection03Show,
-            "aSection04Show": aSection04Show,
-            "aSection05Show": aSection05Show,
-            "aSection06Show": aSection06Show,
-            "aSection07Show": aSection07Show,
-            "aSection08Show": aSection08Show,
-            "aSection09Show": aSection09Show,
-            "aSection10Show": aSection10Show,
-            **aSection01FieldShow,
-            **aSection02FieldShow,
-            **aSection03FieldShow,
-            **aSection04FieldShow,
-            **aSection05FieldShow,
-            **aSection06FieldShow,
-            **aSection07FieldShow,
-            **aSection08FieldShow,
-            **aSection09FieldShow,
-            **aSection10FieldShow,
+            **section_show,
+            **field_show,
             "highlight_fields": highlight_fields,
-        })
+        }
+
+        # Render template
+        return render(request, "PageDataSheet.html", context)
 
 
     
@@ -629,166 +407,57 @@ def SavePageDataSheet(request):
             #######################################
             print("#######################")
         
-            # Initialize all section variables
-            aSection01Show = "Yes"
-            aSection02Show = "Yes"
-            aSection03Show = "Yes"
-            aSection04Show = "Yes"
-            aSection05Show = "Yes"
-            aSection06Show = "Yes"
-            aSection07Show = "Yes"
-            aSection08Show = "Yes"
-            aSection09Show = "Yes"
-            aSection10Show = "Yes"
-
-            # Initialize visibility dictionaries
-            aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-            aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-            aSection03FieldShow = {f"aSection03Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-            aSection04FieldShow = {f"aSection04Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-            aSection05FieldShow = {f"aSection05Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-            aSection06FieldShow = {f"aSection06Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-            aSection07FieldShow = {f"aSection07Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-            aSection08FieldShow = {f"aSection08Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-            aSection09FieldShow = {f"aSection09Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-            aSection10FieldShow = {f"aSection10Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
             
-            print(form.fields['oSec01Field01'].initial)
-            print(form.fields['oSec02Field01'].initial)
-            print(form.fields['oSec03Field01'].initial)
-            print(form.fields['oSec04Field01'].initial)
-            print(form.fields['oSec05Field01'].initial)
-            print(form.fields['oSec06Field01'].initial)
-            print(form.fields['oSec07Field01'].initial)
-            print(form.fields['oSec08Field01'].initial)
-            print(form.fields['oSec09Field01'].initial)
-            print(form.fields['oSec10Field01'].initial)
-        
-            # Apply conditions to modify the values
-            if form.fields['oSec01Field01'].initial in ["oooo", None]:
-                aSection01Show = "Hide"
-        
-            if form.fields['oSec02Field01'].initial in ["oooo", None]:
-                aSection02Show = "Hide"
-        
-            if form.fields['oSec03Field01'].initial in ["oooo", None]:
-                aSection03Show = "Hide"
-        
-            if form.fields['oSec04Field01'].initial in ["oooo", None]:
-                aSection04Show = "Hide"
-        
-            if form.fields['oSec05Field01'].initial in ["oooo", None]:
-                aSection05Show = "Hide"
-        
-            if form.fields['oSec06Field01'].initial in ["oooo", None]:
-                aSection06Show = "Hide"
-        
-            if form.fields['oSec07Field01'].initial in ["oooo", None]:
-                aSection07Show = "Hide"
-        
-            if form.fields['oSec08Field01'].initial in ["oooo", None]:
-                aSection08Show = "Hide"
-        
-            if form.fields['oSec09Field01'].initial in ["oooo", None]:
-                aSection09Show = "Hide"
-        
-            if form.fields['oSec10Field01'].initial in ["oooo", None]:
-                aSection10Show = "Hide"
-            
-            print(aSection01Show)
-            print(aSection02Show)
-            print(aSection03Show)
-            print(aSection04Show)
-            print(aSection05Show)
-            print(aSection06Show)
-            print(aSection07Show)
-            print(aSection08Show)
-            print(aSection09Show)
-            print(aSection10Show)
+            # Initialize section visibility
+            section_show = {f"aSection{str(s).zfill(2)}Show": "Yes" for s in range(1, 11)}
 
-            # Update visibility based on field counts
-            for i in range(0, 10):
-                if form.fields[f'oSec01Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                    aSection01FieldShow[f"aSection01Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                    aSection01FieldShow[f"aSection01Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+            # Initialize all field visibility in one dict
+            field_show = {
+                f"aSection{str(s).zfill(2)}Field{str(f).zfill(2)}Show": "Yes"
+                for s in range(1, 11)
+                for f in range(1, 21)
+            }
 
-            for i in range(0, 10):
-                if form.fields[f'oSec02Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                    aSection02FieldShow[f"aSection02Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                    aSection02FieldShow[f"aSection02Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+            # Print initial field values for section 1-10
+            for s in range(1, 11):
+                print(form.fields[f'oSec{str(s).zfill(2)}Field01'].initial)
 
-            for i in range(0, 10):
-                if form.fields[f'oSec03Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                    aSection03FieldShow[f"aSection03Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                    aSection03FieldShow[f"aSection03Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+            # Apply section visibility conditions
+            for s in range(1, 11):
+                key = f'oSec{str(s).zfill(2)}Field01'
+                if form.fields[key].initial in ["oooo", None]:
+                    section_show[f"aSection{str(s).zfill(2)}Show"] = "Hide"
 
-            for i in range(0, 10):
-                if form.fields[f'oSec04Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                    aSection04FieldShow[f"aSection04Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                    aSection04FieldShow[f"aSection04Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+            # Print section visibility for debugging
+            for s in range(1, 11):
+                print(section_show[f"aSection{str(s).zfill(2)}Show"])
 
-            for i in range(0, 10):
-                if form.fields[f'oSec05Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                    aSection05FieldShow[f"aSection05Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                    aSection05FieldShow[f"aSection05Field{str(i*2+2).zfill(2)}Show"] = "Hide"
+            # Hide field pairs if first field is "oooo", None, or ""
+            for s in range(1, 11):
+                for i in range(0, 10):
+                    idx1 = str(i * 2 + 1).zfill(2)
+                    idx2 = str(i * 2 + 2).zfill(2)
+                    field_key = f'oSec{str(s).zfill(2)}Field{idx1}'
+                    if form.fields[field_key].initial in ["oooo", None, ""]:
+                        field_show[f"aSection{str(s).zfill(2)}Field{idx1}Show"] = "Hide"
+                        field_show[f"aSection{str(s).zfill(2)}Field{idx2}Show"] = "Hide"
 
-            for i in range(0, 10):
-                if form.fields[f'oSec06Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                    aSection06FieldShow[f"aSection06Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                    aSection06FieldShow[f"aSection06Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-
-            for i in range(0, 10):
-                if form.fields[f'oSec07Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                    aSection07FieldShow[f"aSection07Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                    aSection07FieldShow[f"aSection07Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-
-            for i in range(0, 10):
-                if form.fields[f'oSec08Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                    aSection08FieldShow[f"aSection08Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                    aSection08FieldShow[f"aSection08Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-
-            for i in range(0, 10):
-                if form.fields[f'oSec09Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                    aSection09FieldShow[f"aSection09Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                    aSection09FieldShow[f"aSection09Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-
-            for i in range(0, 10):
-                if form.fields[f'oSec10Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None, ""]:
-                    aSection10FieldShow[f"aSection10Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-                    aSection10FieldShow[f"aSection10Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-                    
-
-
-            return render(request, "PageDataSheet.html", {
+            # Build context
+            context = {
                 "form": form,
                 "machines": machines,
-                "projects": projects,  
-                "aMachineName": aMachineName,  
+                "projects": projects,
+                "aMachineName": aMachineName,
                 "user_company": user_company,
                 "sheet_key": sheet_key,
                 "sheet_keys": sheet_keys,
                 "machineShow": machineShow,
-                "aSection01Show": aSection01Show,
-                "aSection02Show": aSection02Show,
-                "aSection03Show": aSection03Show,
-                "aSection04Show": aSection04Show,
-                "aSection05Show": aSection05Show,
-                "aSection06Show": aSection06Show,
-                "aSection07Show": aSection07Show,
-                "aSection08Show": aSection08Show,
-                "aSection09Show": aSection09Show,
-                "aSection10Show": aSection10Show,
-                **aSection01FieldShow,
-                **aSection02FieldShow,
-                **aSection03FieldShow,
-                **aSection04FieldShow,
-                **aSection05FieldShow,
-                **aSection06FieldShow,
-                **aSection07FieldShow,
-                **aSection08FieldShow,
-                **aSection09FieldShow,
-                **aSection10FieldShow,
-            })
+                **section_show,
+                **field_show,
+            }
+
+            # Render page
+            return render(request, "PageDataSheet.html", context)
 
         else:
 
@@ -857,166 +526,49 @@ def DeleteMachine(request, machine_id):
     print(f"Initial value for oSec01Field02: {form.fields['oSec01Field02'].initial}")
     
     
-    # Initialize all section variables
-    aSection01Show = "Yes"
-    aSection02Show = "Yes"
-    aSection03Show = "Yes"
-    aSection04Show = "Yes"
-    aSection05Show = "Yes"
-    aSection06Show = "Yes"
-    aSection07Show = "Yes"
-    aSection08Show = "Yes"
-    aSection09Show = "Yes"
-    aSection10Show = "Yes"
+    # Initialize section visibility and field visibility
+    section_show = {f"aSection{str(s).zfill(2)}Show": "Yes" for s in range(1, 11)}
+    field_show = {
+        f"aSection{str(s).zfill(2)}Field{str(f).zfill(2)}Show": "Yes"
+        for s in range(1, 11)
+        for f in range(1, 21)
+    }
 
-    # Initialize visibility dictionaries
-    aSection01FieldShow = {f"aSection01Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection02FieldShow = {f"aSection02Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection03FieldShow = {f"aSection03Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection04FieldShow = {f"aSection04Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection05FieldShow = {f"aSection05Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection06FieldShow = {f"aSection06Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection07FieldShow = {f"aSection07Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection08FieldShow = {f"aSection08Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection09FieldShow = {f"aSection09Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    aSection10FieldShow = {f"aSection10Field{str(i).zfill(2)}Show": "Yes" for i in range(1, 21)}
-    
-    print(form.fields['oSec01Field01'].initial)
-    print(form.fields['oSec02Field01'].initial)
-    print(form.fields['oSec03Field01'].initial)
-    print(form.fields['oSec04Field01'].initial)
-    print(form.fields['oSec05Field01'].initial)
-    print(form.fields['oSec06Field01'].initial)
-    print(form.fields['oSec07Field01'].initial)
-    print(form.fields['oSec08Field01'].initial)
-    print(form.fields['oSec09Field01'].initial)
-    print(form.fields['oSec10Field01'].initial)
+    # Print initial values of first fields for debugging
+    for s in range(1, 11):
+        print(form.fields[f'oSec{str(s).zfill(2)}Field01'].initial)
 
-    # Apply conditions to modify the values
-    if form.fields['oSec01Field01'].initial in ["oooo", None]:
-        aSection01Show = "Hide"
+    # Apply section visibility conditions
+    for s in range(1, 11):
+        first_field_value = form.fields[f'oSec{str(s).zfill(2)}Field01'].initial
+        if first_field_value in ["oooo", None]:
+            section_show[f"aSection{str(s).zfill(2)}Show"] = "Hide"
 
-    if form.fields['oSec02Field01'].initial in ["oooo", None]:
-        aSection02Show = "Hide"
+    # Print section visibility after check
+    for s in range(1, 11):
+        print(section_show[f"aSection{str(s).zfill(2)}Show"])
 
-    if form.fields['oSec03Field01'].initial in ["oooo", None]:
-        aSection03Show = "Hide"
+    # Hide field pairs if first in pair is "oooo" / None / ""
+    for s in range(1, 11):
+        for i in range(0, 10):
+            idx1, idx2 = str(i * 2 + 1).zfill(2), str(i * 2 + 2).zfill(2)
+            field_key = f'oSec{str(s).zfill(2)}Field{idx1}'
+            if form.fields[field_key].initial in ["oooo", None]:
+                field_show[f"aSection{str(s).zfill(2)}Field{idx1}Show"] = "Hide"
+                field_show[f"aSection{str(s).zfill(2)}Field{idx2}Show"] = "Hide"
 
-    if form.fields['oSec04Field01'].initial in ["oooo", None]:
-        aSection04Show = "Hide"
-
-    if form.fields['oSec05Field01'].initial in ["oooo", None]:
-        aSection05Show = "Hide"
-
-    if form.fields['oSec06Field01'].initial in ["oooo", None]:
-        aSection06Show = "Hide"
-
-    if form.fields['oSec07Field01'].initial in ["oooo", None]:
-        aSection07Show = "Hide"
-
-    if form.fields['oSec08Field01'].initial in ["oooo", None]:
-        aSection08Show = "Hide"
-
-    if form.fields['oSec09Field01'].initial in ["oooo", None]:
-        aSection09Show = "Hide"
-
-    if form.fields['oSec10Field01'].initial in ["oooo", None]:
-        aSection10Show = "Hide"
-    
-    print(aSection01Show)
-    print(aSection02Show)
-    print(aSection03Show)
-    print(aSection04Show)
-    print(aSection05Show)
-    print(aSection06Show)
-    print(aSection07Show)
-    print(aSection08Show)
-    print(aSection09Show)
-    print(aSection10Show)
-    
-   
-    # Update visibility based on field counts
-    for i in range(0, 10):
-        if form.fields[f'oSec01Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection01FieldShow[f"aSection01Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection01FieldShow[f"aSection01Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec02Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection02FieldShow[f"aSection02Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection02FieldShow[f"aSection02Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec03Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection03FieldShow[f"aSection03Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection03FieldShow[f"aSection03Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec04Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection04FieldShow[f"aSection04Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection04FieldShow[f"aSection04Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec05Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection05FieldShow[f"aSection05Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection05FieldShow[f"aSection05Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec06Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection06FieldShow[f"aSection06Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection06FieldShow[f"aSection06Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec07Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection07FieldShow[f"aSection07Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection07FieldShow[f"aSection07Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec08Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection08FieldShow[f"aSection08Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection08FieldShow[f"aSection08Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec09Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection09FieldShow[f"aSection09Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection09FieldShow[f"aSection09Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    for i in range(0, 10):
-        if form.fields[f'oSec10Field{str(i*2+1).zfill(2)}'].initial in ["oooo", None]:
-            aSection10FieldShow[f"aSection10Field{str(i*2+1).zfill(2)}Show"] = "Hide"
-            aSection10FieldShow[f"aSection10Field{str(i*2+2).zfill(2)}Show"] = "Hide"
-    
-    # print(projects)
-
+    # Render final page
     return render(request, "PageDataSheet.html", {
         "form": form,
         "machines": machines,
-        "projects": projects,  
-        "aMachineName": aMachineName,  
+        "projects": projects,
+        "aMachineName": aMachineName,
         "user_company": user_company,
         "sheet_key": sheet_key,
         "sheet_keys": sheet_keys,
         "machineShow": machineShow,
-        "aSection01Show": aSection01Show,
-        "aSection02Show": aSection02Show,
-        "aSection03Show": aSection03Show,
-        "aSection04Show": aSection04Show,
-        "aSection05Show": aSection05Show,
-        "aSection06Show": aSection06Show,
-        "aSection07Show": aSection07Show,
-        "aSection08Show": aSection08Show,
-        "aSection09Show": aSection09Show,
-        "aSection10Show": aSection10Show,
-        **aSection01FieldShow,
-        **aSection02FieldShow,
-        **aSection03FieldShow,
-        **aSection04FieldShow,
-        **aSection05FieldShow,
-        **aSection06FieldShow,
-        **aSection07FieldShow,
-        **aSection08FieldShow,
-        **aSection09FieldShow,
-        **aSection10FieldShow,
+        **section_show,
+        **field_show,
     })
 
 

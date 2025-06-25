@@ -45,7 +45,7 @@
         
         <h3 class="mt-4">Projects List</h3>
         
-        <table class="table table-bordered mt-2">
+        <table id="sortable-table" class="table table-bordered mt-2">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -104,7 +104,17 @@
     </div>
 </div>
 
+<!-- Add jQuery & DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 
+<!-- Initialize DataTables -->
+<script>
+    $(document).ready(function () {
+        $('#sortable-table').DataTable();
+    });
+</script>
 
 <!--Edit Modal  -->
 <div id="editProjectModal" class="modal" tabindex="-1" role="dialog">

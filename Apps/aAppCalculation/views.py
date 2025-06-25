@@ -149,7 +149,7 @@ def LoadPageCalculationSheet(request):
         print(f"Warning: Unknown sheet_key '{sheet_key}'")
 
 
-     # Assign company filter only if the user has a company
+    # Assign company filter only if the user has a company
     if user_company:
         machines = modelcalc.objects.filter(oSec00Field03=sheet_key, company=user_company)
         projects = APP_Project.objects.filter(company=user_company)
@@ -165,385 +165,48 @@ def LoadPageCalculationSheet(request):
     print(f"Initial value for oSec01Field02: {form.fields['oSec01Field02'].initial}")
     
     # Initialize all section variables
-    aSection01Field01Show = "Yes"
-    aSection01Field02Show = "Yes"
-    aSection01Field03Show = "Yes"
-    aSection01Field04Show = "Yes"
-    aSection01Field05Show = "Yes"
-    aSection01Field06Show = "Yes"
-    aSection01Field07Show = "Yes"
-    aSection01Field08Show = "Yes"
-    aSection01Field09Show = "Yes"
-    aSection01Field10Show = "Yes"
-    aSection01Field11Show = "Yes"
-    aSection01Field12Show = "Yes"
-    aSection01Field13Show = "Yes"
-    aSection01Field14Show = "Yes"
-    aSection01Field15Show = "Yes"
-    aSection01Field16Show = "Yes"
-    aSection01Field17Show = "Yes"
-    aSection01Field18Show = "Yes"
-    aSection01Field19Show = "Yes"
-    aSection01Field20Show = "Yes"
-    aSection01Field21Show = "Yes"
-    aSection01Field22Show = "Yes"
-    aSection01Field23Show = "Yes"
-    aSection01Field24Show = "Yes"
-    aSection01Field25Show = "Yes"
-    aSection01Field26Show = "Yes"
-    aSection01Field27Show = "Yes"
-    aSection01Field28Show = "Yes"
-    aSection01Field29Show = "Yes"
-    aSection01Field30Show = "Yes"
-    aSection02Field01Show = "Yes"
-    aSection02Field02Show = "Yes"
-    aSection02Field03Show = "Yes"
-    aSection02Field04Show = "Yes"
-    aSection02Field05Show = "Yes"
-    aSection02Field06Show = "Yes"
-    aSection02Field07Show = "Yes"
-    aSection02Field08Show = "Yes"
-    aSection02Field09Show = "Yes"
-    aSection02Field10Show = "Yes"
-    aSection02Field11Show = "Yes"
-    aSection02Field12Show = "Yes"
-    aSection02Field13Show = "Yes"
-    aSection02Field14Show = "Yes"
-    aSection02Field15Show = "Yes"
-    aSection02Field16Show = "Yes"
-    aSection02Field17Show = "Yes"
-    aSection02Field18Show = "Yes"
-    aSection02Field19Show = "Yes"
-    aSection02Field20Show = "Yes"
-    aSection02Field21Show = "Yes"
-    aSection02Field22Show = "Yes"
-    aSection02Field23Show = "Yes"
-    aSection02Field24Show = "Yes"
-    aSection02Field25Show = "Yes"
-    aSection02Field26Show = "Yes"
-    aSection02Field27Show = "Yes"
-    aSection02Field28Show = "Yes"
-    aSection02Field29Show = "Yes"
-    aSection02Field30Show = "Yes"
-    
-    print(form.fields['oSec01Field01'].initial)
-    print(form.fields['oSec01Field02'].initial)
-    print(form.fields['oSec01Field03'].initial)
-    print(form.fields['oSec01Field04'].initial)
-    print(form.fields['oSec01Field05'].initial)
-    print(form.fields['oSec01Field06'].initial)
-    print(form.fields['oSec01Field07'].initial)
-    print(form.fields['oSec01Field08'].initial)
-    print(form.fields['oSec01Field09'].initial)
-    print(form.fields['oSec01Field10'].initial)
-    print(form.fields['oSec01Field11'].initial)
-    print(form.fields['oSec01Field12'].initial)
-    print(form.fields['oSec01Field13'].initial)
-    print(form.fields['oSec01Field14'].initial)
-    print(form.fields['oSec01Field15'].initial)
-    print(form.fields['oSec01Field16'].initial)
-    print(form.fields['oSec01Field17'].initial)
-    print(form.fields['oSec01Field18'].initial)
-    print(form.fields['oSec01Field19'].initial)
-    print(form.fields['oSec01Field20'].initial)
-    print(form.fields['oSec01Field21'].initial)
-    print(form.fields['oSec01Field22'].initial)
-    print(form.fields['oSec01Field23'].initial)
-    print(form.fields['oSec01Field24'].initial)
-    print(form.fields['oSec01Field25'].initial)
-    print(form.fields['oSec01Field26'].initial)
-    print(form.fields['oSec01Field27'].initial)
-    print(form.fields['oSec01Field28'].initial)
-    print(form.fields['oSec01Field29'].initial)
-    print(form.fields['oSec01Field30'].initial)
-    print(form.fields['oSec02Field01'].initial)
-    print(form.fields['oSec02Field02'].initial)
-    print(form.fields['oSec02Field03'].initial)
-    print(form.fields['oSec02Field04'].initial)
-    print(form.fields['oSec02Field05'].initial)
-    print(form.fields['oSec02Field06'].initial)
-    print(form.fields['oSec02Field07'].initial)
-    print(form.fields['oSec02Field08'].initial)
-    print(form.fields['oSec02Field09'].initial)
-    print(form.fields['oSec02Field10'].initial)
-    print(form.fields['oSec02Field11'].initial)
-    print(form.fields['oSec02Field12'].initial)
-    print(form.fields['oSec02Field13'].initial)
-    print(form.fields['oSec02Field14'].initial)
-    print(form.fields['oSec02Field15'].initial)
-    print(form.fields['oSec02Field16'].initial)
-    print(form.fields['oSec02Field17'].initial)
-    print(form.fields['oSec02Field18'].initial)
-    print(form.fields['oSec02Field19'].initial)
-    print(form.fields['oSec02Field20'].initial)
-    print(form.fields['oSec02Field21'].initial)
-    print(form.fields['oSec02Field22'].initial)
-    print(form.fields['oSec02Field23'].initial)
-    print(form.fields['oSec02Field24'].initial)
-    print(form.fields['oSec02Field25'].initial)
-    print(form.fields['oSec02Field26'].initial)
-    print(form.fields['oSec02Field27'].initial)
-    print(form.fields['oSec02Field28'].initial)
-    print(form.fields['oSec02Field29'].initial)
-    print(form.fields['oSec02Field30'].initial)
+    section_vars = {}
+
+    for section in range(1, 3):  # Section 1 and 2
+        for field in range(1, 31):
+            var_name = f"aSection{section:02d}Field{field:02d}Show"
+            section_vars[var_name] = "Yes"
 
     # Apply conditions to modify the values
-    if form.fields['oSec01Field01'].initial in ["oooo", None , ""]:
-        aSection01Field01Show = "Hide"
-    if form.fields['oSec01Field02'].initial in ["oooo", None , ""]:
-        aSection01Field02Show = "Hide"
-    if form.fields['oSec01Field03'].initial in ["oooo", None , ""]:
-        aSection01Field03Show = "Hide"
-    if form.fields['oSec01Field04'].initial in ["oooo", None , ""]:
-        aSection01Field04Show = "Hide"
-    if form.fields['oSec01Field05'].initial in ["oooo", None , ""]:
-        aSection01Field05Show = "Hide"
-    if form.fields['oSec01Field06'].initial in ["oooo", None , ""]:
-        aSection01Field06Show = "Hide"
-    if form.fields['oSec01Field07'].initial in ["oooo", None , ""]:
-        aSection01Field07Show = "Hide"
-    if form.fields['oSec01Field08'].initial in ["oooo", None , ""]:
-        aSection01Field08Show = "Hide"
-    if form.fields['oSec01Field09'].initial in ["oooo", None , ""]:
-        aSection01Field09Show = "Hide"
-    if form.fields['oSec01Field10'].initial in ["oooo", None , ""]:
-        aSection01Field10Show = "Hide"
-    if form.fields['oSec01Field11'].initial in ["oooo", None , ""]:
-        aSection01Field11Show = "Hide"
-    if form.fields['oSec01Field12'].initial in ["oooo", None , ""]:
-        aSection01Field12Show = "Hide"
-    if form.fields['oSec01Field13'].initial in ["oooo", None , ""]:
-        aSection01Field13Show = "Hide"
-    if form.fields['oSec01Field14'].initial in ["oooo", None , ""]:
-        aSection01Field14Show = "Hide"
-    if form.fields['oSec01Field15'].initial in ["oooo", None , ""]:
-        aSection01Field15Show = "Hide"
-    if form.fields['oSec01Field16'].initial in ["oooo", None , ""]:
-        aSection01Field16Show = "Hide"
-    if form.fields['oSec01Field17'].initial in ["oooo", None , ""]:
-        aSection01Field17Show = "Hide"
-    if form.fields['oSec01Field18'].initial in ["oooo", None , ""]:
-        aSection01Field18Show = "Hide"
-    if form.fields['oSec01Field19'].initial in ["oooo", None , ""]:
-        aSection01Field19Show = "Hide"
-    if form.fields['oSec01Field20'].initial in ["oooo", None , ""]:
-        aSection01Field20Show = "Hide"
-    if form.fields['oSec01Field21'].initial in ["oooo", None , ""]:
-        aSection01Field21Show = "Hide"
-    if form.fields['oSec01Field22'].initial in ["oooo", None , ""]:
-        aSection01Field22Show = "Hide"
-    if form.fields['oSec01Field23'].initial in ["oooo", None , ""]:
-        aSection01Field23Show = "Hide"
-    if form.fields['oSec01Field24'].initial in ["oooo", None , ""]:
-        aSection01Field24Show = "Hide"
-    if form.fields['oSec01Field25'].initial in ["oooo", None , ""]:
-        aSection01Field25Show = "Hide"
-    if form.fields['oSec01Field26'].initial in ["oooo", None , ""]:
-        aSection01Field26Show = "Hide"
-    if form.fields['oSec01Field27'].initial in ["oooo", None , ""]:
-        aSection01Field27Show = "Hide"
-    if form.fields['oSec01Field28'].initial in ["oooo", None , ""]:
-        aSection01Field28Show = "Hide"
-    if form.fields['oSec01Field29'].initial in ["oooo", None , ""]:
-        aSection01Field29Show = "Hide"
-    if form.fields['oSec01Field30'].initial in ["oooo", None , ""]:
-        aSection01Field30Show = "Hide"
+    for section in range(1, 3):
+        for field in range(1, 31):
+            field_name = f"oSec{section:02d}Field{field:02d}"
+            var_name = f"aSection{section:02d}Field{field:02d}Show"
+            initial_value = form.fields[field_name].initial
+            if initial_value in ["oooo", None, ""]:
+                section_vars[var_name] = "Hide"
 
-    if form.fields['oSec02Field01'].initial in ["oooo", None , ""]:
-        aSection02Field01Show = "Hide"
-    if form.fields['oSec02Field02'].initial in ["oooo", None , ""]:
-        aSection02Field02Show = "Hide"
-    if form.fields['oSec02Field03'].initial in ["oooo", None , ""]:
-        aSection02Field03Show = "Hide"
-    if form.fields['oSec02Field04'].initial in ["oooo", None , ""]:
-        aSection02Field04Show = "Hide"
-    if form.fields['oSec02Field05'].initial in ["oooo", None , ""]:
-        aSection02Field05Show = "Hide"
-    if form.fields['oSec02Field06'].initial in ["oooo", None , ""]:
-        aSection02Field06Show = "Hide"
-    if form.fields['oSec02Field07'].initial in ["oooo", None , ""]:
-        aSection02Field07Show = "Hide"
-    if form.fields['oSec02Field08'].initial in ["oooo", None , ""]:
-        aSection02Field08Show = "Hide"
-    if form.fields['oSec02Field09'].initial in ["oooo", None , ""]:
-        aSection02Field09Show = "Hide"
-    if form.fields['oSec02Field10'].initial in ["oooo", None , ""]:
-        aSection02Field10Show = "Hide"
-    if form.fields['oSec02Field11'].initial in ["oooo", None , ""]:
-        aSection02Field11Show = "Hide"
-    if form.fields['oSec02Field12'].initial in ["oooo", None , ""]:
-        aSection02Field12Show = "Hide"
-    if form.fields['oSec02Field13'].initial in ["oooo", None , ""]:
-        aSection02Field13Show = "Hide"
-    if form.fields['oSec02Field14'].initial in ["oooo", None , ""]:
-        aSection02Field14Show = "Hide"
-    if form.fields['oSec02Field15'].initial in ["oooo", None , ""]:
-        aSection02Field15Show = "Hide"
-    if form.fields['oSec02Field16'].initial in ["oooo", None , ""]:
-        aSection02Field16Show = "Hide"
-    if form.fields['oSec02Field17'].initial in ["oooo", None , ""]:
-        aSection02Field17Show = "Hide"
-    if form.fields['oSec02Field18'].initial in ["oooo", None , ""]:
-        aSection02Field18Show = "Hide"
-    if form.fields['oSec02Field19'].initial in ["oooo", None , ""]:
-        aSection02Field19Show = "Hide"
-    if form.fields['oSec02Field20'].initial in ["oooo", None , ""]:
-        aSection02Field20Show = "Hide"
-    if form.fields['oSec02Field21'].initial in ["oooo", None , ""]:
-        aSection02Field21Show = "Hide"
-    if form.fields['oSec02Field22'].initial in ["oooo", None , ""]:
-        aSection02Field22Show = "Hide"
-    if form.fields['oSec02Field23'].initial in ["oooo", None , ""]:
-        aSection02Field23Show = "Hide"
-    if form.fields['oSec02Field24'].initial in ["oooo", None , ""]:
-        aSection02Field24Show = "Hide"
-    if form.fields['oSec02Field25'].initial in ["oooo", None , ""]:
-        aSection02Field25Show = "Hide"
-    if form.fields['oSec02Field26'].initial in ["oooo", None , ""]:
-        aSection02Field26Show = "Hide"
-    if form.fields['oSec02Field27'].initial in ["oooo", None , ""]:
-        aSection02Field27Show = "Hide"
-    if form.fields['oSec02Field28'].initial in ["oooo", None , ""]:
-        aSection02Field28Show = "Hide"
-    if form.fields['oSec02Field29'].initial in ["oooo", None , ""]:
-        aSection02Field29Show = "Hide"
-    if form.fields['oSec02Field30'].initial in ["oooo", None , ""]:
-        aSection02Field30Show = "Hide"
-    
+    # Optional: print statements if you still need them
+    for section in range(1, 3):
+        for field in range(1, 31):
+            field_name = f"oSec{section:02d}Field{field:02d}"
+            print(form.fields[field_name].initial)
 
-    print(aSection01Field01Show)
-    print(aSection01Field02Show)
-    print(aSection01Field03Show)
-    print(aSection01Field04Show)
-    print(aSection01Field05Show)
-    print(aSection01Field06Show)
-    print(aSection01Field07Show)
-    print(aSection01Field08Show)
-    print(aSection01Field09Show)
-    print(aSection01Field10Show)
-    print(aSection01Field11Show)
-    print(aSection01Field12Show)
-    print(aSection01Field13Show)
-    print(aSection01Field14Show)
-    print(aSection01Field15Show)
-    print(aSection01Field16Show)
-    print(aSection01Field17Show)
-    print(aSection01Field18Show)
-    print(aSection01Field19Show)
-    print(aSection01Field20Show)
-    print(aSection01Field21Show)
-    print(aSection01Field22Show)
-    print(aSection01Field23Show)
-    print(aSection01Field24Show)
-    print(aSection01Field25Show)
-    print(aSection01Field26Show)
-    print(aSection01Field27Show)
-    print(aSection01Field28Show)
-    print(aSection01Field29Show)
-    print(aSection01Field30Show)
-    print(aSection02Field01Show)
-    print(aSection02Field02Show)
-    print(aSection02Field03Show)
-    print(aSection02Field04Show)
-    print(aSection02Field05Show)
-    print(aSection02Field06Show)
-    print(aSection02Field07Show)
-    print(aSection02Field08Show)
-    print(aSection02Field09Show)
-    print(aSection02Field10Show)
-    print(aSection02Field11Show)
-    print(aSection02Field12Show)
-    print(aSection02Field13Show)
-    print(aSection02Field14Show)
-    print(aSection02Field15Show)
-    print(aSection02Field16Show)
-    print(aSection02Field17Show)
-    print(aSection02Field18Show)
-    print(aSection02Field19Show)
-    print(aSection02Field20Show)
-    print(aSection02Field21Show)
-    print(aSection02Field22Show)
-    print(aSection02Field23Show)
-    print(aSection02Field24Show)
-    print(aSection02Field25Show)
-    print(aSection02Field26Show)
-    print(aSection02Field27Show)
-    print(aSection02Field28Show)
-    print(aSection02Field29Show)
-    print(aSection02Field30Show)
-    
+    for var_name in section_vars:
+        print(section_vars[var_name])
 
-    return render(request, "PageCalculationSheet.html", {
-    "form": form,
-    "machines": machines,
-    "projects": projects,  
-    "aMachineName": aMachineName, 
-    "user_company": user_company, 
-    "sheet_key": sheet_key,
-    "sheet_keys": sheet_keys,
-    "machineShow": machineShow,
-    "aSection01Field01Show": aSection01Field01Show,
-    "aSection01Field02Show": aSection01Field02Show,
-    "aSection01Field03Show": aSection01Field03Show,
-    "aSection01Field04Show": aSection01Field04Show,
-    "aSection01Field05Show": aSection01Field05Show,
-    "aSection01Field06Show": aSection01Field06Show,
-    "aSection01Field07Show": aSection01Field07Show,
-    "aSection01Field08Show": aSection01Field08Show,
-    "aSection01Field09Show": aSection01Field09Show,
-    "aSection01Field10Show": aSection01Field10Show,
-    "aSection01Field11Show": aSection01Field11Show,
-    "aSection01Field12Show": aSection01Field12Show,
-    "aSection01Field13Show": aSection01Field13Show,
-    "aSection01Field14Show": aSection01Field14Show,
-    "aSection01Field15Show": aSection01Field15Show,
-    "aSection01Field16Show": aSection01Field16Show,
-    "aSection01Field17Show": aSection01Field17Show,
-    "aSection01Field18Show": aSection01Field18Show,
-    "aSection01Field19Show": aSection01Field19Show,
-    "aSection01Field20Show": aSection01Field20Show,
-    "aSection01Field21Show": aSection01Field21Show,
-    "aSection01Field22Show": aSection01Field22Show,
-    "aSection01Field23Show": aSection01Field23Show,
-    "aSection01Field24Show": aSection01Field24Show,
-    "aSection01Field25Show": aSection01Field25Show,
-    "aSection01Field26Show": aSection01Field26Show,
-    "aSection01Field27Show": aSection01Field27Show,
-    "aSection01Field28Show": aSection01Field28Show,
-    "aSection01Field29Show": aSection01Field29Show,
-    "aSection01Field30Show": aSection01Field30Show,
-    "aSection02Field01Show": aSection02Field01Show,
-    "aSection02Field02Show": aSection02Field02Show,
-    "aSection02Field03Show": aSection02Field03Show,
-    "aSection02Field04Show": aSection02Field04Show,
-    "aSection02Field05Show": aSection02Field05Show,
-    "aSection02Field06Show": aSection02Field06Show,
-    "aSection02Field07Show": aSection02Field07Show,
-    "aSection02Field08Show": aSection02Field08Show,
-    "aSection02Field09Show": aSection02Field09Show,
-    "aSection02Field10Show": aSection02Field10Show,
-    "aSection02Field11Show": aSection02Field11Show,
-    "aSection02Field12Show": aSection02Field12Show,
-    "aSection02Field13Show": aSection02Field13Show,
-    "aSection02Field14Show": aSection02Field14Show,
-    "aSection02Field15Show": aSection02Field15Show,
-    "aSection02Field16Show": aSection02Field16Show,
-    "aSection02Field17Show": aSection02Field17Show,
-    "aSection02Field18Show": aSection02Field18Show,
-    "aSection02Field19Show": aSection02Field19Show,
-    "aSection02Field20Show": aSection02Field20Show,
-    "aSection02Field21Show": aSection02Field21Show,
-    "aSection02Field22Show": aSection02Field22Show,
-    "aSection02Field23Show": aSection02Field23Show,
-    "aSection02Field24Show": aSection02Field24Show,
-    "aSection02Field25Show": aSection02Field25Show,
-    "aSection02Field26Show": aSection02Field26Show,
-    "aSection02Field27Show": aSection02Field27Show,
-    "aSection02Field28Show": aSection02Field28Show,
-    "aSection02Field29Show": aSection02Field29Show,
-    "aSection02Field30Show": aSection02Field30Show,
-    
-})
+    # Prepare context dictionary
+    context = {
+        "form": form,
+        "machines": machines,
+        "projects": projects,
+        "aMachineName": aMachineName,
+        "user_company": user_company,
+        "sheet_key": sheet_key,
+        "sheet_keys": sheet_keys,
+        "machineShow": machineShow,
+    }
+
+    # Add section variables to context
+    context.update(section_vars)
+
+    return render(request, "PageCalculationSheet.html", context)
+
 
 def HandleCalculationSheetForm(request):
     sheet_key = request.POST.get("sheet_key")
@@ -1412,385 +1075,43 @@ def DeleteCalcMachine(request, machine_id):
     
     print(f"Initial value for oSec01Field02: {form.fields['oSec01Field02'].initial}")
     
-    # Initialize all section variables
-    aSection01Field01Show = "Yes"
-    aSection01Field02Show = "Yes"
-    aSection01Field03Show = "Yes"
-    aSection01Field04Show = "Yes"
-    aSection01Field05Show = "Yes"
-    aSection01Field06Show = "Yes"
-    aSection01Field07Show = "Yes"
-    aSection01Field08Show = "Yes"
-    aSection01Field09Show = "Yes"
-    aSection01Field10Show = "Yes"
-    aSection01Field11Show = "Yes"
-    aSection01Field12Show = "Yes"
-    aSection01Field13Show = "Yes"
-    aSection01Field14Show = "Yes"
-    aSection01Field15Show = "Yes"
-    aSection01Field16Show = "Yes"
-    aSection01Field17Show = "Yes"
-    aSection01Field18Show = "Yes"
-    aSection01Field19Show = "Yes"
-    aSection01Field20Show = "Yes"
-    aSection01Field21Show = "Yes"
-    aSection01Field22Show = "Yes"
-    aSection01Field23Show = "Yes"
-    aSection01Field24Show = "Yes"
-    aSection01Field25Show = "Yes"
-    aSection01Field26Show = "Yes"
-    aSection01Field27Show = "Yes"
-    aSection01Field28Show = "Yes"
-    aSection01Field29Show = "Yes"
-    aSection01Field30Show = "Yes"
-    aSection02Field01Show = "Yes"
-    aSection02Field02Show = "Yes"
-    aSection02Field03Show = "Yes"
-    aSection02Field04Show = "Yes"
-    aSection02Field05Show = "Yes"
-    aSection02Field06Show = "Yes"
-    aSection02Field07Show = "Yes"
-    aSection02Field08Show = "Yes"
-    aSection02Field09Show = "Yes"
-    aSection02Field10Show = "Yes"
-    aSection02Field11Show = "Yes"
-    aSection02Field12Show = "Yes"
-    aSection02Field13Show = "Yes"
-    aSection02Field14Show = "Yes"
-    aSection02Field15Show = "Yes"
-    aSection02Field16Show = "Yes"
-    aSection02Field17Show = "Yes"
-    aSection02Field18Show = "Yes"
-    aSection02Field19Show = "Yes"
-    aSection02Field20Show = "Yes"
-    aSection02Field21Show = "Yes"
-    aSection02Field22Show = "Yes"
-    aSection02Field23Show = "Yes"
-    aSection02Field24Show = "Yes"
-    aSection02Field25Show = "Yes"
-    aSection02Field26Show = "Yes"
-    aSection02Field27Show = "Yes"
-    aSection02Field28Show = "Yes"
-    aSection02Field29Show = "Yes"
-    aSection02Field30Show = "Yes"
     
-    print(form.fields['oSec01Field01'].initial)
-    print(form.fields['oSec01Field02'].initial)
-    print(form.fields['oSec01Field03'].initial)
-    print(form.fields['oSec01Field04'].initial)
-    print(form.fields['oSec01Field05'].initial)
-    print(form.fields['oSec01Field06'].initial)
-    print(form.fields['oSec01Field07'].initial)
-    print(form.fields['oSec01Field08'].initial)
-    print(form.fields['oSec01Field09'].initial)
-    print(form.fields['oSec01Field10'].initial)
-    print(form.fields['oSec01Field11'].initial)
-    print(form.fields['oSec01Field12'].initial)
-    print(form.fields['oSec01Field13'].initial)
-    print(form.fields['oSec01Field14'].initial)
-    print(form.fields['oSec01Field15'].initial)
-    print(form.fields['oSec01Field16'].initial)
-    print(form.fields['oSec01Field17'].initial)
-    print(form.fields['oSec01Field18'].initial)
-    print(form.fields['oSec01Field19'].initial)
-    print(form.fields['oSec01Field20'].initial)
-    print(form.fields['oSec01Field21'].initial)
-    print(form.fields['oSec01Field22'].initial)
-    print(form.fields['oSec01Field23'].initial)
-    print(form.fields['oSec01Field24'].initial)
-    print(form.fields['oSec01Field25'].initial)
-    print(form.fields['oSec01Field26'].initial)
-    print(form.fields['oSec01Field27'].initial)
-    print(form.fields['oSec01Field28'].initial)
-    print(form.fields['oSec01Field29'].initial)
-    print(form.fields['oSec01Field30'].initial)
-    print(form.fields['oSec02Field01'].initial)
-    print(form.fields['oSec02Field02'].initial)
-    print(form.fields['oSec02Field03'].initial)
-    print(form.fields['oSec02Field04'].initial)
-    print(form.fields['oSec02Field05'].initial)
-    print(form.fields['oSec02Field06'].initial)
-    print(form.fields['oSec02Field07'].initial)
-    print(form.fields['oSec02Field08'].initial)
-    print(form.fields['oSec02Field09'].initial)
-    print(form.fields['oSec02Field10'].initial)
-    print(form.fields['oSec02Field11'].initial)
-    print(form.fields['oSec02Field12'].initial)
-    print(form.fields['oSec02Field13'].initial)
-    print(form.fields['oSec02Field14'].initial)
-    print(form.fields['oSec02Field15'].initial)
-    print(form.fields['oSec02Field16'].initial)
-    print(form.fields['oSec02Field17'].initial)
-    print(form.fields['oSec02Field18'].initial)
-    print(form.fields['oSec02Field19'].initial)
-    print(form.fields['oSec02Field20'].initial)
-    print(form.fields['oSec02Field21'].initial)
-    print(form.fields['oSec02Field22'].initial)
-    print(form.fields['oSec02Field23'].initial)
-    print(form.fields['oSec02Field24'].initial)
-    print(form.fields['oSec02Field25'].initial)
-    print(form.fields['oSec02Field26'].initial)
-    print(form.fields['oSec02Field27'].initial)
-    print(form.fields['oSec02Field28'].initial)
-    print(form.fields['oSec02Field29'].initial)
-    print(form.fields['oSec02Field30'].initial)
+    # Initialize all field show variables for both sections
+    field_show = {
+        f"aSection{str(s).zfill(2)}Field{str(f).zfill(2)}Show": "Yes"
+        for s in range(1, 3)
+        for f in range(1, 31)
+    }
 
-    # Apply conditions to modify the values
-    if form.fields['oSec01Field01'].initial in ["oooo", None , ""]:
-        aSection01Field01Show = "Hide"
-    if form.fields['oSec01Field02'].initial in ["oooo", None , ""]:
-        aSection01Field02Show = "Hide"
-    if form.fields['oSec01Field03'].initial in ["oooo", None , ""]:
-        aSection01Field03Show = "Hide"
-    if form.fields['oSec01Field04'].initial in ["oooo", None , ""]:
-        aSection01Field04Show = "Hide"
-    if form.fields['oSec01Field05'].initial in ["oooo", None , ""]:
-        aSection01Field05Show = "Hide"
-    if form.fields['oSec01Field06'].initial in ["oooo", None , ""]:
-        aSection01Field06Show = "Hide"
-    if form.fields['oSec01Field07'].initial in ["oooo", None , ""]:
-        aSection01Field07Show = "Hide"
-    if form.fields['oSec01Field08'].initial in ["oooo", None , ""]:
-        aSection01Field08Show = "Hide"
-    if form.fields['oSec01Field09'].initial in ["oooo", None , ""]:
-        aSection01Field09Show = "Hide"
-    if form.fields['oSec01Field10'].initial in ["oooo", None , ""]:
-        aSection01Field10Show = "Hide"
-    if form.fields['oSec01Field11'].initial in ["oooo", None , ""]:
-        aSection01Field11Show = "Hide"
-    if form.fields['oSec01Field12'].initial in ["oooo", None , ""]:
-        aSection01Field12Show = "Hide"
-    if form.fields['oSec01Field13'].initial in ["oooo", None , ""]:
-        aSection01Field13Show = "Hide"
-    if form.fields['oSec01Field14'].initial in ["oooo", None , ""]:
-        aSection01Field14Show = "Hide"
-    if form.fields['oSec01Field15'].initial in ["oooo", None , ""]:
-        aSection01Field15Show = "Hide"
-    if form.fields['oSec01Field16'].initial in ["oooo", None , ""]:
-        aSection01Field16Show = "Hide"
-    if form.fields['oSec01Field17'].initial in ["oooo", None , ""]:
-        aSection01Field17Show = "Hide"
-    if form.fields['oSec01Field18'].initial in ["oooo", None , ""]:
-        aSection01Field18Show = "Hide"
-    if form.fields['oSec01Field19'].initial in ["oooo", None , ""]:
-        aSection01Field19Show = "Hide"
-    if form.fields['oSec01Field20'].initial in ["oooo", None , ""]:
-        aSection01Field20Show = "Hide"
-    if form.fields['oSec01Field21'].initial in ["oooo", None , ""]:
-        aSection01Field21Show = "Hide"
-    if form.fields['oSec01Field22'].initial in ["oooo", None , ""]:
-        aSection01Field22Show = "Hide"
-    if form.fields['oSec01Field23'].initial in ["oooo", None , ""]:
-        aSection01Field23Show = "Hide"
-    if form.fields['oSec01Field24'].initial in ["oooo", None , ""]:
-        aSection01Field24Show = "Hide"
-    if form.fields['oSec01Field25'].initial in ["oooo", None , ""]:
-        aSection01Field25Show = "Hide"
-    if form.fields['oSec01Field26'].initial in ["oooo", None , ""]:
-        aSection01Field26Show = "Hide"
-    if form.fields['oSec01Field27'].initial in ["oooo", None , ""]:
-        aSection01Field27Show = "Hide"
-    if form.fields['oSec01Field28'].initial in ["oooo", None , ""]:
-        aSection01Field28Show = "Hide"
-    if form.fields['oSec01Field29'].initial in ["oooo", None , ""]:
-        aSection01Field29Show = "Hide"
-    if form.fields['oSec01Field30'].initial in ["oooo", None , ""]:
-        aSection01Field30Show = "Hide"
+    # Print initial values for debugging
+    for s in range(1, 3):
+        for f in range(1, 31):
+            print(form.fields[f'oSec{str(s).zfill(2)}Field{str(f).zfill(2)}'].initial)
 
-    if form.fields['oSec02Field01'].initial in ["oooo", None , ""]:
-        aSection02Field01Show = "Hide"
-    if form.fields['oSec02Field02'].initial in ["oooo", None , ""]:
-        aSection02Field02Show = "Hide"
-    if form.fields['oSec02Field03'].initial in ["oooo", None , ""]:
-        aSection02Field03Show = "Hide"
-    if form.fields['oSec02Field04'].initial in ["oooo", None , ""]:
-        aSection02Field04Show = "Hide"
-    if form.fields['oSec02Field05'].initial in ["oooo", None , ""]:
-        aSection02Field05Show = "Hide"
-    if form.fields['oSec02Field06'].initial in ["oooo", None , ""]:
-        aSection02Field06Show = "Hide"
-    if form.fields['oSec02Field07'].initial in ["oooo", None , ""]:
-        aSection02Field07Show = "Hide"
-    if form.fields['oSec02Field08'].initial in ["oooo", None , ""]:
-        aSection02Field08Show = "Hide"
-    if form.fields['oSec02Field09'].initial in ["oooo", None , ""]:
-        aSection02Field09Show = "Hide"
-    if form.fields['oSec02Field10'].initial in ["oooo", None , ""]:
-        aSection02Field10Show = "Hide"
-    if form.fields['oSec02Field11'].initial in ["oooo", None , ""]:
-        aSection02Field11Show = "Hide"
-    if form.fields['oSec02Field12'].initial in ["oooo", None , ""]:
-        aSection02Field12Show = "Hide"
-    if form.fields['oSec02Field13'].initial in ["oooo", None , ""]:
-        aSection02Field13Show = "Hide"
-    if form.fields['oSec02Field14'].initial in ["oooo", None , ""]:
-        aSection02Field14Show = "Hide"
-    if form.fields['oSec02Field15'].initial in ["oooo", None , ""]:
-        aSection02Field15Show = "Hide"
-    if form.fields['oSec02Field16'].initial in ["oooo", None , ""]:
-        aSection02Field16Show = "Hide"
-    if form.fields['oSec02Field17'].initial in ["oooo", None , ""]:
-        aSection02Field17Show = "Hide"
-    if form.fields['oSec02Field18'].initial in ["oooo", None , ""]:
-        aSection02Field18Show = "Hide"
-    if form.fields['oSec02Field19'].initial in ["oooo", None , ""]:
-        aSection02Field19Show = "Hide"
-    if form.fields['oSec02Field20'].initial in ["oooo", None , ""]:
-        aSection02Field20Show = "Hide"
-    if form.fields['oSec02Field21'].initial in ["oooo", None , ""]:
-        aSection02Field21Show = "Hide"
-    if form.fields['oSec02Field22'].initial in ["oooo", None , ""]:
-        aSection02Field22Show = "Hide"
-    if form.fields['oSec02Field23'].initial in ["oooo", None , ""]:
-        aSection02Field23Show = "Hide"
-    if form.fields['oSec02Field24'].initial in ["oooo", None , ""]:
-        aSection02Field24Show = "Hide"
-    if form.fields['oSec02Field25'].initial in ["oooo", None , ""]:
-        aSection02Field25Show = "Hide"
-    if form.fields['oSec02Field26'].initial in ["oooo", None , ""]:
-        aSection02Field26Show = "Hide"
-    if form.fields['oSec02Field27'].initial in ["oooo", None , ""]:
-        aSection02Field27Show = "Hide"
-    if form.fields['oSec02Field28'].initial in ["oooo", None , ""]:
-        aSection02Field28Show = "Hide"
-    if form.fields['oSec02Field29'].initial in ["oooo", None , ""]:
-        aSection02Field29Show = "Hide"
-    if form.fields['oSec02Field30'].initial in ["oooo", None , ""]:
-        aSection02Field30Show = "Hide"
-    
-    print(aSection01Field01Show)
-    print(aSection01Field02Show)
-    print(aSection01Field03Show)
-    print(aSection01Field04Show)
-    print(aSection01Field05Show)
-    print(aSection01Field06Show)
-    print(aSection01Field07Show)
-    print(aSection01Field08Show)
-    print(aSection01Field09Show)
-    print(aSection01Field10Show)
-    print(aSection01Field11Show)
-    print(aSection01Field12Show)
-    print(aSection01Field13Show)
-    print(aSection01Field14Show)
-    print(aSection01Field15Show)
-    print(aSection01Field16Show)
-    print(aSection01Field17Show)
-    print(aSection01Field18Show)
-    print(aSection01Field19Show)
-    print(aSection01Field20Show)
-    print(aSection01Field21Show)
-    print(aSection01Field22Show)
-    print(aSection01Field23Show)
-    print(aSection01Field24Show)
-    print(aSection01Field25Show)
-    print(aSection01Field26Show)
-    print(aSection01Field27Show)
-    print(aSection01Field28Show)
-    print(aSection01Field29Show)
-    print(aSection01Field30Show)
-    print(aSection02Field01Show)
-    print(aSection02Field02Show)
-    print(aSection02Field03Show)
-    print(aSection02Field04Show)
-    print(aSection02Field05Show)
-    print(aSection02Field06Show)
-    print(aSection02Field07Show)
-    print(aSection02Field08Show)
-    print(aSection02Field09Show)
-    print(aSection02Field10Show)
-    print(aSection02Field11Show)
-    print(aSection02Field12Show)
-    print(aSection02Field13Show)
-    print(aSection02Field14Show)
-    print(aSection02Field15Show)
-    print(aSection02Field16Show)
-    print(aSection02Field17Show)
-    print(aSection02Field18Show)
-    print(aSection02Field19Show)
-    print(aSection02Field20Show)
-    print(aSection02Field21Show)
-    print(aSection02Field22Show)
-    print(aSection02Field23Show)
-    print(aSection02Field24Show)
-    print(aSection02Field25Show)
-    print(aSection02Field26Show)
-    print(aSection02Field27Show)
-    print(aSection02Field28Show)
-    print(aSection02Field29Show)
-    print(aSection02Field30Show)
-    
+    # Apply conditions to hide fields if initial value is "oooo", None, or ""
+    for s in range(1, 3):
+        for f in range(1, 31):
+            value = form.fields[f'oSec{str(s).zfill(2)}Field{str(f).zfill(2)}'].initial
+            if value in ["oooo", None, ""]:
+                field_show[f"aSection{str(s).zfill(2)}Field{str(f).zfill(2)}Show"] = "Hide"
 
+    # Print show/hide states for debugging
+    for s in range(1, 3):
+        for f in range(1, 31):
+            print(field_show[f"aSection{str(s).zfill(2)}Field{str(f).zfill(2)}Show"])
+
+    # Render template
     return render(request, "PageCalculationSheet.html", {
-    "form": form,
-    "machines": machines,
-    "projects": projects,  
-    "aMachineName": aMachineName, 
-    "user_company": user_company, 
-    "sheet_key": sheet_key,
-    "sheet_keys": sheet_keys,
-    "machineShow": machineShow,
-    "aSection01Field01Show": aSection01Field01Show,
-    "aSection01Field02Show": aSection01Field02Show,
-    "aSection01Field03Show": aSection01Field03Show,
-    "aSection01Field04Show": aSection01Field04Show,
-    "aSection01Field05Show": aSection01Field05Show,
-    "aSection01Field06Show": aSection01Field06Show,
-    "aSection01Field07Show": aSection01Field07Show,
-    "aSection01Field08Show": aSection01Field08Show,
-    "aSection01Field09Show": aSection01Field09Show,
-    "aSection01Field10Show": aSection01Field10Show,
-    "aSection01Field11Show": aSection01Field11Show,
-    "aSection01Field12Show": aSection01Field12Show,
-    "aSection01Field13Show": aSection01Field13Show,
-    "aSection01Field14Show": aSection01Field14Show,
-    "aSection01Field15Show": aSection01Field15Show,
-    "aSection01Field16Show": aSection01Field16Show,
-    "aSection01Field17Show": aSection01Field17Show,
-    "aSection01Field18Show": aSection01Field18Show,
-    "aSection01Field19Show": aSection01Field19Show,
-    "aSection01Field20Show": aSection01Field20Show,
-    "aSection01Field21Show": aSection01Field21Show,
-    "aSection01Field22Show": aSection01Field22Show,
-    "aSection01Field23Show": aSection01Field23Show,
-    "aSection01Field24Show": aSection01Field24Show,
-    "aSection01Field25Show": aSection01Field25Show,
-    "aSection01Field26Show": aSection01Field26Show,
-    "aSection01Field27Show": aSection01Field27Show,
-    "aSection01Field28Show": aSection01Field28Show,
-    "aSection01Field29Show": aSection01Field29Show,
-    "aSection01Field30Show": aSection01Field30Show,
-    "aSection02Field01Show": aSection02Field01Show,
-    "aSection02Field02Show": aSection02Field02Show,
-    "aSection02Field03Show": aSection02Field03Show,
-    "aSection02Field04Show": aSection02Field04Show,
-    "aSection02Field05Show": aSection02Field05Show,
-    "aSection02Field06Show": aSection02Field06Show,
-    "aSection02Field07Show": aSection02Field07Show,
-    "aSection02Field08Show": aSection02Field08Show,
-    "aSection02Field09Show": aSection02Field09Show,
-    "aSection02Field10Show": aSection02Field10Show,
-    "aSection02Field11Show": aSection02Field11Show,
-    "aSection02Field12Show": aSection02Field12Show,
-    "aSection02Field13Show": aSection02Field13Show,
-    "aSection02Field14Show": aSection02Field14Show,
-    "aSection02Field15Show": aSection02Field15Show,
-    "aSection02Field16Show": aSection02Field16Show,
-    "aSection02Field17Show": aSection02Field17Show,
-    "aSection02Field18Show": aSection02Field18Show,
-    "aSection02Field19Show": aSection02Field19Show,
-    "aSection02Field20Show": aSection02Field20Show,
-    "aSection02Field21Show": aSection02Field21Show,
-    "aSection02Field22Show": aSection02Field22Show,
-    "aSection02Field23Show": aSection02Field23Show,
-    "aSection02Field24Show": aSection02Field24Show,
-    "aSection02Field25Show": aSection02Field25Show,
-    "aSection02Field26Show": aSection02Field26Show,
-    "aSection02Field27Show": aSection02Field27Show,
-    "aSection02Field28Show": aSection02Field28Show,
-    "aSection02Field29Show": aSection02Field29Show,
-    "aSection02Field30Show": aSection02Field30Show,
-    
-})
+        "form": form,
+        "machines": machines,
+        "projects": projects,
+        "aMachineName": aMachineName,
+        "user_company": user_company,
+        "sheet_key": sheet_key,
+        "sheet_keys": sheet_keys,
+        "machineShow": machineShow,
+        **field_show
+    })
 
 
 def CalculationSheet_get_data(request, machine_id):
