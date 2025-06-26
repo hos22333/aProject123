@@ -170,11 +170,7 @@ def LoadPageDataSheet(request):
 
 
 
-
-
-
-
-def SavePageDataSheet(request):
+def LoadCalcData(request):
     sheet_key = request.POST.get("sheet_key")
     print(sheet_key)
     if sheet_key :
@@ -315,6 +311,151 @@ def SavePageDataSheet(request):
 
         # Render template
         return render(request, "PageDataSheet.html", context)
+
+
+
+
+def SavePageDataSheet(request):
+    sheet_key = request.POST.get("sheet_key")
+    print(sheet_key)
+    if sheet_key :
+        machineShow = "Yes"
+    # Redirect unauthenticated users
+    if not request.user.is_authenticated:
+        return redirect("login")  
+    
+    
+    ###LOG
+    aLogEntry.objects.create(
+            user=request.user,
+            message=f"at {now()} {request.user} saved accessed Load {sheet_key} "
+        )
+    
+    
+    # Get the company of the logged-in user    
+    user_company = None
+    if request.user.is_authenticated:
+        try:
+            user_company = UserCompany.objects.get(user=request.user).company
+        except UserCompany.DoesNotExist:
+            user_company = None
+
+    sheet_keys = AddMachine.objects.exclude(nameForm__isnull=True).exclude(nameForm__exact="None").exclude(nameForm__exact="No").filter(company=user_company).order_by('order')
+
+    #Define Retrieve values from AddMachine model
+    try:
+        machine_config = AddMachine.objects.get(keyValue=sheet_key, company=user_company)
+        form_type = machine_config.nameForm
+        DB_Name = machine_config.nameDB
+        aMachineName = machine_config.nameMachine
+    except AddMachine.DoesNotExist:
+        form_type = "None"
+        DB_Name = "None"
+        aMachineName = "None"
+        
+
+    # Assign company filter only if the user has a company
+    if user_company:
+        machines = Machine.objects.filter(oSec00Field03=DB_Name, company=user_company)
+        projects = APP_Project.objects.filter(company=user_company)
+    else:
+        machines = Machine.objects.none()  # Return an empty queryset if no company
+        projects = APP_Project.objects.none()  # Return an empty queryset if no company
+
+    print(form_type)
+    
+    
+
+    """ # ============================================
+    # 🔵 HANDLE LOAD FROM modelcalc (preview only)
+    # ============================================
+    if request.method == "POST" and 'loadcalculationdataname' in request.POST:
+        machineShow = "Yes"
+        selected_project_id = request.POST.get("project")
+        keyvalue = sheet_key[:-2] 
+        print("Key Value : ",keyvalue)
+
+        
+        highlight_fields = []
+        form_data = request.POST.copy()
+        if selected_project_id:
+            print("selected_project_id : ", selected_project_id)
+            form_data["project"] = selected_project_id
+
+        if sheet_key and selected_project_id:
+            calc_instance = modelcalc.objects.filter(project_id=selected_project_id, company=user_company, oSec00Field03=sheet_key).first()
+            if calc_instance:
+                mappings = DataTransfer.objects.filter(keyValue=keyvalue, company=user_company)
+                print("mappings : ", mappings)
+                for mapping in mappings:
+                    calc_field = mapping.CalculationField
+                    print("calc Data : ", getattr(calc_instance, calc_field))
+                    form_field = mapping.SubmittalField
+                    if hasattr(calc_instance, calc_field):
+                        form_data[form_field] = getattr(calc_instance, calc_field)
+                        highlight_fields.append(form_field)
+                    
+                
+                
+        print("highlight_fields : ",highlight_fields)
+        form = FormDataSheet(initial=form_data, form_type=form_type)
+
+        #######################################
+        print("#######################")
+        
+
+        # Initialize section show values
+        section_show = {f"aSection{str(s).zfill(2)}Show": "Yes" for s in range(1, 11)}
+
+        # Initialize visibility dictionaries for each section's fields
+        field_show = {
+            f"aSection{str(s).zfill(2)}Field{str(f).zfill(2)}Show": "Yes"
+            for s in range(1, 11)
+            for f in range(1, 21)
+        }
+
+        # Print initial values for debugging
+        for s in range(1, 11):
+            field_name = f"oSec{str(s).zfill(2)}Field01"
+            print(form.fields[field_name].initial)
+
+        # Apply section visibility conditions
+        for s in range(1, 11):
+            field_name = f"oSec{str(s).zfill(2)}Field01"
+            if form.fields[field_name].initial in ["oooo", None]:
+                section_show[f"aSection{str(s).zfill(2)}Show"] = "Hide"
+
+        # Print section visibility for debugging
+        for s in range(1, 11):
+            print(section_show[f"aSection{str(s).zfill(2)}Show"])
+
+        # Apply field visibility in pairs (fields 1&2, 3&4, ..., 19&20)
+        for s in range(1, 11):
+            for i in range(0, 10):
+                idx1 = str(i*2+1).zfill(2)
+                idx2 = str(i*2+2).zfill(2)
+                field_name = f"oSec{str(s).zfill(2)}Field{idx1}"
+                if form.fields[field_name].initial in ["oooo", None, ""]:
+                    field_show[f"aSection{str(s).zfill(2)}Field{idx1}Show"] = "Hide"
+                    field_show[f"aSection{str(s).zfill(2)}Field{idx2}Show"] = "Hide"
+
+        # Merge section_show and field_show into context
+        context = {
+            "form": form,
+            "machines": machines,
+            "projects": projects,
+            "aMachineName": aMachineName,
+            "user_company": user_company,
+            "sheet_key": sheet_key,
+            "sheet_keys": sheet_keys,
+            "machineShow": machineShow,
+            **section_show,
+            **field_show,
+            "highlight_fields": highlight_fields,
+        }
+
+        # Render template
+        return render(request, "PageDataSheet.html", context) """
 
 
     

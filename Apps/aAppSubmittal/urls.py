@@ -12,6 +12,7 @@ urlpatterns = [
 
     path("PageDataSheet/", views.LoadPageDataSheet, name="PageDataSheet"),
     path("PageDataSheet/Save/", views.SavePageDataSheet, name="SavePageDataSheet"),
+    path("PageDataSheet/Load/", views.LoadCalcData, name="LoadCalcData"),
 
 #########################################################################################################
 
