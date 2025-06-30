@@ -1275,9 +1275,13 @@ def modify_dxf_file(static_path, modified_path, modifications,user_company,sheet
     # DIMENSION entities
     for entity in msp.query("DIMENSION"):
         old_text = entity.dxf.text
-        horvtype = DXF_data.objects.get(sheetkey = sheetkey, company = user_company, fieldname=old_text)
         cleaned_text = old_text.lower().strip()
         if cleaned_text in normalized_mods:
+            try:
+                horvtype = DXF_data.objects.get( sheetkey=sheetkey, company=user_company, fieldname=old_text )
+            except DXF_data.DoesNotExist:
+                continue
+
             new_text = normalized_mods[cleaned_text]
             print(f"[DIMENSION] Replacing '{old_text}' → '{new_text}'")
             
