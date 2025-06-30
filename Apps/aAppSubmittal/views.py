@@ -1246,7 +1246,7 @@ def get_dxf_paths(user_company, category, aType):
     return static_path, modified_path
 
 # Helper function to modify DXF files
-def modify_dxf_file(static_path, modified_path, modifications):
+def modify_dxf_file(static_path, modified_path, modifications,user_company,sheetkey):
     """ doc = ezdxf.readfile(static_path)
 
     for entity in doc.modelspace().query("DIMENSION"):
@@ -1275,19 +1275,32 @@ def modify_dxf_file(static_path, modified_path, modifications):
     # DIMENSION entities
     for entity in msp.query("DIMENSION"):
         old_text = entity.dxf.text
+        horvtype = DXF_data.objects.get(sheetkey = sheetkey, company = user_company, fieldname=old_text)
         cleaned_text = old_text.lower().strip()
         if cleaned_text in normalized_mods:
             new_text = normalized_mods[cleaned_text]
             print(f"[DIMENSION] Replacing '{old_text}' → '{new_text}'")
+            
+
             entity.dxf.text = new_text
+
+            
 
             # Optionally update style
             dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)
             if dimstyle:
                 dimstyle.dxf.dimtxt = 0.1  # Text height
                 dimstyle.dxf.dimasz = 0.1  # Arrow size
+                dimstyle.dxf.dimtih = 1
+                dimstyle.dxf.dimtoh = 0 
+
+            if horvtype.horv == "V":
+                entity.dxf.text_rotation = (entity.dxf.get('text_rotation', 0 ) + 270 ) % 360
+                print(f"the entity {new_text} rotated")
 
             entity.render()
+
+            
 
     # TEXT entities
     for entity in msp.query("TEXT"):
@@ -1298,6 +1311,7 @@ def modify_dxf_file(static_path, modified_path, modifications):
             print(f"[TEXT] Replacing '{old_text}' → '{new_text}'")
             entity.dxf.text = new_text
 
+
     # MTEXT entities
     for entity in msp.query("MTEXT"):
         old_text = entity.text
@@ -1306,6 +1320,7 @@ def modify_dxf_file(static_path, modified_path, modifications):
             new_text = normalized_mods[cleaned_text]
             print(f"[MTEXT] Replacing '{old_text}' → '{new_text}'")
             entity.text = new_text
+
 
     # ATTRIB entities (inside blocks)
     for entity in msp.query("INSERT"):
@@ -1343,7 +1358,7 @@ def process_dxf(request, aMachine_ID, category, modifications, output_filename, 
 
     if request.method == "POST":
         try:
-            modify_dxf_file(static_path, modified_path, modifications(machine))
+            modify_dxf_file(static_path, modified_path, modifications(machine),user_company,category)
 
             # Serve the modified file for download
             with open(modified_path, "rb") as dxf_file:
@@ -1398,8 +1413,16 @@ def General_DXF_ALL(request, aMachine_ID, aType):
     datas = DXF_data.objects.filter(sheetkey = sheetkey, company = user_company)
     print("Data is : ", datas)
     machine = Machine.objects.get(id=aMachine_ID)
+    """ for d in datas:
+        print(f"{d.fieldname} : {resolve_fieldvalue(machine, d.fieldvalue)}") """
+
+    model_fields = {f.verbose_name: f.name for f in Machine._meta.fields}
+
     for d in datas:
-        print(f"{d.fieldname} : {resolve_fieldvalue(machine, d.fieldvalue)}")
+        label = d.fieldvalue  # This is now assumed to be the label (verbose_name)
+        field_name = model_fields.get(label)
+        value = getattr(machine, field_name) if field_name else None
+        print(f"{d.fieldname} : {value}")
 
 
     return process_dxf(
@@ -1407,7 +1430,8 @@ def General_DXF_ALL(request, aMachine_ID, aType):
         aMachine_ID,
         sheetkey,
         lambda machine: {
-            data.fieldname : resolve_fieldvalue(machine, data.fieldvalue)
+            data.fieldname: getattr(machine, model_fields.get(data.fieldvalue))
+            if model_fields.get(data.fieldvalue) else None
             for data in datas
         },
         f"{file_name}.dxf",
@@ -1528,6 +1552,14 @@ def FullDrawing(request, aMachine_ID, aType):
         )
     
     datas = DXF_data.objects.filter(sheetkey = sheetkey, company = user_company)
+    machine = Machine.objects.get(id=aMachine_ID)
+    model_fields = {f.verbose_name: f.name for f in Machine._meta.fields}
+
+    for d in datas:
+        label = d.fieldvalue  # This is now assumed to be the label (verbose_name)
+        field_name = model_fields.get(label)
+        value = getattr(machine, field_name) if field_name else None
+        print(f"{d.fieldname} : {value}")
 
 
     return FullDrawing_process_dxf(
@@ -1535,7 +1567,8 @@ def FullDrawing(request, aMachine_ID, aType):
         aMachine_ID,
         sheetkey,
         lambda machine: {
-            data.fieldname : resolve_fieldvalue(machine, data.fieldvalue)
+            data.fieldname: getattr(machine, model_fields.get(data.fieldvalue))
+            if model_fields.get(data.fieldvalue) else None
             for data in datas
         },
         f"{file_name}.dxf",

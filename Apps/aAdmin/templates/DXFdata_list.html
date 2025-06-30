@@ -23,6 +23,9 @@
                                 {{ form.fieldvalue }}
                             </div>
                             <div class="col-md-4 mb-3">
+                                {{ form.horv }}
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 {{ form.company }}
                             </div>
                         </div>
@@ -39,6 +42,7 @@
                     <th>Sheet Key</th>
                     <th>Field Name</th>
                     <th>Field Value</th>
+                    <th>Field H or V</th>
                     <th>Company Name</th>
                     <th>Actions</th>
                 </tr>
@@ -49,6 +53,7 @@
                     <td>{{ data.sheetkey }}</td>
                     <td>{{ data.fieldname }}</td>
                     <td>{{ data.fieldvalue }}</td>
+                    <td>{{ data.horv }}</td>
                     <td>{{ data.company }}</td>
                     <td>
                         <!-- Edit button -->

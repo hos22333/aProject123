@@ -478,6 +478,11 @@ class DXF_data(models.Model):
     sheetkey = models.CharField(max_length=255)
     fieldname = models.CharField(max_length=255)
     fieldvalue = models.CharField(max_length=255)
+    HorV_CHOICES = [
+        ('H', 'H'),
+        ('V', 'V'),
+    ]
+    horv = models.CharField(max_length=10, choices=HorV_CHOICES, default= 'H')
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):

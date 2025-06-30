@@ -44,6 +44,11 @@
         </form>
         
         <h3 class="mt-4">Projects List</h3>
+        <div id="download-status" class="alert alert-info d-none" style="display: flex; align-items: center; gap: 10px;">
+            <span id="loading-spinner" class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+            <span id="loading-text"></span>
+        </div>
+
         
         <table id="sortable-table" class="table table-bordered mt-2">
             <thead>
@@ -91,7 +96,7 @@
                                 <button class="dropdown-item text-success" onclick="reviewSubmittalMachines('{{ project.id }}')">Review Submittal Machines</button>
                                 <button class="dropdown-item text-success" onclick="reviewCalculationMachines('{{ project.id }}')">Review Calculation Machines</button>
                                 <button class="saveReportsBtn dropdown-item" data-url="{% url 'save_reports' project.id %}" data-project-id="{{ project.id }}">Save Reports</button>
-                                <a href="{% url 'download_drive_project_reports' project.id %}" class="dropdown-item"> Download All Reports (ZIP) </a>
+                                <a href="{% url 'download_drive_project_reports' project.id %}" class="downloadReportsBtn dropdown-item"> Download All Reports (ZIP) </a>
                               </li>
                             </ul>
                           </div>
@@ -2431,5 +2436,62 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const statusBox = document.getElementById("download-status");
+    const spinner = document.getElementById("loading-spinner");
+    const text = document.getElementById("loading-text");
+
+    document.querySelectorAll('.downloadReportsBtn').forEach(button => {
+        button.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            const url = this.getAttribute("href");
+            const projectRow = this.closest("tr");
+            const projectName = projectRow.querySelector("td").textContent;
+
+            // Show loading message
+            spinner.classList.remove("d-none");
+            text.textContent = `Downloading reports for project: ${projectName}...`;
+            statusBox.classList.remove("d-none");
+            statusBox.classList.replace("alert-success", "alert-info");
+
+            // Trigger download via JS
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error("Download failed.");
+                    const disposition = response.headers.get('Content-Disposition');
+                    let filename = "report.zip";
+                    if (disposition && disposition.includes("filename=")) {
+                        filename = disposition
+                            .split("filename=")[1]
+                            .replace(/['"]/g, '')
+                            .trim();
+                    }
+                    return response.blob().then(blob => ({ blob, filename }));
+                })
+                .then(({ blob, filename }) => {
+                    const a = document.createElement("a");
+                    a.href = URL.createObjectURL(blob);
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+
+                    // Update status to complete
+                    spinner.classList.add("d-none");
+                    text.textContent = `Download complete for project: ${projectName}.`;
+                    statusBox.classList.replace("alert-info", "alert-success");
+                })
+                .catch(error => {
+                    spinner.classList.add("d-none");
+                    text.textContent = `Download failed for ${projectName}.`;
+                    statusBox.classList.replace("alert-info", "alert-danger");
+                });
+        });
+    });
+});
+</script>
 
 {% endblock %}

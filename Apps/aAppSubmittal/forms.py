@@ -1019,11 +1019,12 @@ class FormDataSheet_log(forms.Form):
 class DXFdataForm(forms.ModelForm):
     class Meta:
         model = DXF_data
-        fields = ['sheetkey', 'fieldname', 'fieldvalue', 'company']
+        fields = ['sheetkey', 'fieldname', 'fieldvalue', 'company', 'horv']
         widgets = {
             'sheetkey': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the machine sheetkey'}),
             'fieldname': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the field name'}),
             'fieldvalue': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the field value'}),
+            'horv': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -1034,3 +1035,4 @@ class DXFdataForm(forms.ModelForm):
         
         # Add empty label as placeholder
         self.fields['company'].empty_label = "Select a company..."
+        

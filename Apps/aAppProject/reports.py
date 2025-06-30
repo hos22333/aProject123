@@ -576,7 +576,7 @@ def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id, general_DXF_perc
     
     
     # Helper function to modify DXF files
-    def modify_saved_dxf_file(static_path, modified_path, modifications):
+    def modify_saved_dxf_file(static_path, modified_path, modifications,user_company,sheetkey):
         """ doc = ezdxf.readfile(static_path)
 
         for entity in doc.modelspace().query("DIMENSION"):
@@ -604,17 +604,25 @@ def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id, general_DXF_perc
         # DIMENSION entities
         for entity in msp.query("DIMENSION"):
             old_text = entity.dxf.text
+            horvtype = DXF_data.objects.get(sheetkey = sheetkey, company = user_company, fieldname=old_text)
             cleaned_text = old_text.lower().strip()
             if cleaned_text in normalized_mods:
                 new_text = normalized_mods[cleaned_text]
                 print(f"[DIMENSION] Replacing '{old_text}' → '{new_text}'")
                 entity.dxf.text = new_text
 
+
                 # Optionally update style
                 dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)
                 if dimstyle:
                     dimstyle.dxf.dimtxt = 0.1  # Text height
                     dimstyle.dxf.dimasz = 0.1  # Arrow size
+                    dimstyle.dxf.dimtih = 1
+                    dimstyle.dxf.dimtoh = 0 
+
+                if horvtype.horv == "V":
+                    entity.dxf.text_rotation = (entity.dxf.get('text_rotation', 0 ) + 270 ) % 360
+                    print(f"the entity {new_text} rotated")
 
                 entity.render()
 
@@ -726,7 +734,7 @@ def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id, general_DXF_perc
         machine = Machine.objects.get(id=aMachine_ID)
 
         
-        modify_saved_dxf_file(static_path, modified_path, modifications(machine))
+        modify_saved_dxf_file(static_path, modified_path, modifications(machine),user_company,category)
 
         file_name = output_filename
         mime_type = 'application/dxf'
@@ -848,7 +856,15 @@ def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id, general_DXF_perc
     project_slug = slugify(project.name)
     folder_name = slugify(f"{project_id}_{company_slug}_{project_slug}")
 
-    datas = DXF_data.objects.filter(sheetkey = sheetkey)
+    datas = DXF_data.objects.filter(sheetkey = sheetkey, company = user_company)
+    machine = Machine.objects.get(id=aMachine_ID)
+    model_fields = {f.verbose_name: f.name for f in Machine._meta.fields}
+
+    for d in datas:
+        label = d.fieldvalue  # This is now assumed to be the label (verbose_name)
+        field_name = model_fields.get(label)
+        value = getattr(machine, field_name) if field_name else None
+        print(f"{d.fieldname} : {value}")
 
 
     return process_saved_dxf(
@@ -857,7 +873,8 @@ def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id, general_DXF_perc
         sheetkey,
         project_id,
         lambda machine: {
-            data.fieldname : resolve_fieldvalue(machine, data.fieldvalue)
+            data.fieldname: getattr(machine, model_fields.get(data.fieldvalue))
+            if model_fields.get(data.fieldvalue) else None
             for data in datas
         },
         f"{file_name}.dxf",
@@ -1088,6 +1105,14 @@ def SavedFullDrawing(user, aMachine_ID, aType, project_id):
         )
 
     datas = DXF_data.objects.filter(sheetkey = sheetkey)
+    machine = Machine.objects.get(id=aMachine_ID)
+    model_fields = {f.verbose_name: f.name for f in Machine._meta.fields}
+
+    for d in datas:
+        label = d.fieldvalue  # This is now assumed to be the label (verbose_name)
+        field_name = model_fields.get(label)
+        value = getattr(machine, field_name) if field_name else None
+        print(f"{d.fieldname} : {value}")
 
 
     return SavedFullDrawing_process_dxf(
@@ -1096,7 +1121,8 @@ def SavedFullDrawing(user, aMachine_ID, aType, project_id):
         sheetkey,
         project_id,
         lambda machine: {
-            data.fieldname : resolve_fieldvalue(machine, data.fieldvalue)
+            data.fieldname: getattr(machine, model_fields.get(data.fieldvalue))
+            if model_fields.get(data.fieldvalue) else None
             for data in datas
         },
         f"{file_name}.dxf",

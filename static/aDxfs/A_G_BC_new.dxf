@@ -489,7 +489,7 @@ $SKPOLY
   9
 $TDCREATE
  40
-2460854.8419212964
+2460857.5161226853
   9
 $TDUCREATE
  40
@@ -497,7 +497,7 @@ $TDUCREATE
   9
 $TDUPDATE
  40
-2460854.8419212964
+2460857.5161226853
   9
 $TDUUPDATE
  40
@@ -933,7 +933,7 @@ $FINGERPRINTGUID
   9
 $VERSIONGUID
   2
-{5E580271-F3D4-42A4-ABBC-7A54A3019F62}
+{64C9186A-9679-48EE-8D0F-1CAF8E13A0F2}
   9
 $EXTNAMES
 290
@@ -1331,9 +1331,9 @@ ISM
   0
 CLASS
   1
-LAYOUT
+ACDBPLACEHOLDER
   2
-AcDbLayout
+AcDbPlaceHolder
   3
 ObjectDBX Classes
  90
@@ -1347,9 +1347,9 @@ ObjectDBX Classes
   0
 CLASS
   1
-ACDBPLACEHOLDER
+LAYOUT
   2
-AcDbPlaceHolder
+AcDbLayout
   3
 ObjectDBX Classes
  90
@@ -1985,7 +1985,7 @@ Standard
  72
 0
  73
-0
+1
  74
 0
  75
@@ -3793,7 +3793,7 @@ AcDbMText
   1
 123123 approx.
  50
-90.0
+270.0
   0
 POINT
   5
@@ -4137,7 +4137,7 @@ AcDbMText
   1
 213123
  50
-90.0
+270.0
   0
 POINT
   5
@@ -4451,7 +4451,7 @@ AcDbMText
   1
 213123
  50
-90.0
+270.0
   0
 POINT
   5
@@ -388512,6 +388512,8 @@ Standard
 0
   1
 123123 approx.
+ 53
+270.0
 100
 AcDbAlignedDimension
  13
@@ -388576,6 +388578,8 @@ Standard
 0
   1
 213123
+ 53
+270.0
 100
 AcDbAlignedDimension
  13
@@ -388640,6 +388644,8 @@ Standard
 0
   1
 213123
+ 53
+270.0
 100
 AcDbAlignedDimension
  13
@@ -403237,7 +403243,7 @@ DictionaryVariables
 280
 0
   1
-1.4.1 @ 2025-06-27T17:12:22.518824+00:00
+1.4.1 @ 2025-06-30T09:23:13.926585+00:00
   0
 ENDSEC
   0
