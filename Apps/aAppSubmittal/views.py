@@ -366,100 +366,7 @@ def SavePageDataSheet(request):
     
     
 
-    """ # ============================================
-    # 🔵 HANDLE LOAD FROM modelcalc (preview only)
-    # ============================================
-    if request.method == "POST" and 'loadcalculationdataname' in request.POST:
-        machineShow = "Yes"
-        selected_project_id = request.POST.get("project")
-        keyvalue = sheet_key[:-2] 
-        print("Key Value : ",keyvalue)
-
-        
-        highlight_fields = []
-        form_data = request.POST.copy()
-        if selected_project_id:
-            print("selected_project_id : ", selected_project_id)
-            form_data["project"] = selected_project_id
-
-        if sheet_key and selected_project_id:
-            calc_instance = modelcalc.objects.filter(project_id=selected_project_id, company=user_company, oSec00Field03=sheet_key).first()
-            if calc_instance:
-                mappings = DataTransfer.objects.filter(keyValue=keyvalue, company=user_company)
-                print("mappings : ", mappings)
-                for mapping in mappings:
-                    calc_field = mapping.CalculationField
-                    print("calc Data : ", getattr(calc_instance, calc_field))
-                    form_field = mapping.SubmittalField
-                    if hasattr(calc_instance, calc_field):
-                        form_data[form_field] = getattr(calc_instance, calc_field)
-                        highlight_fields.append(form_field)
-                    
-                
-                
-        print("highlight_fields : ",highlight_fields)
-        form = FormDataSheet(initial=form_data, form_type=form_type)
-
-        #######################################
-        print("#######################")
-        
-
-        # Initialize section show values
-        section_show = {f"aSection{str(s).zfill(2)}Show": "Yes" for s in range(1, 11)}
-
-        # Initialize visibility dictionaries for each section's fields
-        field_show = {
-            f"aSection{str(s).zfill(2)}Field{str(f).zfill(2)}Show": "Yes"
-            for s in range(1, 11)
-            for f in range(1, 21)
-        }
-
-        # Print initial values for debugging
-        for s in range(1, 11):
-            field_name = f"oSec{str(s).zfill(2)}Field01"
-            print(form.fields[field_name].initial)
-
-        # Apply section visibility conditions
-        for s in range(1, 11):
-            field_name = f"oSec{str(s).zfill(2)}Field01"
-            if form.fields[field_name].initial in ["oooo", None]:
-                section_show[f"aSection{str(s).zfill(2)}Show"] = "Hide"
-
-        # Print section visibility for debugging
-        for s in range(1, 11):
-            print(section_show[f"aSection{str(s).zfill(2)}Show"])
-
-        # Apply field visibility in pairs (fields 1&2, 3&4, ..., 19&20)
-        for s in range(1, 11):
-            for i in range(0, 10):
-                idx1 = str(i*2+1).zfill(2)
-                idx2 = str(i*2+2).zfill(2)
-                field_name = f"oSec{str(s).zfill(2)}Field{idx1}"
-                if form.fields[field_name].initial in ["oooo", None, ""]:
-                    field_show[f"aSection{str(s).zfill(2)}Field{idx1}Show"] = "Hide"
-                    field_show[f"aSection{str(s).zfill(2)}Field{idx2}Show"] = "Hide"
-
-        # Merge section_show and field_show into context
-        context = {
-            "form": form,
-            "machines": machines,
-            "projects": projects,
-            "aMachineName": aMachineName,
-            "user_company": user_company,
-            "sheet_key": sheet_key,
-            "sheet_keys": sheet_keys,
-            "machineShow": machineShow,
-            **section_show,
-            **field_show,
-            "highlight_fields": highlight_fields,
-        }
-
-        # Render template
-        return render(request, "PageDataSheet.html", context) """
-
-
     
-
     # =====================================
     # ✅ HANDLE SAVE TO DATABASE
     # =====================================
@@ -1247,22 +1154,6 @@ def get_dxf_paths(user_company, category, aType):
 
 # Helper function to modify DXF files
 def modify_dxf_file(static_path, modified_path, modifications,user_company,sheetkey):
-    """ doc = ezdxf.readfile(static_path)
-
-    for entity in doc.modelspace().query("DIMENSION"):
-        if entity.dxf.text in modifications:
-            entity.dxf.text = modifications[entity.dxf.text]
-
-        # Update text height and arrow size
-        dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)
-        if dimstyle:
-            dimstyle.dxf.dimtxt = 0.1  # Set text height
-            dimstyle.dxf.dimasz = 0.1  # Set arrow size
-
-        entity.render()
-
-    doc.saveas(modified_path) """
-
 
     # Normalize keys in modifications dict for safe matching
     normalized_mods = {
@@ -1285,10 +1176,7 @@ def modify_dxf_file(static_path, modified_path, modifications,user_company,sheet
             new_text = normalized_mods[cleaned_text]
             print(f"[DIMENSION] Replacing '{old_text}' → '{new_text}'")
             
-
             entity.dxf.text = new_text
-
-            
 
             # Optionally update style
             dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)

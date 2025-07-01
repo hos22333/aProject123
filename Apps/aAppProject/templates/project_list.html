@@ -2385,27 +2385,7 @@ function pollReportProgress(projectId) {
     }, 2000); // Every 2s
 }
 
-/* function updateProgress(projectId) {
-    fetch(`/Project/progress/${projectId}/`)  
-        .then(response => response.json())
-        .then(data => {
-            const progressStatus = document.getElementById(`progress-status-${projectId}`);
-            const progressBar = document.getElementById(`progress-bar-${projectId}`);
 
-            if (data.percent === -1) {
-                progressStatus.innerText = "❌ Timeout Error";
-                progressBar.value = 0;
-                progressBar.classList.add("bg-danger");
-            } else if (data.percent === 100) {
-                progressStatus.innerText = "✅ Complete";
-                progressBar.value = 100;
-                progressBar.classList.remove("bg-danger");
-            } else {
-                progressStatus.innerText = `${data.status}`;
-                progressBar.value = data.percent;
-            }
-        });
-} */
 
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".saveReportsBtn").forEach(button => {
@@ -2453,6 +2433,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Show loading message
             spinner.classList.remove("d-none");
             text.textContent = `Downloading reports for project: ${projectName}...`;
+            text.style.color = "blue";
             statusBox.classList.remove("d-none");
             statusBox.classList.replace("alert-success", "alert-info");
 
@@ -2482,11 +2463,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Update status to complete
                     spinner.classList.add("d-none");
                     text.textContent = `Download complete for project: ${projectName}.`;
+                    text.style.color = "green";
                     statusBox.classList.replace("alert-info", "alert-success");
                 })
                 .catch(error => {
                     spinner.classList.add("d-none");
                     text.textContent = `Download failed for ${projectName}.`;
+                    text.style.color = "red";
                     statusBox.classList.replace("alert-info", "alert-danger");
                 });
         });

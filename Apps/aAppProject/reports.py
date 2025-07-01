@@ -577,21 +577,6 @@ def General_saved_DXF_ALL(user, aMachine_ID, aType, project_id, general_DXF_perc
     
     # Helper function to modify DXF files
     def modify_saved_dxf_file(static_path, modified_path, modifications,user_company,sheetkey):
-        """ doc = ezdxf.readfile(static_path)
-
-        for entity in doc.modelspace().query("DIMENSION"):
-            if entity.dxf.text in modifications:
-                entity.dxf.text = modifications[entity.dxf.text]
-
-            # Update text height and arrow size
-            dimstyle = doc.dimstyles.get(entity.dxf.dimstyle)
-            if dimstyle:
-                dimstyle.dxf.dimtxt = 0.1  # Set text height
-                dimstyle.dxf.dimasz = 0.1  # Set arrow size
-
-            entity.render()
-
-        doc.saveas(modified_path) """
 
         # Normalize keys in modifications dict for safe matching
         normalized_mods = {
