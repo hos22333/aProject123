@@ -1123,70 +1123,14 @@ def CalculationSheet_get_data(request, machine_id):
     
     
     data = {
-        "project": machine.project.name if machine.project else "No Project",
-        "oSec01Field01": machine.oSec01Field01,
-        "oSec01Field02": machine.oSec01Field02,
-        "oSec01Field03": machine.oSec01Field03,
-        "oSec01Field04": machine.oSec01Field04,
-        "oSec01Field05": machine.oSec01Field05,
-        "oSec01Field06": machine.oSec01Field06,
-        "oSec01Field07": machine.oSec01Field07,
-        "oSec01Field08": machine.oSec01Field08,
-        "oSec01Field09": machine.oSec01Field09,
-        "oSec01Field10": machine.oSec01Field10,        
-        "oSec01Field11": machine.oSec01Field11,
-        "oSec01Field12": machine.oSec01Field12,
-        "oSec01Field13": machine.oSec01Field13,
-        "oSec01Field14": machine.oSec01Field14,
-        "oSec01Field15": machine.oSec01Field15,
-        "oSec01Field16": machine.oSec01Field16,
-        "oSec01Field17": machine.oSec01Field17,
-        "oSec01Field18": machine.oSec01Field18,
-        "oSec01Field19": machine.oSec01Field19,
-        "oSec01Field20": machine.oSec01Field20,
-        "oSec01Field21": machine.oSec01Field21,
-        "oSec01Field22": machine.oSec01Field22,
-        "oSec01Field23": machine.oSec01Field23,
-        "oSec01Field24": machine.oSec01Field24,
-        "oSec01Field25": machine.oSec01Field25,
-        "oSec01Field26": machine.oSec01Field26,
-        "oSec01Field27": machine.oSec01Field27,
-        "oSec01Field28": machine.oSec01Field28,
-        "oSec01Field29": machine.oSec01Field29,
-        "oSec01Field30": machine.oSec01Field30,
-        
-        "oSec02Field01": machine.oSec02Field01,
-        "oSec02Field02": machine.oSec02Field02,
-        "oSec02Field03": machine.oSec02Field03,
-        "oSec02Field04": machine.oSec02Field04,
-        "oSec02Field05": machine.oSec02Field05,
-        "oSec02Field06": machine.oSec02Field06,
-        "oSec02Field07": machine.oSec02Field07,
-        "oSec02Field08": machine.oSec02Field08,
-        "oSec02Field09": machine.oSec02Field09,
-        "oSec02Field10": machine.oSec02Field10,        
-        "oSec02Field11": machine.oSec02Field11,
-        "oSec02Field12": machine.oSec02Field12,
-        "oSec02Field13": machine.oSec02Field13,
-        "oSec02Field14": machine.oSec02Field14,
-        "oSec02Field15": machine.oSec02Field15,
-        "oSec02Field16": machine.oSec02Field16,
-        "oSec02Field17": machine.oSec02Field17,
-        "oSec02Field18": machine.oSec02Field18,
-        "oSec02Field19": machine.oSec02Field19,
-        "oSec02Field20": machine.oSec02Field20,
-        "oSec02Field21": machine.oSec02Field21,
-        "oSec02Field22": machine.oSec02Field22,
-        "oSec02Field23": machine.oSec02Field23,
-        "oSec02Field24": machine.oSec02Field24,
-        "oSec02Field25": machine.oSec02Field25,
-        "oSec02Field26": machine.oSec02Field26,
-        "oSec02Field27": machine.oSec02Field27,
-        "oSec02Field28": machine.oSec02Field28,
-        "oSec02Field29": machine.oSec02Field29,
-        "oSec02Field30": machine.oSec02Field30,
-        
+        "project": machine.project.name if machine.project else "No Project"
     }
+
+    # Loop for oSec01Field01–30 and oSec02Field01–30
+    for sec in range(1, 3):
+        for i in range(1, 31):
+            field_name = f"oSec{str(sec).zfill(2)}Field{str(i).zfill(2)}"
+            data[field_name] = getattr(machine, field_name, "")
 
     return JsonResponse(data)
 
