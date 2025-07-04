@@ -6,13 +6,14 @@ import ezdxf
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import shutil
 
 
 from django.shortcuts import render
 from config import settings
 from .models import APP_Project
 from .models import ReportProgress
-from .drive import create_folder, service, check_folder_exists, get_folder_id_by_name, upload_files, upload_files_directly
+from .drive import create_folder, service, check_folder_exists, get_folder_id_by_name, upload_files, upload_files_directly, get_file_ids_in_folder, download_file_as_bytes, get_file_id_by_name_from_folder
 from Apps.aAppMechanical.models import UserCompany
 from Apps.aAppSubmittal.models import Machine
 from Apps.aAppSubmittal.models import AddMachine
@@ -1556,7 +1557,8 @@ def save_word_pdf_calculation_report(user, project_id, logo, color):
     except APP_Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
 
-        
+    
+
 def save_all_pdf_report(user, project_id, logo):
     
     # Define a custom class for the PDF layout
@@ -1819,7 +1821,40 @@ def save_all_pdf_report(user, project_id, logo):
                 for page in appendix.pages:
                     output.add_page(page)
 
+        if company_slug == "aaaa":
+            folder_exist, folder_data = check_folder_exists(service, "aReports")
+            aReport_folder_id = folder_data['id']
+            print("folder_exist:",folder_exist)
+            print("aReport_folder_id:",aReport_folder_id)
+            company_folder_exist, company_folder_data = check_folder_exists(service, company_name, aReport_folder_id)
+            company_folder_id = company_folder_data['id']
+            print("company_folder_exist:",company_folder_exist)
+            print("company_folder_id:",company_folder_id)
+            project_folder_exist, project_folder_data = check_folder_exists(service, folder_name, company_folder_id)
+            project_folder_id = project_folder_data['id']
+            print("project_folder_exist:",project_folder_exist)
+            print("project_folder_exist:",project_folder_exist)
 
+            for i in range(1, 6):
+                cost_file_name = f'Cost{i}_pdf.pdf'
+                cost_file_id = get_file_id_by_name_from_folder(service, project_folder_id, cost_file_name)
+
+                if cost_file_id:
+                    local_cost_path = os.path.join(project_folder, cost_file_name)
+                    if not os.path.exists(local_cost_path):
+                        try:
+                            file_bytes = download_file_as_bytes(service, cost_file_id)
+                            if file_bytes:
+                                with open(local_cost_path, "wb") as f:
+                                    f.write(file_bytes)
+                                print(f"Downloaded: {cost_file_name}")
+                            else:
+                                print(f"Download failed: No data for {cost_file_name}")
+                        except Exception as e:
+                            print(f"Error downloading {cost_file_name}: {e}")
+                else:
+                    print(f"Missing in Drive: {cost_file_name}")
+        
         if company_slug == "aaaa":
             for i in range(1 , 6):
                 emptyappendix = None
@@ -1830,6 +1865,24 @@ def save_all_pdf_report(user, project_id, logo):
                 if emptyappendix != None:
                     for page in emptyappendix.pages:
                         output.add_page(page)
+        
+        """ if company_slug == "aaaa":
+            folder_id = get_folder_id_by_name(service, "aReports")
+            company_folder_id = get_folder_id_by_name(service, company_name, folder_id)
+            project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
+
+            drive_files = get_file_ids_in_folder(service, project_folder_id)  # Returns list of dicts with name/id
+
+            for i in range(1, 6):
+                cost_file_name = f"Cost{i}_pdf.pdf"
+
+                # Search for file in Drive
+                matching_file = next((f for f in drive_files if f[0] == cost_file_name), None)
+                if matching_file:
+                    file_bytes = download_file_as_bytes(service, matching_file[1])
+                    pdf_reader = PdfReader(file_bytes)
+                    for page in pdf_reader.pages:
+                        output.add_page(page) """
 
         # Save the new PDF
         with open(pdf_file_path, "wb") as f:
@@ -1872,6 +1925,14 @@ def save_all_pdf_report(user, project_id, logo):
             project_folder_id = get_folder_id_by_name(service, folder_name, company_folder_id)
             upload_files(service,pdf_file_path, file_name, mime_type, project_folder_id)
 
+         # Upload complete, now delete local folder
+        try:
+            if os.path.exists(project_folder):
+                shutil.rmtree(project_folder)
+                print(f"Deleted local folder: {project_folder}")
+        except Exception as e:
+            print(f"Error deleting local folder: {e}")
+
         return HttpResponse(status=204)
         
 
@@ -1879,4 +1940,3 @@ def save_all_pdf_report(user, project_id, logo):
 
     except APP_Project.DoesNotExist:
         return HttpResponse("Project not found", status=404)
-

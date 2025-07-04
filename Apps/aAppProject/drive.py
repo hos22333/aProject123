@@ -1,5 +1,6 @@
 import os
 import io
+from io import BytesIO
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload, MediaIoBaseUpload
@@ -77,6 +78,17 @@ def get_file_id_by_name(service, file_name):
     if files:
         return files[0]['id']
     print(f"No file found with name: {file_name}")
+    return None
+
+
+def get_file_id_by_name_from_folder(service, folder_id, filename):
+    results = service.files().list(
+        q=f"'{folder_id}' in parents and name='{filename}' and trashed = false",
+        fields="files(id, name)"
+    ).execute()
+    files = results.get('files', [])
+    if files:
+        return files[0]['id']
     return None
 
 
@@ -200,3 +212,24 @@ def upload_files_directly(service, file_obj, file_name, mime_type, folder_id=Non
             print(f"Upload progress: {int(status.progress() * 100)}%")
 
     return response.get('id')
+
+def list_drive_files(service, parent_folder_id, name_contains=None, mime_type=None):
+    query = f"'{parent_folder_id}' in parents and trashed = false"
+    if name_contains:
+        query += f" and name contains '{name_contains}'"
+    if mime_type:
+        query += f" and mimeType = '{mime_type}'"
+
+    results = service.files().list(q=query, fields="files(id, name)").execute()
+    return results.get('files', [])
+
+
+def download_file_from_drive(service, file_id):
+    request = service.files().get_media(fileId=file_id)
+    fh = BytesIO()
+    downloader = MediaIoBaseDownload(fh, request)
+    done = False
+    while not done:
+        status, done = downloader.next_chunk()
+    fh.seek(0)
+    return fh.read()
